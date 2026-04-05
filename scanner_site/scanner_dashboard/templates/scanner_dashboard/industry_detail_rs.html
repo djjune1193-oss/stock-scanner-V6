@@ -1,0 +1,168 @@
+
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ industry }} - Ticker Relative Strength</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f8;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+h2 {
+    margin: 0;
+}
+
+a.back {
+    text-decoration: none;
+    padding: 8px 12px;
+    background: #6b7280;
+    color: white;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* TABLE */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: #111827;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+td {
+    padding: 8px;
+    text-align: center;
+}
+
+tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+tbody tr:hover {
+    background: #e5e7eb;
+}
+
+/* RS SCORE COLORS */
+.strong { background: #065f46; color: white; }
+.good { background: #d1fae5; }
+.weak { background: #fef3c7; }
+.bad { background: #fee2e2; }
+
+.ticker {
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>📊 {{ industry }} - Relative Strength (Tickers)</h2>
+        <a class="back" href="{% url 'industry_rs' %}">← Back</a>
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>RS_7</th>
+                    <th>RS_21</th>
+                    <th>RS_50</th>
+                    <th>RS_100</th>
+                    <th>RS_200</th>
+                    <th>RS_SCORE</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for row in rows %}
+            <tr>
+
+                <!-- TICKER -->
+                <td class="ticker">
+                    <a href="{% url 'equity_chart' row.TICKER %}">
+                        {{ row.TICKER }}
+                    </a>
+                </td>
+
+                <!-- RS_7 -->
+                <td>{{ row.RS_7|floatformat:2 }}</td>
+
+                <!-- RS_21 -->
+                <td>{{ row.RS_21|floatformat:2 }}</td>
+
+                <!-- RS_50 -->
+                <td>{{ row.RS_50|floatformat:2 }}</td>
+
+                <!-- RS_100 -->
+                <td>{{ row.RS_100|floatformat:2 }}</td>
+
+                <!-- RS_200 -->
+                <td>{{ row.RS_200|floatformat:2 }}</td>
+
+                <!-- SCORE -->
+                <td
+                    {% if row.RS_SCORE > 1.2 %}
+                        class="strong"
+                    {% elif row.RS_SCORE > 1 %}
+                        class="good"
+                    {% elif row.RS_SCORE > 0.9 %}
+                        class="weak"
+                    {% else %}
+                        class="bad"
+                    {% endif %}
+                >
+                    {{ row.RS_SCORE|floatformat:2 }}
+                </td>
+
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

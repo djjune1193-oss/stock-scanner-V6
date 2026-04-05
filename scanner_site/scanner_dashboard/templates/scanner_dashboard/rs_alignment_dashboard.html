@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RS Alignment</title>
+
+    <style>
+        body {
+            margin:0;
+            font-family:Arial;
+            background:#f4f6f8;
+        }
+
+        .container {
+            max-width:1300px;
+            margin:20px auto;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+        }
+
+        .btn-back {
+            padding:8px 12px;
+            background:#6c757d;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:13px;
+        }
+
+        .buttons {
+            margin-bottom:15px;
+        }
+
+        .buttons a {
+            padding:6px 10px;
+            margin-right:5px;
+            background:#e5e7eb;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:12px;
+        }
+
+        .buttons a.active {
+            background:#2563eb;
+            color:white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>📊 RS Alignment</h2>
+
+        <!-- BACK BUTTON -->
+        <a href="{% url 'home' %}" class="btn-back">← Home</a>
+    </div>
+
+    <!-- PERIOD SELECT -->
+    <div class="buttons">
+        <a href="?period=7" class="{% if period == 7 %}active{% endif %}">7D</a>
+        <a href="?period=21" class="{% if period == 21 %}active{% endif %}">21D</a>
+        <a href="?period=50" class="{% if period == 50 %}active{% endif %}">50D</a>
+        <a href="?period=100" class="{% if period == 100 %}active{% endif %}">100D</a>
+        <a href="?period=200" class="{% if period == 200 %}active{% endif %}">200D</a>
+    </div>
+
+    <!-- CHART -->
+    <div>
+        {{ chart|safe }}
+    </div>
+
+</div>
+
+</body>
+</html>

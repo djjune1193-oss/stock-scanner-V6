@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Industry Weekly Performance</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#f4f6f8;
+}
+
+.container {
+    max-width:1150px;
+    margin:30px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.header h2 {
+    margin:0;
+}
+
+/* BACK BUTTON */
+.btn-back {
+    padding:8px 12px;
+    background:#6c757d;
+    color:white;
+    text-decoration:none;
+    border-radius:6px;
+    font-size:13px;
+}
+
+.btn-back:hover {
+    background:#5a6268;
+}
+
+/* TABLE */
+.table-container {
+    overflow:auto;
+    max-height:75vh;
+    border-radius:10px;
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+/* HEADER */
+thead th {
+    position:sticky;
+    top:0;
+    background:#1f2937;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+/* CELLS */
+td {
+    padding:8px;
+    text-align:center;
+}
+
+/* ROW STYLING */
+tbody tr:nth-child(even) {
+    background:#f9fafb;
+}
+
+tbody tr:hover {
+    background:#e5e7eb;
+}
+
+/* PERFORMANCE COLORS */
+.strong { background:#065f46; color:white; }
+.good { background:#d1fae5; }
+.weak { background:#fef3c7; }
+.bad { background:#fee2e2; }
+
+/* VOLUME SPIKE */
+.spike { background:#2563eb; color:white; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>📊 {{ industry }} - Weekly Performance</h2>
+        <a href="{% url 'industry_weekly' %}" class="btn-back">← Back</a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Return (%)</th>
+                    <th>Current Vol</th>
+                    <th>Prev Vol</th>
+                    <th>Δ Volume</th>
+                    <th>Δ %</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for row in rows %}
+            <tr>
+
+                <!-- TICKER -->
+                <td style="font-weight:bold;">
+                    {{ row.TICKER }}
+                </td>
+
+                <!-- RETURN -->
+                <td class="
+                    {% if row.weekly_return > 5 %} strong
+                    {% elif row.weekly_return > 0 %} good
+                    {% elif row.weekly_return > -3 %} weak
+                    {% else %} bad
+                    {% endif %}
+                ">
+                    {{ row.weekly_return|floatformat:2 }}
+                </td>
+
+                <!-- CURRENT VOLUME -->
+                <td>
+                    {{ row.current_volume|floatformat:0 }}
+                </td>
+
+                <!-- PREVIOUS VOLUME -->
+                <td>
+                    {{ row.prev_volume|floatformat:0 }}
+                </td>
+
+                <!-- VOLUME CHANGE -->
+                <td class="
+                    {% if row.volume_change > 0 %} good
+                    {% else %} bad
+                    {% endif %}
+                ">
+                    {{ row.volume_change|floatformat:0 }}
+                </td>
+
+                <!-- VOLUME % CHANGE -->
+                <td class="
+                    {% if row.volume_pct_change > 50 %} spike
+                    {% elif row.volume_pct_change > 0 %} good
+                    {% else %} bad
+                    {% endif %}
+                ">
+                    {{ row.volume_pct_change|floatformat:1 }}%
+                </td>
+
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

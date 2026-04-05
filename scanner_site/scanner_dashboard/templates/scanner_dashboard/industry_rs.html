@@ -1,0 +1,180 @@
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Industry Relative Strength</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#f4f6f8;
+}
+
+.container {
+    max-width:1200px;
+    margin:30px auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.header h2 {
+    margin:0;
+}
+
+.btn-back {
+    padding:8px 12px;
+    background:#6c757d;
+    color:white;
+    text-decoration:none;
+    border-radius:6px;
+    font-size:13px;
+}
+
+/* TABLE */
+.table-container {
+    overflow:auto;
+    max-height:75vh;
+    border-radius:10px;
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+thead th {
+    position:sticky;
+    top:0;
+    background:#1f2937;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+td {
+    padding:8px;
+    text-align:center;
+}
+
+tbody tr:nth-child(even) {
+    background:#f9fafb;
+}
+
+tbody tr:hover {
+    background:#e5e7eb;
+}
+
+/* SCORE COLORS */
+.strong { background:#065f46; color:white; }
+.good { background:#d1fae5; }
+.weak { background:#fef3c7; }
+.bad { background:#fee2e2; }
+
+.industry {
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>📊 Industry Relative Strength (Ranked)</h2>
+        <a href="{% url 'home' %}" class="btn-back">← Home</a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+
+        <table>
+
+            <!-- HEADER -->
+            <thead>
+                <tr>
+                    {% for col in columns %}
+                        <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <!-- BODY -->
+            <tbody>
+
+            {% for row in rows %}
+            <tr>
+
+                {% for col in columns %}
+
+                    {% if col == "Industry" %}
+
+                        <td class="industry">
+                            <a href="{% url 'industry_detail' row.Industry|urlencode %}"
+                               style="text-decoration:none; color:#2563eb;">
+                                {{ row.Industry }}
+                            </a>
+                        </td>
+
+                    {% elif col == "TICKER" %}
+
+                        <td class="industry">
+                            <a href="{% url 'equity_chart' row.TICKER %}"
+                               style="text-decoration:none;">
+                                {{ row.TICKER }}
+                            </a>
+                        </td>
+
+                    {% elif col == "RS_SCORE" %}
+
+                        <td
+                            {% if row.RS_SCORE > 1.2 %}
+                                class="strong"
+                            {% elif row.RS_SCORE > 1 %}
+                                class="good"
+                            {% elif row.RS_SCORE > 0.9 %}
+                                class="weak"
+                            {% else %}
+                                class="bad"
+                            {% endif %}
+                        >
+                            {{ row.RS_SCORE|floatformat:2 }}
+                        </td>
+
+                    {% else %}
+
+                        <td>
+                            {{ row|get_item:col|floatformat:2 }}
+                        </td>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

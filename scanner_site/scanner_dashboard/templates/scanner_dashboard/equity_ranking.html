@@ -1,0 +1,138 @@
+<style>
+    /* Table container for scrolling if needed */
+    .equity-table-container {
+        overflow-x: auto;
+        margin: 20px 0;
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    /* Base table styles */
+    table.equity-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px; /* space from back button */
+    }
+
+    /* Header styles */
+    table.equity-table thead {
+        background-color: #1f2937; /* Dark gray */
+        color: #f9fafb; /* Light text */
+    }
+
+    table.equity-table th, table.equity-table td {
+        padding: 12px 16px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    table.equity-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Alternating row colors */
+    table.equity-table tbody tr:nth-child(even) {
+        background-color: #f3f4f6; /* Light gray */
+    }
+
+    /* Row hover effect */
+    table.equity-table tbody tr:hover {
+        background-color: #e5e7eb; /* Slightly darker gray */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    /* Numeric alignment */
+    table.equity-table td.numeric {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Back button */
+    .btn-back {
+        display: inline-block;
+        margin-bottom: 10px; /* space before table */
+        padding: 8px 14px;
+        background-color: #e5e7eb;
+        color: #111827;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .btn-back:hover {
+        background-color: #d1d5db;
+    }
+
+    /* Arrows for positions climbed */
+    .arrow-up {
+        color: green;
+        margin-left: 5px;
+        font-weight: bold;
+    }
+
+    .arrow-down {
+        color: red;
+        margin-left: 5px;
+        font-weight: bold;
+    }
+
+    .ticker-link {
+   	 color: #1e40af;
+    	text-decoration: none;
+    	font-weight: 600;
+    }
+
+.ticker-link:hover {
+    text-decoration: underline;
+}
+</style>
+
+<div class="equity-table-container">
+    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+
+    <table class="equity-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Ticker</th>
+                <th>Cumulative Normalized Return</th>
+                <th>Positions Climbed (7d)</th>
+                <th>Positions Climbed (21d)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ranking_list %}
+            <tr>
+                <td class="numeric">{{ item.Rank|floatformat:0 }}</td>
+                <td>
+    		<a href="{% url 'equity_chart' item.Ticker %}" target="_blank" class="ticker-link">
+        	{{ item.Ticker }}
+    		</a>
+		</td>
+                <td class="numeric">{{ item.Cumulative_Return|floatformat:4 }}</td>
+                <td class="numeric">
+                    {{ item.Pos_Climbed_7d|floatformat:0 }}
+                    {% if item.Pos_Climbed_7d > 0 %}
+                        <span class="arrow-up">▲</span>
+                    {% elif item.Pos_Climbed_7d < 0 %}
+                        <span class="arrow-down">▼</span>
+                    {% endif %}
+                </td>
+                <td class="numeric">
+                    {{ item.Pos_Climbed_21d|floatformat:0 }}
+                    {% if item.Pos_Climbed_21d > 0 %}
+                        <span class="arrow-up">▲</span>
+                    {% elif item.Pos_Climbed_21d < 0 %}
+                        <span class="arrow-down">▼</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

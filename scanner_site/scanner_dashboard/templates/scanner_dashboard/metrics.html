@@ -1,0 +1,195 @@
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Metrics</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f4f6f8;
+        }
+
+        /* Sticky header */
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #f1f1f1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* table container */
+        #tableContainer {
+            overflow:auto;
+            max-height:80vh;
+            background:white;
+            border-radius:10px;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            min-width:1600px;
+            width:100%;
+            border-collapse:collapse;
+            font-size:12px;
+        }
+
+        td, th {
+            padding:8px;
+            text-align:center;
+            white-space:nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background:#f9f9f9;
+        }
+
+        tbody tr:hover {
+            background:#eaf3ff;
+        }
+
+        a {
+            text-decoration:none;
+            color:#007bff;
+        }
+
+        /* BACK BUTTON */
+        .btn {
+            padding:8px 12px;
+            background:#6c757d;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:13px;
+        }
+
+        .btn:hover {
+            background:#5a6268;
+        }
+
+        .search-box input {
+            padding:8px;
+            border-radius:6px;
+            border:1px solid #ccc;
+        }
+
+        .search-box button {
+            padding:8px 12px;
+            background:#007bff;
+            color:white;
+            border:none;
+            border-radius:6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div style="display:flex; justify-content:space-between; align-items:center; margin:15px;">
+
+    <h2 style="margin:0;">📈 Metrics Dashboard</h2>
+
+    <div style="display:flex; gap:10px; align-items:center;">
+
+        <a href="/" class="btn">← Back Home</a>
+
+        <form method="GET" class="search-box">
+            <input type="text"
+                   name="search"
+                   value="{{ search_query }}"
+                   placeholder="Search Ticker...">
+
+            <button type="submit">Search</button>
+        </form>
+
+    </div>
+</div>
+
+<!-- TABLE -->
+<div id="tableContainer">
+
+    <table>
+
+        <thead>
+            <tr>
+                {% for col in columns %}
+                <th>
+                    <a href="?sort={{ col }}">
+                        {{ col }} ⬇
+                    </a>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for row in rows %}
+
+            <tr id="row-{{ row.TICKER }}">
+
+                {% for col in columns %}
+
+                    {% if col == "TICKER" %}
+                    <td style="font-weight:bold;">
+                        <a href="{% url 'equity_chart' row.TICKER %}" target="_blank">
+                            {{ row.TICKER }}
+                        </a>
+                    </td>
+
+                    {% else %}
+                    <td>
+                        {{ row|get_item:col }}
+                    </td>
+                    {% endif %}
+
+                {% endfor %}
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
+
+<!-- ================= JS ================= -->
+
+<script>
+function focusTickerRow(ticker) {
+    if (!ticker) return;
+
+    ticker = ticker.toUpperCase().trim();
+
+    const row = document.getElementById("row-" + ticker);
+
+    if (!row) return;
+
+    const container = document.getElementById("tableContainer");
+
+    container.scrollTo({
+        top: row.offsetTop - 200,
+        behavior: "smooth"
+    });
+
+    row.style.backgroundColor = "#fff3cd";
+}
+</script>
+
+<script>
+const searchTicker = "{{ search_query|default:'' }}";
+
+if (searchTicker) {
+    window.onload = function () {
+        focusTickerRow(searchTicker);
+    }
+}
+</script>
+
+</body>
+</html>

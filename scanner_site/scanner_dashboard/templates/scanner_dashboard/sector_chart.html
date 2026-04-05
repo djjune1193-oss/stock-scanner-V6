@@ -1,0 +1,33 @@
+<style>
+
+  .btn-back {
+    padding: 8px 14px;
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .btn-back:hover {
+    background-color: #d1d5db;
+  }
+
+  .chart-wrapper {
+    margin-top: 30px;   /* space between header and chart */
+  }
+
+</style>
+
+<div class="scanner-container">
+
+  <div class="scanner-header">
+    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+  </div>
+
+  <div class="chart-wrapper">
+    {{ chart|safe }}
+  </div>
+
+</div>

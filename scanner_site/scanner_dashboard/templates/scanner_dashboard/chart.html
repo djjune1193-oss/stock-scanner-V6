@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ ticker }} Chart</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    #chart {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="chart"></div>
+
+<script>
+  const dates = {{ dates|safe }};
+  const open = {{ open|safe }};
+  const high = {{ high|safe }};
+  const low = {{ low|safe }};
+  const close = {{ close|safe }};
+  const volume = {{ volume|safe }};
+
+  const price = {
+    x: dates,
+    open: open,
+    high: high,
+    low: low,
+    close: close,
+    type: "candlestick",
+    name: "{{ ticker }}",
+    increasing: { line: { color: "#22c55e" } },
+    decreasing: { line: { color: "#ef4444" } },
+    yaxis: "y"
+  };
+
+  const vol = {
+    x: dates,
+    y: volume,
+    type: "bar",
+    name: "Volume",
+    yaxis: "y2",
+    marker: {
+      color: "#64748b",
+      opacity: 0.45
+    }
+  };
+
+  const layout = {
+    title: "{{ ticker }} — Price & Volume",
+    paper_bgcolor: "#0f172a",
+    plot_bgcolor: "#0f172a",
+    font: { color: "#e5e7eb" },
+    showlegend: false,
+
+    xaxis: {
+      rangeslider: { visible: false }
+    },
+
+    yaxis: {
+      title: "Price",
+      domain: [0.28, 1],   // 🔥 PRICE gets 72% height
+      showgrid: true
+    },
+
+    yaxis2: {
+      title: "Volume",
+      domain: [0, 0.22],   // 🔥 VOLUME only 22% height
+      showgrid: false
+    }
+  };
+
+  Plotly.newPlot("chart", [price, vol], layout, { responsive: true });
+</script>
+</body>
+</html>

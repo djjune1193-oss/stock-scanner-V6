@@ -1,0 +1,172 @@
+<style>
+  .scanner-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  .scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .scanner-header h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 22px;
+  }
+
+  .btn-back {
+    padding: 8px 14px;
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .btn-back:hover {
+    background-color: #d1d5db;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #1f2937;
+    color: white;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  th {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  tbody tr:hover {
+    background-color: #e5e7eb;
+  }
+
+  .empty-row td {
+    text-align: center;
+    padding: 24px;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+/* Ticker link must inherit row color */
+.ticker-link {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+  display: block;
+  width: 100%;
+}
+
+.ticker-link:hover {
+  text-decoration: underline;
+}
+
+
+</style>
+
+
+<style>
+  /* --- Percentage change row colors --- */
+  tr.light-green {
+    background-color: #d1fae5 !important; /* 0 to +4 */
+  }
+
+  tr.dark-green {
+    background-color: #6ee7b7 !important; /* > +4 */
+    font-weight: 600;
+  }
+
+  tr.light-red {
+    background-color: #fee2e2 !important; /* 0 to -4 */
+  }
+
+  tr.dark-red {
+    background-color: #fca5a5 !important; /* < -4 */
+    font-weight: 600;
+  }
+</style>
+
+
+<div class="scanner-container">
+
+  <div class="scanner-header">
+    <h2>📈 Sector Performance</h2>
+    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        {% for col in columns %}
+          <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+<tbody>
+  {% if rows %}
+    {% for row in rows %}
+      {% with pct=row.2 %}
+        <tr class="
+          {% if pct > 4 %}
+            dark-green
+          {% elif pct > 0 %}
+            light-green
+          {% elif pct >= -4 %}
+            light-red
+          {% else %}
+            dark-red
+          {% endif %}
+        ">
+          {% for cell in row %}
+            {% if forloop.counter == 2 %}
+              <td>
+                <a href="{% url 'equity_chart' cell %}"
+                   target="_blank"
+                   class="ticker-link">
+                  {{ cell }}
+                </a>
+              </td>
+            {% else %}
+              <td>{{ cell }}</td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      {% endwith %}
+    {% endfor %}
+  {% else %}
+    <tr>
+      <td colspan="{{ columns|length }}" class="empty-state">
+        No stocks matched scanner criteria
+      </td>
+    </tr>
+  {% endif %}
+</tbody>
+  </table>
+
+</div>

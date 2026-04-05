@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sector ETF LBR</title>
+
+    <style>
+        body { margin:0; font-family:Arial; background:#f4f6f8; }
+
+        .container {
+            max-width:1200px;
+            margin:20px auto;
+            background:white;
+            padding:20px;
+            border-radius:10px;
+        }
+
+        .header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .btn-back {
+            padding:8px 12px;
+            background:#6c757d;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+        }
+
+        .controls {
+            margin:15px 0;
+            display:flex;
+            gap:10px;
+        }
+
+        select {
+            padding:6px;
+            border-radius:6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>📊 Sector ETF ROC + LBR</h2>
+        <a href="{% url 'home' %}" class="btn-back">← Home</a>
+    </div>
+
+    <!-- CONTROLS -->
+    <form method="GET" class="controls">
+
+        <!-- ETF SELECT -->
+        <select name="etf" onchange="this.form.submit()">
+            {% for e in etfs %}
+                <option value="{{ e }}" {% if e == selected_etf %}selected{% endif %}>
+                    {{ e }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- DAYS -->
+        <select name="days" onchange="this.form.submit()">
+            <option value="30" {% if days == 30 %}selected{% endif %}>30D</option>
+            <option value="60" {% if days == 60 %}selected{% endif %}>60D</option>
+            <option value="90" {% if days == 90 %}selected{% endif %}>90D</option>
+        </select>
+
+    </form>
+
+    <!-- CHART -->
+    <div>
+        {{ chart|safe }}
+    </div>
+
+</div>
+
+</body>
+</html>

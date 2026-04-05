@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MA Structure Dashboard</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#f5f7fb;
+    color:#111827;
+}
+
+.container {
+    max-width:1300px;
+    margin:25px auto;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.06);
+}
+
+/* HEADER */
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.header h2 {
+    margin:0;
+    font-size:20px;
+}
+
+/* NAV BUTTONS */
+.nav {
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.btn {
+    padding:6px 12px;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:13px;
+    border:1px solid #e5e7eb;
+    background:#f9fafb;
+    color:#111827;
+}
+
+.btn:hover {
+    background:#eef2ff;
+}
+
+/* TABLE */
+.table-container {
+    overflow:auto;
+    max-height:75vh;
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+thead th {
+    position:sticky;
+    top:0;
+    background:#111827;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+td {
+    padding:8px;
+    text-align:center;
+    border-bottom:1px solid #f1f5f9;
+}
+
+/* LIGHT GROUP COLORS */
+.g1 { background:#ecfdf5; }  /* strong */
+.g2 { background:#f0fdf4; }
+.g3 { background:#fefce8; }
+.g4 { background:#fff7ed; }
+.g5 { background:#fef2f2; }
+.g6 { background:#f8fafc; }
+
+/* MOVE */
+.move-up { color:#16a34a; font-weight:bold; }
+.move-down { color:#dc2626; font-weight:bold; }
+
+/* POS/NEG */
+.pos { color:#16a34a; font-weight:bold; }
+.neg { color:#dc2626; font-weight:bold; }
+
+/* SELECT */
+select {
+    padding:6px;
+    border-radius:6px;
+    border:1px solid #e5e7eb;
+    background:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+
+    <h2>📊 MA Structure </h2>
+
+    <div class="nav">
+
+        <!-- HOME -->
+        <a class="btn" href="/">🏠 Home</a>
+
+        <!-- VIEW TOGGLE -->
+        <a class="btn" href="?view=group">Group View</a>
+
+    </div>
+
+</div>
+
+<!-- OPTIONAL: INDUSTRY FILTER -->
+<form method="get">
+    <input type="hidden" name="view" value="{{ view_mode }}">
+
+    <select name="industry" onchange="this.form.submit()">
+        <option value="">All Industries</option>
+
+        {% for row in rows %}
+            <option value="{{ row.Industry }}">
+                {{ row.Industry }}
+            </option>
+        {% endfor %}
+
+    </select>
+</form>
+
+<!-- TABLE -->
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+    <th>Group</th>
+    <th>Ticker</th>
+    <th>Industry</th>
+    <th>MA10</th>
+    <th>Base</th>
+    <th>Base Value</th>
+    <th>Δ %</th>
+    <th>Move</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in rows %}
+
+<tr class="
+    {% if row.group == 'MA10 > ALL' %} g1
+    {% elif row.group == 'MA10: 21–34' %} g2
+    {% elif row.group == 'MA10: 34–50' %} g3
+    {% elif row.group == 'MA10: 50–100' %} g4
+    {% elif row.group == 'MA10: 100–200' %} g5
+    {% else %} g6
+    {% endif %}
+">
+
+    <td><b>{{ row.group }}</b></td>
+    <td>{{ row.TICKER }}</td>
+    <td>{{ row.Industry }}</td>
+    <td>{{ row.MA_10|floatformat:2 }}</td>
+    <td>{{ row.base_label }}</td>
+    <td>{{ row.base_value|floatformat:2 }}</td>
+
+    <td class="{% if row.pct_distance > 0 %}pos{% else %}neg{% endif %}">
+        {{ row.pct_distance|floatformat:2 }}%
+    </td>
+
+    <td>
+        {% if row.move == "⬆" %}
+            <span class="move-up">⬆</span>
+        {% elif row.move == "⬇" %}
+            <span class="move-down">⬇</span>
+        {% else %}
+            <span style="color:#9ca3af;">→</span>
+        {% endif %}
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

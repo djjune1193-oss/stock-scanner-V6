@@ -1,0 +1,187 @@
+<style>
+  .scanner-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  .scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .scanner-header h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 22px;
+  }
+
+  .btn-back {
+    padding: 8px 14px;
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .btn-back:hover {
+    background-color: #d1d5db;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background-color: #1f2937;
+    color: white;
+  }
+
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  th {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  tbody tr:hover {
+    background-color: #e5e7eb;
+  }
+
+  .empty-row td {
+    text-align: center;
+    padding: 24px;
+    color: #6b7280;
+    font-style: italic;
+  }
+</style>
+
+<div class="scanner-container">
+
+  <div class="scanner-header">
+    <h2>📈 WAVES</h2>
+    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        {% for col in columns %}
+          <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+
+
+<style>
+
+.strategy-box{
+    background:#fff9db;
+    border-left:6px solid #facc15;
+    padding:20px;
+    margin-top:30px;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.strategy-box h3{
+    margin-top:0;
+    color:#1f2937;
+}
+
+.strategy-box p{
+    line-height:1.6;
+    color:#374151;
+}
+
+.strategy-box ul{
+    line-height:1.7;
+    margin-left:18px;
+}
+
+</style>
+
+
+<div class="strategy-box">
+
+<h3>NEW WAVE</h3>
+
+
+
+<ul>
+
+<li><strong> Computes ATR, 14-bar highs/lows, up-wave and down-wave levels.  </strong><br></li>
+<li><strong>Identifies the first candle that starts an up-wave or down-wave </strong><br></li>
+<li><strong> Low of 14 Days	+ 3 * ATR_15 </strong><br></li>
+<li><strong> High of 14 Days 	- 3 * ATR_15 </strong><br></li>
+</ul>
+</div>
+
+
+
+<tbody>
+  {% if rows %}
+    {% for row in rows %}
+      {% with pct=row.2 %}
+        <tr class="
+          {% if pct > 4 %}
+            dark-green
+          {% elif pct > 0 %}
+            light-green
+          {% elif pct >= -4 %}
+            light-red
+          {% else %}
+            dark-red
+          {% endif %}
+        ">
+          {% for cell in row %}
+            {% if forloop.counter == 2 %}
+              <td>
+                <a href="{% url 'equity_chart' cell %}"
+                   target="_blank"
+                   class="ticker-link">
+                  {{ cell }}
+                </a>
+              </td>
+            {% else %}
+              <td>{{ cell }}</td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      {% endwith %}
+    {% endfor %}
+  {% else %}
+    <tr>
+      <td colspan="{{ columns|length }}" class="empty-state">
+        No stocks matched scanner criteria
+      </td>
+    </tr>
+  {% endif %}
+</tbody>
+  </table>
+
+</div>
+
+
+
+
+

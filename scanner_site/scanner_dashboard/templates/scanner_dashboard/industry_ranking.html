@@ -1,0 +1,125 @@
+<style>
+    /* Table container for scrolling if needed */
+    .industry-table-container {
+        overflow-x: auto;
+        margin: 20px 0;
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    /* Base table styles */
+    table.industry-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px; /* space from back button */
+    }
+
+    /* Header styles */
+    table.industry-table thead {
+        background-color: #1f2937; /* Dark gray */
+        color: #f9fafb; /* Light text */
+    }
+
+    table.industry-table th, table.industry-table td {
+        padding: 12px 16px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    table.industry-table th {
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Alternating row colors */
+    table.industry-table tbody tr:nth-child(even) {
+        background-color: #f3f4f6; /* Light gray */
+    }
+
+    /* Row hover effect */
+    table.industry-table tbody tr:hover {
+        background-color: #e5e7eb; /* Slightly darker gray */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    /* Numeric alignment */
+    table.industry-table td.numeric {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Back button */
+    .btn-back {
+        display: inline-block;
+        margin-bottom: 10px; /* space before table */
+        padding: 8px 14px;
+        background-color: #e5e7eb;
+        color: #111827;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .btn-back:hover {
+        background-color: #d1d5db;
+    }
+
+    /* Arrows */
+    .arrow-up {
+        color: green;
+        margin-left: 5px;
+        font-weight: bold;
+    }
+
+    .arrow-down {
+        color: red;
+        margin-left: 5px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="industry-table-container">
+    <h2>📈 Industry Normalized( SPY) Performance</h2>
+    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+
+    <table class="industry-table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Industry</th>
+                <th>Cumulative Normalized Return</th>
+                <th>Positions Climbed (7d)</th>
+                <th>Positions Climbed (21d)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ranking_list %}
+            <tr>
+                <td class="numeric">{{ item.Rank|floatformat:0 }}</td>
+                <td>{{ item.Industry }}</td>
+                <td class="numeric">{{ item.Cumulative_Return|floatformat:4 }}</td>
+                <td class="numeric">
+                    {{ item.Pos_Climbed_7d|floatformat:0 }}
+                    {% if item.Pos_Climbed_7d > 0 %}
+                        <span class="arrow-up">▲</span>
+                    {% elif item.Pos_Climbed_7d < 0 %}
+                        <span class="arrow-down">▼</span>
+                    {% endif %}
+                </td>
+                <td class="numeric">
+                    {{ item.Pos_Climbed_21d|floatformat:0 }}
+                    {% if item.Pos_Climbed_21d > 0 %}
+                        <span class="arrow-up">▲</span>
+                    {% elif item.Pos_Climbed_21d < 0 %}
+                        <span class="arrow-down">▼</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
