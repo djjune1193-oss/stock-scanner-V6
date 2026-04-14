@@ -10,7 +10,7 @@
     ← Home
   </a>
 
-  <h2 style="margin:0;">Sector Dashboard</h2>
+  <h2 style="margin:0;">Industry Weekly Performance</h2>
 
 </div>
 
@@ -38,6 +38,7 @@
         <p>📈 Up: {{ item.UP }}</p>
         <p>📉 Down: {{ item.DOWN }}</p>
         <p>📊 Total: {{ item.TOTAL }}</p>
+        <p>⚖️ Median: {{ item.MEDIAN_GAIN|floatformat:2 }}%</p>
         <p><strong>{{ item.RATIO|floatformat:2 }}</strong></p>
       </div>
 

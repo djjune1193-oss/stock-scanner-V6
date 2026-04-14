@@ -33,7 +33,6 @@ body {
     font-size:20px;
 }
 
-/* NAV BUTTONS */
 .nav {
     display:flex;
     gap:10px;
@@ -81,13 +80,43 @@ td {
     border-bottom:1px solid #f1f5f9;
 }
 
-/* LIGHT GROUP COLORS */
-.g1 { background:#ecfdf5; }  /* strong */
-.g2 { background:#f0fdf4; }
-.g3 { background:#fefce8; }
-.g4 { background:#fff7ed; }
-.g5 { background:#fef2f2; }
-.g6 { background:#f8fafc; }
+/* =========================
+   GROUP COLORS (FIXED LOGIC)
+   ========================= */
+
+/* Strong trend */
+.g1 { background:#dcfce7; }
+
+/* Early structure */
+.g2 { background:#ecfdf5; }
+
+/* Expanding range */
+.g3 { background:#d1fae5; }
+
+/* Mid structure */
+.g4 { background:#fef9c3; }
+
+/* Extended range */
+.g5 { background:#fde68a; }
+
+/* Weakening */
+.g6 { background:#fed7aa; }
+
+/* More weakness */
+.g7 { background:#fdba74; }
+
+/* Late stage */
+.g8 { background:#fb923c; }
+
+/* Risk zone */
+.g9 { background:#fecaca; }
+.g10 { background:#fca5a5; }
+
+/* Breakdown */
+.g11 { background:#fda4af; }
+
+/* Default */
+.g12 { background:#e5e7eb; }
 
 /* MOVE */
 .move-up { color:#16a34a; font-weight:bold; }
@@ -97,7 +126,6 @@ td {
 .pos { color:#16a34a; font-weight:bold; }
 .neg { color:#dc2626; font-weight:bold; }
 
-/* SELECT */
 select {
     padding:6px;
     border-radius:6px;
@@ -113,22 +141,15 @@ select {
 
 <!-- HEADER -->
 <div class="header">
-
-    <h2>📊 MA Structure </h2>
+    <h2>📊 MA Structure</h2>
 
     <div class="nav">
-
-        <!-- HOME -->
         <a class="btn" href="/">🏠 Home</a>
-
-        <!-- VIEW TOGGLE -->
         <a class="btn" href="?view=group">Group View</a>
-
     </div>
-
 </div>
 
-<!-- OPTIONAL: INDUSTRY FILTER -->
+<!-- FILTER -->
 <form method="get">
     <input type="hidden" name="view" value="{{ view_mode }}">
 
@@ -136,9 +157,11 @@ select {
         <option value="">All Industries</option>
 
         {% for row in rows %}
-            <option value="{{ row.Industry }}">
-                {{ row.Industry }}
-            </option>
+            {% ifchanged row.Industry %}
+                <option value="{{ row.Industry }}">
+                    {{ row.Industry }}
+                </option>
+            {% endifchanged %}
         {% endfor %}
 
     </select>
@@ -168,11 +191,24 @@ select {
 
 <tr class="
     {% if row.group == 'MA10 > ALL' %} g1
+
     {% elif row.group == 'MA10: 21–34' %} g2
-    {% elif row.group == 'MA10: 34–50' %} g3
-    {% elif row.group == 'MA10: 50–100' %} g4
-    {% elif row.group == 'MA10: 100–200' %} g5
-    {% else %} g6
+    {% elif row.group == 'MA10: 21–50' %} g2
+    {% elif row.group == 'MA10: 21–100' %} g3
+    {% elif row.group == 'MA10: 21–200' %} g3
+
+    {% elif row.group == 'MA10: 34–50' %} g4
+    {% elif row.group == 'MA10: 34–100' %} g4
+    {% elif row.group == 'MA10: 34–200' %} g5
+
+    {% elif row.group == 'MA10: 50–100' %} g6
+    {% elif row.group == 'MA10: 50–200' %} g7
+
+    {% elif row.group == 'MA10: 100–200' %} g8
+
+    {% elif row.group == 'MA10 < 200' %} g11
+
+    {% else %} g12
     {% endif %}
 ">
 

@@ -24,9 +24,9 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)  # ensure it exists
 SECRET_KEY = 'django-insecure-7@0#!8i_10(*@2bm9fbsf(vsn-!z74%*ypo0vaf!iz1yd=1vif'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["swingtradesingh.com","www.swingtradesingh.com","146.190.147.47"]
 
 
 # Application definition
@@ -53,11 +53,15 @@ MIDDLEWARE = [
 ]
 
 
-#CRONJOBS = [
-#    ('45 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),        # 9:45 AM
-#    ('*/15 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),  # every 15 mins 10:00–3:45
-#    ('0,15 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),     # 4:00 and 4:15 PM
-#]
+CRONJOBS = [
+    # Every 30 minutes from 9:15 AM to 4:30 PM (Mon–Fri)
+    ('15,45 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+    ('15,45 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+    ('15,30 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+
+    # Finviz run once daily at 10 PM (Mon–Fri)
+    ('0 22 * * 1-5', 'scanner.tasks.run_finviz_cron'),
+]
 
 
 FULL_HISTORY_FILE = DATA_DIR / "full_history.parquet"
@@ -142,10 +146,5 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-import os
-
-if os.name != "nt":  # only load on Linux
-    INSTALLED_APPS += ["django_crontab"]
 
 

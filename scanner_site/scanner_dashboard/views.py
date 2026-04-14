@@ -908,9 +908,12 @@ def industry_weekly_view(request):
     # Metrics
     grouped["TOTAL"] = grouped["UP"] + grouped["DOWN"]
     grouped["RATIO"] = grouped["UP"] / grouped["TOTAL"]
+    median_gain = df.groupby("Industry")["perc_change"].median()
+    grouped["MEDIAN_GAIN"] = median_gain
+
 
     # Sort strongest → weakest industries
-    grouped = grouped.sort_values("RATIO", ascending=False).reset_index()
+    grouped = grouped.sort_values("MEDIAN_GAIN", ascending=False).reset_index()
 
     return render(
         request,
@@ -1537,9 +1540,11 @@ def industry_today_view(request):
     # ----------------------------
     grouped["TOTAL"] = grouped["UP"] + grouped["DOWN"]
     grouped["RATIO"] = grouped["UP"] / grouped["TOTAL"].replace(0, 1)
+    median_gain = df.groupby("Industry")["perc_change"].median()
+    grouped["MEDIAN_GAIN"] = median_gain
 
     # Sort strongest → weakest
-    grouped = grouped.sort_values("RATIO", ascending=False).reset_index()
+    grouped = grouped.sort_values("MEDIAN_GAIN", ascending=False).reset_index()
 
     return render(
         request,
@@ -1598,30 +1603,45 @@ def ma_structure_view(request):
     # CLASSIFICATION LOGIC
     # ----------------------------
     def classify(row):
-        ma10 = row["MA_10"]
-        ma21 = row["MA_21"]
-        ma34 = row["MA_34"]
-        ma50 = row["MA_50"]
-        ma100 = row["MA_100"]
-        ma200 = row["MA_200"]
+    	ma10 = row["MA_10"]
+    	ma21 = row["MA_21"]
+    	ma34 = row["MA_34"]
+    	ma50 = row["MA_50"]
+    	ma100 = row["MA_100"]
+    	ma200 = row["MA_200"]
 
-        if ma10 > ma21 > ma34 > ma50 > ma100 > ma200:
-            return "MA10 > ALL", ma21, "MA21"
+    # ----------------------------
+    # 1. HARD STRUCTURE (TOP PRIORITY)
+    # ----------------------------
+    	if ma10 < ma200:
+        	return "MA10 < 200", ma200, "MA200"
 
-        elif ma21 >= ma10 > ma34:
-            return "MA10: 21–34", ma34, "MA34"
+    	if ma10 < ma100:
+        	return "MA10: 100-200", ma200, "MA200"
 
-        elif ma34 >= ma10 > ma50:
-            return "MA10: 34–50", ma50, "MA50"
+    	if ma10 < ma50:
+        	return "MA10: 50-100", ma100, "MA100"
 
-        elif ma50 >= ma10 > ma100:
-            return "MA10: 50–100", ma100, "MA100"
+    	if ma10 < ma34:
+        	return "MA10: 34-50", ma50, "MA50"
 
-        elif ma100 >= ma10 > ma200:
-            return "MA10: 100–200", ma200, "MA200"
+    	if ma10 < ma21:
+        	return "MA10: 21-34", ma34, "MA34"
 
-        else:
-            return "MA10 < 200", ma200, "MA200"
+    # ----------------------------
+    # 2. STRONG TREND
+    # ----------------------------
+    	if ma10 >= ma21:
+
+    # perfect structure
+    		if ma10 > ma21 > ma34 > ma50 > ma100 > ma200:
+        		return "MA10 > ALL (strong)", ma10, "MA10"
+
+    # still above but messy
+    		return "MA10 > ALL (weak)", ma10, "MA10"
+
+    # fallback safety
+    	return "MA10 < 200", ma200, "MA200"
 
     # ----------------------------
     # APPLY CLASSIFICATION (LATEST)
@@ -1654,13 +1674,17 @@ def ma_structure_view(request):
     # MOVEMENT (ONLY REAL CHANGES)
     # ----------------------------
     rank = {
-        "MA10 > ALL": 5,
-        "MA10: 21–34": 4,
-        "MA10: 34–50": 3,
-        "MA10: 50–100": 2,
-        "MA10: 100–200": 1,
-        "MA10 < 200": 0
-    }
+    "MA10 > ALL (strong)": 7,
+
+    "MA10 > ALL (weak)": 6,
+
+    "MA10: 21-34": 5,
+    "MA10: 34-50": 4,
+    "MA10: 50-100": 3,
+
+    "MA10: 100-200": 2,
+    "MA10 < 200": 1
+ 	}
 
     def movement(row):
         if row["group"] == row["prev_group"]:
@@ -1673,20 +1697,22 @@ def ma_structure_view(request):
     # DISTANCE FROM BASE
     # ----------------------------
     latest_df["pct_distance"] = (
-        (latest_df["MA_10"] - latest_df["base_value"]) / latest_df["base_value"]
+        (latest_df["Close"] - latest_df["base_value"]) / latest_df["base_value"]
     ) * 100
 
     # ----------------------------
     # GROUP ORDER SORT (IMPORTANT FIX)
     # ----------------------------
     group_order = {
-        "MA10 > ALL": 0,
-        "MA10: 21–34": 1,
-        "MA10: 34–50": 2,
-        "MA10: 50–100": 3,
-        "MA10: 100–200": 4,
-        "MA10 < 200": 5
-    }
+	 "MA10 > ALL (strong)": 0,
+
+   	 "MA10 > ALL (weak)": 1,
+   	 "MA10: 21-34": 2,
+    	 "MA10: 34-50": 3,
+   	 "MA10: 50-100": 4,
+   	 "MA10: 100-200": 5,
+   	 "MA10 < 200": 6
+		}
 
     latest_df["group_rank"] = latest_df["group"].map(group_order)
 

@@ -1,0 +1,7 @@
+[2026-04-08 19:14:34 -0400] [35984] [INFO] Starting gunicorn 25.1.0
+[2026-04-08 19:14:34 -0400] [35984] [INFO] Listening at: http://127.0.0.1:8000 (35984)
+[2026-04-08 19:14:34 -0400] [35984] [INFO] Using worker: sync
+[2026-04-08 19:14:34 -0400] [35984] [INFO] Control socket listening at /root/stock-scanner-V3/gunicorn.ctl
+[2026-04-08 19:17:42 -0400] [35984] [INFO] Handling signal: term
+[2026-04-08 19:18:12 -0400] [35984] [ERROR] Worker (pid:35986) was sent SIGKILL! Perhaps out of memory?
+[2026-04-08 19:18:12 -0400] [35984] [INFO] Shutting down: Master

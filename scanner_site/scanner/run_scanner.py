@@ -19,14 +19,11 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 # -----------------------------
 
 
-import numpy as np
 
 
 import numpy as np
 import pandas as pd
 
-import numpy as np
-import pandas as pd
 
 def compute_relative_strength(df, spy_df, periods=[7, 21, 50, 100, 200]):
 

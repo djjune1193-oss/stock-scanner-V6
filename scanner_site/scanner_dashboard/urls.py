@@ -25,14 +25,10 @@ urlpatterns = [
     path("industry/<str:industry_name>/", industry_detail_view_change, name="industry_detail"),
     path("fundamentals/", fundamentals_view, name="fundamentals"),
     path("industry_rs/", industry_rs_view, name="industry_rs"),
-    path("industry/<path:industry_name>/", industry_detail_view, name="industry_detail_rs"),
+    path("industry/rs/<path:industry_name>/", industry_detail_view, name="industry_detail_rs"),
     path("rs_alignment/",views.rs_alignment_dashboard,name="rs_alignment_dashboard"),
     path("sector_lbr/", views.sector_lbr_view, name="sector_lbr"),
     path("today/",views.industry_today_view,name="industry_today"),
     path("today/<str:industry_name>/",views.industry_today_detail,name="industry_today_detail"),
     path("ma_structure/",views.ma_structure_view,name="ma_structure"),
-    
-    
-    
-    
 ]

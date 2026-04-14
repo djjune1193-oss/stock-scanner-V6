@@ -124,7 +124,7 @@ tbody tr:hover {
                     {% if col == "Industry" %}
 
                         <td class="industry">
-                            <a href="{% url 'industry_detail' row.Industry|urlencode %}"
+                            <a href="{% url 'industry_detail_rs' row.Industry %}"
                                style="text-decoration:none; color:#2563eb;">
                                 {{ row.Industry }}
                             </a>
