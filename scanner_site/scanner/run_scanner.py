@@ -25,6 +25,81 @@ import numpy as np
 import pandas as pd
 
 
+
+def build_keltner_data(df):
+
+    df = df.copy()
+
+    df["prev_close"] = df.groupby("TICKER")["Close"].shift(1)
+
+    # =============================
+    # TRUE RANGE
+    # =============================
+
+    df["tr"] = np.maximum.reduce([
+        df["High"] - df["Low"],
+        abs(df["High"] - df["prev_close"]),
+        abs(df["Low"] - df["prev_close"])
+    ])
+
+    # =============================
+    # EMA + ATR
+    # =============================
+
+    df["ema20"] = (
+        df.groupby("TICKER")["Close"]
+        .transform(lambda x: x.ewm(span=20, adjust=False).mean())
+    )
+
+    df["atr20"] = (
+        df.groupby("TICKER")["tr"]
+        .transform(lambda x: x.ewm(alpha=1/20, adjust=False).mean())
+    )
+
+    # =============================
+    # KELTNER CHANNELS
+    # =============================
+
+    df["kc_upper"] = df["ema20"] + 2.5 * df["atr20"]
+    df["kc_lower"] = df["ema20"] - 2.5 * df["atr20"]
+
+    # =============================
+    # METRICS
+    # =============================
+
+    df["pct_above_ema"] = (
+        (df["Close"] - df["ema20"]) / df["ema20"]
+    ) * 100
+
+    df["atr_pct"] = (
+        df["atr20"] / df["Close"]
+    ) * 100
+
+    # =============================
+    # DAYS ABOVE EMA
+    # =============================
+
+    days_col = []
+
+    for ticker, g in df.groupby("TICKER"):
+
+        count = 0
+
+        for _, row in g.iterrows():
+
+            if row["Close"] > row["ema20"]:
+                count += 1
+            else:
+                count = 0
+
+            days_col.append(count)
+
+    df["days_above_ema"] = days_col
+
+    return df
+
+
+
 def compute_relative_strength(df, spy_df, periods=[7, 21, 50, 100, 200]):
 
     results = []
@@ -219,6 +294,36 @@ def run_scanner():
     if full_history:
 
         history_df = pd.concat(full_history, ignore_index=True).round(2)
+
+        # =====================================
+        # PRECOMPUTE KELTNER DATA
+        # =====================================
+
+        history_df = history_df.sort_values(["TICKER", "Date"])
+
+        keltner_df = build_keltner_data(history_df)
+
+        # full history with KC columns
+        keltner_df.to_parquet(
+            DATA_DIR / "keltner_history.parquet",
+            index=False
+        )
+
+        # latest snapshot only
+        latest_keltner = (
+            keltner_df
+            .groupby("TICKER")
+            .tail(1)
+            .reset_index(drop=True)
+        )
+
+        latest_keltner.to_parquet(
+            DATA_DIR / "keltner_latest.parquet",
+            index=False
+        )
+
+
+        
 
         # SPY data (^GSPC)
         spy_df = history_df[history_df["TICKER"] == "^GSPC"][["Date", "Close"]].sort_values("Date")

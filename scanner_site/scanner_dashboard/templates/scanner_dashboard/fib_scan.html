@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Fibonacci Retracement Scanner</title>
+
+<style>
+
+/* ================= THEME ================= */
+
+body {
+    margin: 0;
+    background: #0b1220;
+    font-family: "Segoe UI", Roboto, Arial;
+    color: #e5e7eb;
+}
+
+.container {
+    padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0f172a;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.top-nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.top-nav a:hover {
+    background: #1f2937;
+    color: white;
+}
+
+/* ================= CARD ================= */
+
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+/* ================= INPUT ================= */
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #0f172a;
+    color: white;
+    width: 260px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+/* ================= TABLE ================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+/* SORTABLE HEADERS */
+
+th {
+    background: #1f2937;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+}
+
+th a {
+    color: white;
+    text-decoration: none;
+}
+
+th a:hover {
+    color: #93c5fd;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+tr:nth-child(even) {
+    background: #0f172a;
+}
+
+/* ================= RETRACEMENT COLORS ================= */
+
+.fib-strong {
+    background: rgba(34,197,94,0.18);
+    color: #86efac;
+    font-weight: 600;
+}
+
+.fib-good {
+    background: rgba(59,130,246,0.18);
+    color: #93c5fd;
+    font-weight: 600;
+}
+
+.fib-neutral {
+    background: rgba(234,179,8,0.18);
+    color: #fde68a;
+    font-weight: 600;
+}
+
+.fib-weak {
+    background: rgba(249,115,22,0.18);
+    color: #fdba74;
+    font-weight: 600;
+}
+
+.fib-breakdown {
+    background: rgba(239,68,68,0.18);
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+/* ================= TICKER LINK ================= */
+
+.ticker-link {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.ticker-link:hover {
+    text-decoration: underline;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
+<div class="container">
+
+<h2>📊 Fibonacci Retracement Scanner</h2>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="card desc">
+
+<strong>Logic Overview</strong><br><br>
+
+✔ Uses highest historical high as Fibonacci anchor<br>
+✔ Calculates current retracement relative to major trend range<br>
+✔ Detects pullback depth from trend highs<br>
+✔ Helps identify continuation vs breakdown structures<br><br>
+
+<strong>Fibonacci Interpretation</strong><br><br>
+
+🟢 0–23% → strong trend continuation<br>
+🔵 23–38% → healthy pullback<br>
+🟡 38–50% → neutral consolidation<br>
+🟠 50–61% → weakening structure<br>
+🔴 61%+ → potential breakdown zone<br><br>
+
+<strong>Default Chart</strong><br>
+Auto-loads <b>^GSPC</b> Fibonacci structure
+
+</div>
+
+<!-- ================= INPUT ================= -->
+
+<div class="card">
+
+<form method="get">
+
+    <input
+        type="text"
+        name="ticker"
+        value="{{ selected_ticker }}"
+        placeholder="Switch ticker (e.g. AAPL)"
+    >
+
+    <button type="submit">Switch</button>
+
+</form>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="card">
+
+{% if chart %}
+    {{ chart|safe }}
+{% endif %}
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=ticker">
+Ticker
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Close">
+Close
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=high_max">
+High
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=low_min">
+Low
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=retracement">
+Retracement %
+</a>
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in data %}
+
+<tr>
+
+<td>
+
+    <a class="ticker-link"
+       href="?ticker={{ row.ticker }}">
+
+        {{ row.ticker }}
+
+    </a>
+
+</td>
+
+<td>{{ row.Close }}</td>
+
+<td>{{ row.high_max }}</td>
+
+<td>{{ row.low_min }}</td>
+
+<td class="
+{% if row.retracement <= 23 %}
+    fib-strong
+{% elif row.retracement <= 38 %}
+    fib-good
+{% elif row.retracement <= 50 %}
+    fib-neutral
+{% elif row.retracement <= 61 %}
+    fib-weak
+{% else %}
+    fib-breakdown
+{% endif %}
+">
+
+{{ row.retracement }}%
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

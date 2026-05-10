@@ -1,436 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Stock Scanner Dashboard</title>
-
-  <!-- ===== BASE STYLES ===== -->
-  <style>
-    body {
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      background: #ffffff;
-      padding: 24px;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 24px;
-      color: #2c3e50;
-    }
-.market-summary{
-  display:flex;
-  gap:20px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-}
-
-.pos {
-  color: #22c55e;
-  font-weight: 600;
-}
-
-.neg {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-
-.index-box{
-  background:#020617;
-  border-radius:12px;
-  padding:16px 20px;
-  width:260px;
-  color:#e5e7eb;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
-}
-
-.index-row{
-  display:flex;
-  justify-content:space-between;
-  margin-top:8px;
-  font-size:14px;
-}
-
-.index-row span:first-child{
-  font-weight:600;
-}
-
-.index-row span:last-child:not(.pos):not(.neg){
-  color:#94a3b8;
-}
-
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 10px 16px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-primary {
-      background-color: #2563eb;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #1d4ed8;
-    }
-
-    .btn-link {
-      background-color: #eef2ff;
-      color: #1e40af;
-    }
-
-    .btn-link:hover {
-      background-color: #e0e7ff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    thead {
-      background-color: #1f2937;
-      color: #ffffff;
-    }
-
-    th, td {
-      padding: 10px 12px;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.05em;
-    }
-
-    tbody tr:nth-child(even) {
-      background-color: #f9fafb;
-    }
-
-    tbody tr:hover {
-      background-color: #e5e7eb;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px;
-      color: #6b7280;
-      font-size: 16px;
-    }
-
-    /* ===== SCAN BAR ===== */
-    .scan-bar {
-      margin: 16px 0;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .scan-bar.running {
-      background: #0f172a;
-      color: #e5e7eb;
-    }
-
-    .scan-bar.complete {
-      background: #064e3b;
-      color: #ecfdf5;
-    }
-
-    .scan-progress {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 40%;
-      background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
-      animation: scanMove 2s linear infinite;
-      opacity: 0.35;
-    }
-
-    .scan-progress.complete {
-      width: 100%;
-      animation: none;
-      background: #22c55e;
-      opacity: 0.25;
-    }
-
-    @keyframes scanMove {
-      from { left: -40%; }
-      to { left: 100%; }
-    }
-
-    /* ===== MHI ===== */
-    .mhi-box {
-      background: #020617;
-      border-radius: 12px;
-      padding: 16px 20px;
-      width: 240px;
-      color: #e5e7eb;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      margin-bottom: 20px;
-    }
-
-    .mhi-score {
-      font-size: 36px;
-      font-weight: 700;
-    }
-
-    .mhi-date {
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    /* ===== ROW COLORS ===== */
-    tr.light-green { background-color: #d1fae5 !important; }
-    tr.dark-green  { background-color: #6ee7b7 !important; font-weight: 600; }
-    tr.light-red   { background-color: #fee2e2 !important; }
-    tr.dark-red    { background-color: #fca5a5 !important; font-weight: 600; }
-
-    /* Ticker link */
-    .ticker-link {
-      color: inherit;
-      text-decoration: none;
-      font-weight: 600;
-      display: block;
-    }
-
-    .ticker-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Stock Scanner Dashboard</title>
 
 <style>
-.entry-style-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
 }
 
-.entry-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #e0e7ff; /* light blue background */
-    color: #1e40af; /* dark blue text */
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+.container {
+  padding: 20px;
 }
 
-.entry-btn:hover {
-    background-color: #c7d2fe; /* slightly darker blue on hover */
-    color: #1e3a8a;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transform: translateY(-1px);
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.entry-btn:first-child {
-    flex-basis: 100%;
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= ENTRY MODELS (IMPROVED) ================= */
+
+.section-title {
+  margin: 18px 0 10px;
+  font-size: 12px;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.entry-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+}
+
+.entry-panel a {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.entry-panel a:hover {
+  background: #2563eb;
+  color: white;
+}
+
+/* ================= MARKET CARDS ================= */
+
+.market-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+
+.card {
+  background: #1f2937;
+  padding: 14px;
+  border-radius: 10px;
+  min-width: 160px;
+}
+
+.card h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #93c5fd;
+}
+
+.big {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.small {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.pos { color: #22c55e; }
+.neg { color: #ef4444; }
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+/* ================= SOFT ROW COLORS ================= */
+
+.light-green { background: rgba(34,197,94,0.10); }
+.dark-green  { background: rgba(34,197,94,0.18); font-weight: 600; }
+
+.light-red   { background: rgba(239,68,68,0.10); }
+.dark-red    { background: rgba(239,68,68,0.18); font-weight: 600; }
+
+tr:hover {
+  background: rgba(59,130,246,0.10);
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
 </style>
-
-
 </head>
 
 <body>
 
+<!-- ================= NAVIGATION ================= -->
+
+<div class="top-nav">
+
+  
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+  
+
+</div>
+
 <div class="container">
-  <h1>📊 Stock Scanner Dashboard</h1>
 
-  <!-- ===== ACTIONS ===== -->
-  <div class="actions">
-   
+<!-- ================= ENTRY MODELS ================= -->
 
-    <a href="{% url 'documentation' %}" class="btn btn-link">Tool Guide</a>
-    <a href="{% url 'fundamentals' %}" class="btn btn-link">Fundamentals</a>
-    <a href="{% url 'sector_chart' %}" class="btn btn-link">Sector Trend</a>
-    <a href="{% url 'industry_weekly' %}" class="btn btn-link">Weekly Industry</a>
-    <a href="{% url 'industry_today' %}" class="btn btn-link">Daily Industry</a>
-    <a href="{% url 'sector' %}" class="btn btn-link">Sector Performance</a>
-    <a href="{% url 'industry_ranking' %}" class="btn btn-link">Industry Rank</a>
-    <a href="{% url 'industry_rs' %}" class="btn btn-link">Industry RS</a>
-    <a href="{% url 'rs_alignment_dashboard' %}" class="btn btn-link">RS alignment</a>
-    <a href="{% url 'equity_ranking' %}" class="btn btn-link">Equity Rank</a>
-    <a href="{% url 'metrics' %}" class="btn btn-link">Equity Metrics</a>
-    <a href="{% url 'ma_structure' %}" class="btn btn-link">MA Groups</a>
-    <a href="{% url 'sector_lbr' %}" class="btn btn-link">LBR</a>
+<div class="section-title">Technical Entry Opportunity</div>
 
-    <div style="width: 100%;"></div>
-    <h3 style="margin-bottom: 10px; font-family: 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 600; color: #1f2937;">Entry Style: </h3>
+<div class="entry-panel">
 
-    <a href="{% url 'scanner' %}" class="btn btn-link">21/34 MA</a>
-    <a href="{% url 'flat_bollinger' %}" class="btn btn-link">Flat Bollinger</a>
-    <a href="{% url 'hot_ten_day' %}" class="btn btn-link">Theme</a>
-    <a href="{% url 'double-bottom' %}" class="btn btn-link">Double Bottom</a>
-    <a href="{% url 'turtle_soup' %}" class="btn btn-link">Stochastic</a>
-    <a href="{% url 'momentum_strength' %}" class="btn btn-link">Momentum Strength</a>
-    <a href="{% url 'base_breakout' %}" class="btn btn-link">New Wave</a>
-    <a href="{% url 'breakout_21' %}" class="btn btn-link">Breakout</a>
-  </div>
+  <a href="{% url 'scanner' %}">21/34 Moving average</a>
+  <a href="{% url 'hot_ten_day' %}">Hot Theme</a>
+  <a href="{% url 'turtle_soup' %}">Anti Long</a>
+  <a href="{% url 'stochastic_short' %}">Anti Short</a>
+  <a href="{% url 'breakout_21' %}">Breakout 21</a>
+  <a href="{% url 'double-bottom' %}">Double Bottom</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci Scanner</a>
+  <a href="{% url 'sector_lbr' %}">3/10 Osc.</a>
+  <a href="{% url 'momentum_strength' %}">Daily Momentum</a>
 
+</div>
 
-<div class="market-summary">
+<!-- ================= HEADER ================= -->
 
-  <!-- Market Health -->
-  <div class="mhi-box">
-    <h3>Market Health</h3>
-    <div class="mhi-score">
+<h1>📊 Stock Scanner Dashboard</h1>
+<div class="sub">Institutional momentum, trend & volume scanner</div>
+
+<!-- ================= MARKET CARDS ================= -->
+
+<div class="market-grid">
+
+<a href="{% url 'documentation' %}"
+   style="text-decoration:none; color:inherit;">
+
+  <div class="card" style="cursor:pointer;">
+
+    <h4>Market Health</h4>
+
+    <div class="big">
       {{ mhi.score }}/100
     </div>
-    <div class="mhi-date">
-      As of {{ mhi.date }}
-    </div>
-  </div>
 
-  <!-- Index Summary -->
-  <div class="index-box">
-    <h3>Major Indexes</h3>
-
-    <div class="index-row">
-      <span>S&P</span>
-      <span>{{ index_values.GSPC.close }}</span>
-      <span class="{% if index_values.GSPC.pct > 0 %}pos{% else %}neg{% endif %}">
-        {{ index_values.GSPC.pct }}%
-      </span>
+    <div class="small">
+      {{ mhi.date }}
     </div>
 
-    <div class="index-row">
-      <span>NAS</span>
-      <span>{{ index_values.IXIC.close }}</span>
-      <span class="{% if index_values.IXIC.pct > 0 %}pos{% else %}neg{% endif %}">
-        {{ index_values.IXIC.pct }}%
-      </span>
-    </div>
-
-    <div class="index-row">
-      <span>RUS</span>
-      <span>{{ index_values.RUT.close }}</span>
-      <span class="{% if index_values.RUT.pct > 0 %}pos{% else %}neg{% endif %}">
-        {{ index_values.RUT.pct }}%
-      </span>
-    </div>
-
-    <div class="index-row">
-      <span>VIX</span>
-      <span>{{ index_values.VIX.close }}</span>
-      <span class="{% if index_values.VIX.pct > 0 %}neg{% else %}pos{% endif %}">
-        {{ index_values.VIX.pct }}%
-      </span>
-    </div>
-</div>
-    <div class="mhi-box">
-      <h3>Market Breadth</h3>
-      <div>🟢 Up: {{ up_count }}</div>
-      <div>🔴 Down: {{ down_count }}</div>
-      <div>⚪ Flat: {{ flat_count }}</div>
+    <div class="small" style="margin-top:6px; font-size:10px; color:#93c5fd;">
+      click to know more*
     </div>
 
   </div>
 
+</a>
 
+  <div class="card">
+    <h4>S&P 500</h4>
+    <div class="big">{{ index_values.GSPC.close }}</div>
+    <div class="small {% if index_values.GSPC.pct > 0 %}pos{% else %}neg{% endif %}">
+      {{ index_values.GSPC.pct }}%
+    </div>
+  </div>
 
+  <div class="card">
+    <h4>NASDAQ</h4>
+    <div class="big">{{ index_values.IXIC.close }}</div>
+    <div class="small {% if index_values.IXIC.pct > 0 %}pos{% else %}neg{% endif %}">
+      {{ index_values.IXIC.pct }}%
+    </div>
+  </div>
 
-<!-- ===== AUTO REFRESH ONLY WHILE SCANNING ===== -->
+  <div class="card">
+    <h4>RUSSELL</h4>
+    <div class="big">{{ index_values.RUT.close }}</div>
+    <div class="small {% if index_values.RUT.pct > 0 %}pos{% else %}neg{% endif %}">
+      {{ index_values.RUT.pct }}%
+    </div>
+  </div>
 
-{% if scanner_status.running %}
-<div class="scan-bar running">
-  <div class="scan-progress"></div>
-  🔄 Scan in progress… this may take ~15 minutes
+  <div class="card">
+    <h4>BREADTH</h4>
+    <div class="small">🟢 {{ up_count }}</div>
+    <div class="small">🔴 {{ down_count }}</div>
+    <div class="small">⚪ {{ flat_count }}</div>
+  </div>
+
 </div>
 
-<script>
-  const checkScan = setInterval(() => {
-    fetch(window.location.href, { cache: "no-store" })
-      .then(r => r.text())
-      .then(html => {
+<!-- ================= TABLE ================= -->
 
-        // check if scan is still running
-        if (!html.includes("scan-bar running")) {
-          clearInterval(checkScan);
-          location.reload();   // refresh once scan finished
-        }
+<div class="table-wrap">
 
-      });
-  }, 60000);   // check every 60 seconds
-</script>
-{% endif %}
+<table>
+
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Ticker</th>
+  <th>%</th>
+  <th>Sector</th>
+  <th>Industry</th>
+  <th>Close</th>
+  <th>Open</th>
+  <th>High</th>
+  <th>Low</th>
+  <th>Volume</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in rows %}
+
+<tr class="{{ row.row_class }}">
+
+  <td>{{ row.Date }}</td>
+
+  <td>
+    <a class="ticker" href="{% url 'equity_chart' row.TICKER %}">
+      {{ row.TICKER }}
+    </a>
+  </td>
+
+  <td>{{ row.perc_change }}</td>
+  <td>{{ row.Sector }}</td>
+  <td>{{ row.Industry }}</td>
+  <td>{{ row.Close }}</td>
+  <td>{{ row.Open }}</td>
+  <td>{{ row.High }}</td>
+  <td>{{ row.Low }}</td>
+  <td>{{ row.Volume }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
 
 </body>
 </html>
-
-  <!-- ===== TABLE ===== -->
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-
-    <tbody>
-      {% if rows %}
-        {% for row in rows %}
-          {% with pct=row.2 %}
-            <tr class="
-              {% if pct > 4 %}dark-green
-              {% elif pct > 0 %}light-green
-              {% elif pct >= -4 %}light-red
-              {% else %}dark-red{% endif %}
-            ">
-              {% for cell in row %}
-                {% if forloop.counter == 2 %}
-                  <td>
-                    <a href="{% url 'equity_chart' cell %}" target="_blank" class="ticker-link">
-                      {{ cell }}
-                    </a>
-                  </td>
-                {% else %}
-                  <td>{{ cell }}</td>
-                {% endif %}
-              {% endfor %}
-            </tr>
-          {% endwith %}
-        {% endfor %}
-      {% else %}
-        <tr>
-          <td colspan="{{ columns|length }}" class="empty-state">
-            No stocks matched scanner criteria
-          </td>
-        </tr>
-      {% endif %}
-    </tbody>
-  </table>
-</div>
-</div>

@@ -1,84 +1,344 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>RS Alignment</title>
+<meta charset="UTF-8">
+<title>RS Alignment Dashboard</title>
 
-    <style>
-        body {
-            margin:0;
-            font-family:Arial;
-            background:#f4f6f8;
-        }
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-        .container {
-            max-width:1300px;
-            margin:20px auto;
-            background:white;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        }
+<style>
 
-        .header {
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:15px;
-        }
+/* ================= BASE (SCANNER THEME) ================= */
 
-        .btn-back {
-            padding:8px 12px;
-            background:#6c757d;
-            color:white;
-            text-decoration:none;
-            border-radius:6px;
-            font-size:13px;
-        }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-        .buttons {
-            margin-bottom:15px;
-        }
+.container {
+  padding: 20px;
+}
 
-        .buttons a {
-            padding:6px 10px;
-            margin-right:5px;
-            background:#e5e7eb;
-            text-decoration:none;
-            border-radius:6px;
-            font-size:12px;
-        }
+/* ================= NAV ================= */
 
-        .buttons a.active {
-            background:#2563eb;
-            color:white;
-        }
-    </style>
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.page-description {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TIMEFRAME BUTTONS ================= */
+
+.timeframe-bar {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 18px;
+  flex-wrap: wrap;
+}
+
+.tf-btn {
+  padding: 7px 12px;
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tf-btn.active {
+  background: #2563eb;
+  color: white;
+}
+
+.tf-btn:hover {
+  background: #1f2937;
+}
+
+/* ================= CHART ================= */
+
+.chart-box {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+/* ================= TABLE ================= */
+
+.table-card {
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1f2937;
+  margin-bottom: 25px;
+}
+
+.table-container {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+  font-size: 12px;
+}
+
+thead {
+  background: #111827;
+  color: #93c5fd;
+}
+
+th {
+  padding: 12px 10px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #1f2937;
+}
+
+tbody tr:nth-child(even) {
+  background: #0b1220;
+}
+
+tbody tr:hover {
+  background: #1e293b;
+}
+
+/* ================= SECTION HEADERS ================= */
+
+.section-title {
+  margin: 25px 0 10px;
+  color: #93c5fd;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+}
+
+</style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="header">
-        <h2>📊 RS Alignment</h2>
+<!-- ================= NAV ================= -->
 
-        <!-- BACK BUTTON -->
-        <a href="{% url 'home' %}" class="btn-back">← Home</a>
-    </div>
+<div class="top-nav">
 
-    <!-- PERIOD SELECT -->
-    <div class="buttons">
-        <a href="?period=7" class="{% if period == 7 %}active{% endif %}">7D</a>
-        <a href="?period=21" class="{% if period == 21 %}active{% endif %}">21D</a>
-        <a href="?period=50" class="{% if period == 50 %}active{% endif %}">50D</a>
-        <a href="?period=100" class="{% if period == 100 %}active{% endif %}">100D</a>
-        <a href="?period=200" class="{% if period == 200 %}active{% endif %}">200D</a>
-    </div>
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
-    <!-- CHART -->
-    <div>
-        {{ chart|safe }}
-    </div>
+</div>
+
+<!-- ================= TITLE ================= -->
+
+<h1>📊 RS Alignment Dashboard</h1>
+
+<div class="sub">
+Relative Strength vs Alignment quadrant analysis across equities
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="page-description">
+
+<strong>RS Alignment Model Overview</strong><br><br>
+
+This dashboard maps equities into four institutional-style quadrants based on Relative Strength (RS) and trend alignment.<br><br>
+
+• <b>Strong and Positive Corr</b> → Outperforming market and trade in same direction as S&P 500 <br>
+• <b>Weak and Positive Corr</b> →   Underperforming market and trade in same direction as S&P 500<br>
+• <b>Strong and Negative Corr</b> → Outperforming market and trade in opposite direction as S&P 500<br>
+• <b>Weak and negative Corr</b> →   Underperforming market and trade in opposite direction as S&P 500 <br><br>
+
+Use timeframe filters (7D / 21D / 50D / 200D) to rotate market perspective.
+
+</div>
+
+<!-- ================= TIMEFRAME ================= -->
+
+<div class="timeframe-bar">
+
+  {% for p in valid_periods %}
+    <a href="?period={{ p }}"
+       class="tf-btn {% if period == p %}active{% endif %}">
+       {{ p }}D
+    </a>
+  {% endfor %}
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="chart-box">
+  {{ chart|safe }}
+</div>
+
+<!-- ================= TABLES ================= -->
+
+<div class="section-title">Strong and Positive Corr</div>
+<div class="table-card">
+<div class="table-container">
+<table>
+<thead>
+<tr><th>Ticker</th><th>RS</th><th>Alignment</th><th>Sector</th><th>Industry</th></tr>
+</thead>
+<tbody>
+{% for r in strong_table %}
+<tr>
+  <td>{{ r.TICKER }}</td>
+  <td>{{ r.RS|floatformat:2 }}</td>
+  <td>{{ r.ALIGN }}</td>
+  <td>{{ r.Sector }}</td>
+  <td>{{ r.Industry }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section-title">Weak and Negative Corr</div>
+<div class="table-card">
+<div class="table-container">
+<table>
+<thead>
+<tr><th>Ticker</th><th>RS</th><th>Alignment</th><th>Sector</th><th>Industry</th></tr>
+</thead>
+<tbody>
+{% for r in weak_table %}
+<tr>
+  <td>{{ r.TICKER }}</td>
+  <td>{{ r.RS|floatformat:2 }}</td>
+  <td>{{ r.ALIGN }}</td>
+  <td>{{ r.Sector }}</td>
+  <td>{{ r.Industry }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section-title">Strong and Negative Corr</div>
+<div class="table-card">
+<div class="table-container">
+<table>
+<thead>
+<tr><th>Ticker</th><th>RS</th><th>Alignment</th><th>Sector</th><th>Industry</th></tr>
+</thead>
+<tbody>
+{% for r in improving_table %}
+<tr>
+  <td>{{ r.TICKER }}</td>
+  <td>{{ r.RS|floatformat:2 }}</td>
+  <td>{{ r.ALIGN }}</td>
+  <td>{{ r.Sector }}</td>
+  <td>{{ r.Industry }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section-title">Weak and Positive Corr</div>
+<div class="table-card">
+<div class="table-container">
+<table>
+<thead>
+<tr><th>Ticker</th><th>RS</th><th>Alignment</th><th>Sector</th><th>Industry</th></tr>
+</thead>
+<tbody>
+{% for r in weakening_table %}
+<tr>
+  <td>{{ r.TICKER }}</td>
+  <td>{{ r.RS|floatformat:2 }}</td>
+  <td>{{ r.ALIGN }}</td>
+  <td>{{ r.Sector }}</td>
+  <td>{{ r.Industry }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
 
 </div>
 

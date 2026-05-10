@@ -1,186 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Momentum Strength Scanner</title>
+
 <style>
-  .scanner-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
 
-  .scanner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-  .scanner-header h2 {
+body {
     margin: 0;
-    color: #1f2937;
-    font-size: 22px;
-  }
+    background: #111827;
+    font-family: Arial;
+    color: #e5e7eb;
+}
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
+.container {
+    padding: 20px;
+}
+
+/* NAV */
+.nav {
+    background: #0f172a;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+}
+
+.nav a {
+    color: #cbd5e1;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+.nav a:hover {
+    background: #1f2937;
+}
 
-  table {
+/* HEADER */
+h1 {
+    margin: 10px 0;
+}
+
+.sub {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+/* DESCRIPTION */
+.desc {
+    background: #fef3c7;
+    color: #78350f;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 12px 0;
+    font-size: 12px;
+}
+
+/* TABLE */
+table {
     width: 100%;
     border-collapse: collapse;
-  }
-
-  thead {
-    background-color: #1f2937;
-    color: white;
-  }
-
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 14px;
-  }
-
-  th {
-    text-transform: uppercase;
     font-size: 12px;
-    letter-spacing: 0.05em;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
-
-  tbody tr:hover {
-    background-color: #e5e7eb;
-  }
-
-  .empty-row td {
-    text-align: center;
-    padding: 24px;
-    color: #6b7280;
-    font-style: italic;
-  }
-</style>
-
-<div class="scanner-container">
-
-  <div class="scanner-header">
-    <h2>📈 Metrics</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-
-
-<style>
-
-.strategy-box{
-    background:#fff9db;
-    border-left:6px solid #facc15;
-    padding:20px;
-    margin-top:30px;
-    border-radius:8px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    font-family:"Segoe UI", Roboto, Arial, sans-serif;
 }
 
-.strategy-box h3{
-    margin-top:0;
-    color:#1f2937;
+thead {
+    background: #1f2937;
+    position: sticky;
+    top: 40px;
 }
 
-.strategy-box p{
-    line-height:1.6;
-    color:#374151;
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #374151;
+    text-align: left;
 }
 
-.strategy-box ul{
-    line-height:1.7;
-    margin-left:18px;
+tr:hover {
+    background: #1f2937;
+}
+
+/* MOMENTUM COLORS */
+.high {
+    color: #22c55e;
+    font-weight: 700;
+}
+
+.mid {
+    color: #facc15;
+}
+
+.low {
+    color: #ef4444;
+}
+
+/* LINK */
+.ticker {
+    color: #60a5fa;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.ticker:hover {
+    text-decoration: underline;
 }
 
 </style>
 
+</head>
 
-<div class="strategy-box">
+<body>
 
-<h3>Momentum & Strength</h3>
+<div class="nav">
 
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
-
-<ul>
-
-<li><strong>Momentum measure: 100*(Current Close/Close 3 days ago) </strong><br></li>
-<li><strong>Intra Day Strength: ((High- Open)+ (Close - Low))*(high - Low)</strong><br></li>
-
-</ul>
 </div>
 
+<div class="container">
 
+<h1>⚡ Momentum Strength Scanner </h1>
+
+<div class="sub">
+Liquidity-filtered momentum leaders using 3-day trend acceleration + intraday strength
+</div>
+
+<div class="desc">
+
+<strong>Logic Overview</strong><br><br>
+
+3-day momentum measures  :   100 * (Today Close/Close 3 days ago) <br>
+Intraday strength        : ((High - Open) + (Close - Low)) / 2*(High - Low) <br><br>
+Only stocks > 50M avg volume included<br><br>
+
+<strong>Interpretation</strong><br>
+
+🟢 >120 = Strong momentum expansion<br>
+🟡 100–120 = Neutral / building trend<br>
+🔴 <100 = Weak / retracement risk
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+{% for col in columns %}
+<th>{{ col }}</th>
+{% endfor %}
+</tr>
+</thead>
 
 <tbody>
-  {% if rows %}
-    {% for row in rows %}
-      {% with pct=row.2 %}
-        <tr class="
-          {% if pct > 4 %}
-            dark-green
-          {% elif pct > 0 %}
-            light-green
-          {% elif pct >= -4 %}
-            light-red
-          {% else %}
-            dark-red
-          {% endif %}
-        ">
-          {% for cell in row %}
-            {% if forloop.counter == 2 %}
-              <td>
-                <a href="{% url 'equity_chart' cell %}"
-                   target="_blank"
-                   class="ticker-link">
-                  {{ cell }}
+
+{% for row in rows %}
+
+<tr>
+
+    {% for cell in row.values %}
+
+        {% if forloop.counter == 2 %}
+            <td>
+                <a class="ticker"
+                   href="{% url 'equity_chart' cell %}">
+                   {{ cell }}
                 </a>
-              </td>
-            {% else %}
-              <td>{{ cell }}</td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endwith %}
+            </td>
+
+        {% elif forloop.counter == 5 and cell > 120 %}
+            <td class="high">{{ cell }}</td>
+
+        {% elif forloop.counter == 5 and cell > 100 %}
+            <td class="mid">{{ cell }}</td>
+
+        {% elif forloop.counter == 5 %}
+            <td class="low">{{ cell }}</td>
+
+        {% else %}
+            <td>{{ cell }}</td>
+        {% endif %}
+
     {% endfor %}
-  {% else %}
-    <tr>
-      <td colspan="{{ columns|length }}" class="empty-state">
-        No stocks matched scanner criteria
-      </td>
-    </tr>
-  {% endif %}
+
+</tr>
+
+{% endfor %}
+
 </tbody>
-  </table>
+
+</table>
 
 </div>
 
-
-
-
-
+</body>
+</html>

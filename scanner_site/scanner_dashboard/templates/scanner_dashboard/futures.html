@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Futures Dashboard</title>
+
+<style>
+
+  body {
+    background-color: #111827;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  /* ---------------- NAVBAR ---------------- */
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+  /* ---------------- PAGE ---------------- */
+
+  .scanner-container {
+    padding: 20px 30px;
+    min-height: 100vh;
+  }
+
+  .scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    color: white;
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .page-subtitle {
+    color: #9ca3af;
+    margin-top: 6px;
+    font-size: 15px;
+  }
+
+  .btn-back {
+    padding: 8px 14px;
+    background-color: #e5e7eb;
+    color: #111827;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s ease;
+  }
+
+  .btn-back:hover {
+    background-color: #d1d5db;
+  }
+
+  .chart-wrapper {
+    margin-top: 30px;
+    background-color: #1f2937;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+
+  /* ---------------- GROUP CARDS ---------------- */
+
+  .group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+
+  .group-card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .group-title {
+    color: #60a5fa;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .ticker-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ticker-list li {
+    color: #d1d5db;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= NAVIGATION ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
+<!-- ================= PAGE ================= -->
+
+<div class="scanner-container">
+
+  <!-- HEADER -->
+  <div class="scanner-header">
+
+    <div>
+      <h1 class="page-title">Futures Market Dashboard</h1>
+
+      <div class="page-subtitle">
+        Multi-asset futures tracking across global equity indices, bonds, metals,
+        energy, agriculture, softs, and livestock markets.
+      </div>
+    </div>
+
+    <a href="{% url 'home' %}" class="btn-back">
+      ← Back Home
+    </a>
+
+  </div>
+
+  <!-- GROUP CARDS -->
+  <div class="group-grid">
+
+    <div class="group-card">
+      <div class="group-title">Equities</div>
+      <ul class="ticker-list">
+        <li>ES=F — S&P 500</li>
+        <li>NQ=F — Nasdaq</li>
+        <li>YM=F — Dow</li>
+        <li>RTY=F — Russell</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Bonds</div>
+      <ul class="ticker-list">
+        <li>ZB=F — 30Y Bond</li>
+        <li>ZN=F — 10Y Note</li>
+        <li>ZF=F — 5Y Note</li>
+        <li>ZT=F — 2Y Note</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Metals</div>
+      <ul class="ticker-list">
+        <li>GC=F — Gold</li>
+        <li>SI=F — Silver</li>
+        <li>HG=F — Copper</li>
+        <li>PL=F — Platinum</li>
+        <li>PA=F — Palladium</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Energy</div>
+      <ul class="ticker-list">
+        <li>CL=F — Crude Oil</li>
+        <li>NG=F — Natural Gas</li>
+        <li>RB=F — Gasoline</li>
+        <li>HO=F — Heating Oil</li>
+        <li>BZ=F — Brent</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Agriculture</div>
+      <ul class="ticker-list">
+        <li>ZC=F — Corn</li>
+        <li>ZS=F — Soybeans</li>
+        <li>ZM=F — Soy Meal</li>
+        <li>ZL=F — Soy Oil</li>
+        <li>KE=F — Wheat</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Softs</div>
+      <ul class="ticker-list">
+        <li>CC=F — Cocoa</li>
+        <li>KC=F — Coffee</li>
+        <li>CT=F — Cotton</li>
+        <li>SB=F — Sugar</li>
+        <li>OJ=F — Orange Juice</li>
+      </ul>
+    </div>
+
+    <div class="group-card">
+      <div class="group-title">Livestock</div>
+      <ul class="ticker-list">
+        <li>LE=F — Live Cattle</li>
+        <li>HE=F — Lean Hogs</li>
+        <li>GF=F — Feeder Cattle</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-wrapper">
+    {{ chart|safe }}
+  </div>
+
+</div>
+
+</body>
+</html>

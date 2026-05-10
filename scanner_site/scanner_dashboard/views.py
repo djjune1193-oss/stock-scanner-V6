@@ -16,45 +16,42 @@ def home(request):
 
     df = pd.read_parquet(data_path)
 
+    df = df[df["TICKER"].notna()]
+    df = df[df["TICKER"] != ""]
+
     df["Date"] = pd.to_datetime(df["Date"]).dt.normalize()
     today = df["Date"].max()
 
     today_df = df[df["Date"] == today].copy()
 
-    # ---------- Market Health ----------
     mhi = build_market_health_indicator()
     scanner_status = get_scan_status()
 
-    # ---------- Market Breadth ----------
     up_count = (today_df["perc_change"] > 0).sum()
     down_count = (today_df["perc_change"] < 0).sum()
     flat_count = (today_df["perc_change"] == 0).sum()
 
-    # ---------- Index Values + % Change ----------
+    # Index
     index_tickers = ["^IXIC", "^GSPC", "^RUT", "^VIX"]
-
     index_df = today_df[today_df["TICKER"].isin(index_tickers)]
 
     index_values = {}
 
     for _, row in index_df.iterrows():
-        t = row["TICKER"]
+        key_map = {
+            "^IXIC": "IXIC",
+            "^GSPC": "GSPC",
+            "^RUT": "RUT",
+            "^VIX": "VIX"
+        }
 
-        if t == "^IXIC":
-            key = "IXIC"
-        elif t == "^GSPC":
-            key = "GSPC"
-        elif t == "^RUT":
-            key = "RUT"
-        elif t == "^VIX":
-            key = "VIX"
+        key = key_map[row["TICKER"]]
 
         index_values[key] = {
             "close": round(row["Close"], 2),
             "pct": round(row["perc_change"], 2)
         }
 
-    # ---------- Scanner Table ----------
     selected_columns = [
         "Date","TICKER","perc_change","Sector","Industry",
         "Close","Open","High","Low","Volume"
@@ -62,26 +59,49 @@ def home(request):
 
     table_df = today_df[selected_columns].sort_values("Volume", ascending=False)
 
-    tic_remove = ["^GSPC", "^DJI","^NYA","^RUT","^VIX","^TNX","^TYX","^IXIC"]
-    mask = ~table_df['TICKER'].isin(tic_remove)
-    table_df = table_df.loc[mask]
+    remove = ["^GSPC","^DJI","^NYA","^RUT","^VIX","^TNX","^TYX","^IXIC"]
+    table_df = table_df[~table_df["TICKER"].isin(remove)]
+
     table_df["Date"] = table_df["Date"].dt.date
 
-    return render(
-        request,
-        "scanner_dashboard/home.html",
-        
-        {   "scanner_status": scanner_status,
-            "columns": table_df.columns.tolist(),
-            "rows": table_df.values.tolist(),
-            "mhi": mhi,
-            "index_values": index_values,
-            "up_count": int(up_count),
-            "down_count": int(down_count),
-            "flat_count": int(flat_count),
-        }
-    )
+    # 🔥 ADD COLOR LOGIC
+    def get_row_class(pct):
+        if pct >= 4:
+            return "dark-green"
+        elif pct > 0:
+            return "light-green"
+        elif pct <= -4:
+            return "dark-red"
+        elif pct < 0:
+            return "light-red"
+        return ""
 
+    rows = []
+    for _, r in table_df.iterrows():
+        rows.append({
+            "Date": r["Date"],
+            "TICKER": r["TICKER"],
+            "perc_change": r["perc_change"],
+            "Sector": r["Sector"],
+            "Industry": r["Industry"],
+            "Close": r["Close"],
+            "Open": r["Open"],
+            "High": r["High"],
+            "Low": r["Low"],
+            "Volume": r["Volume"],
+            "row_class": get_row_class(r["perc_change"])
+        })
+
+    return render(request, "scanner_dashboard/home.html", {
+        "scanner_status": scanner_status,
+        "columns": selected_columns,
+        "rows": rows,
+        "mhi": mhi,
+        "index_values": index_values,
+        "up_count": int(up_count),
+        "down_count": int(down_count),
+        "flat_count": int(flat_count),
+    })
 
 
 def scanner_view(request):
@@ -97,7 +117,6 @@ def scanner_view(request):
         (df["Candle_Type"].isin(target_values)) &
         (df["21ma"] > df["50ma"]) &
         (df["Close"] > df["200ma"]) &
-        (df["slope_50"] > 0) &
         (
             (
                 (df["Low"] < df["21ma"]) &
@@ -108,12 +127,12 @@ def scanner_view(request):
                 (df["Close"] > df["34ma"])
             )
         ) &
-        (df["slope_d"] > 0) &
+#        (df["slope_d"] > 0) &
         (df["lower_count"] > 0)
     )
 
     scanner_df = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
+    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_50","lower_count"]
     scanner_df = scanner_df[selected_columns]
 
     return render(
@@ -148,7 +167,7 @@ def flat_bollinger_view(request):
 
 
     bollinger_df = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_Lower", "delta_upper", "lower_count","Position_Size" ]
+    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_Lower", "delta_upper", "lower_count"]
     bollinger_df  = bollinger_df [selected_columns]
 
     return render(
@@ -190,7 +209,7 @@ def hot_ten_day_view(request):
 
 
     hot_ten_day = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_Lower", "delta_upper", "lower_count","Position_Size" ]
+    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_Lower", "delta_upper", "lower_count" ]
     hot_ten_day  = hot_ten_day[selected_columns]
 
     return render(
@@ -221,7 +240,7 @@ def sector_view(request):
     sector_df = df[row_condition].copy()
     today = pd.Timestamp("today").normalize()
     sector_df["Date"] = pd.to_datetime(sector_df["Date"]).dt.normalize()  # normalize to remove time part
-    sector_df = sector_df.sort_values("perc_change", ascending=False).reset_index(drop=True)
+    sector_df = sector_df.sort_values("Volume", ascending=False).reset_index(drop=True)
     sector_df["Date"] = sector_df["Date"].dt.date
     
     return render(
@@ -232,6 +251,101 @@ def sector_view(request):
             "rows": sector_df.values.tolist()
         }
     )
+
+
+
+from plotly.subplots import make_subplots
+
+def futures_view(request):
+
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    df = pd.read_parquet(data_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values(["TICKER", "Date"])
+
+    # ---- Logical grouping ----
+    groups = {
+        "Equities": ["ES=F","NQ=F","YM=F","RTY=F"],
+        "Bonds": ["ZB=F","ZN=F","ZF=F","ZT=F"],
+        "Metals": ["GC=F","SI=F","HG=F","PL=F","PA=F"],
+        "Energy": ["CL=F","NG=F","RB=F","HO=F","BZ=F"],
+        "Agriculture": ["ZC=F","ZS=F","ZM=F","ZL=F","KE=F"],
+        "Softs": ["CC=F","KC=F","CT=F","SB=F","OJ=F"],
+        "Livestock": ["LE=F","HE=F","GF=F"]
+    }
+
+    # Flatten in logical order
+    ordered_tickers = [t for g in groups.values() for t in g]
+
+    df = df[df["TICKER"].isin(ordered_tickers)]
+
+    # ✅ Create ticker → sector map
+    ticker_sector_map = (
+        df.groupby("TICKER")["Sector"]
+        .first()
+        .to_dict()
+    )
+
+    # ✅ Use Sector as subplot title
+    subplot_titles = [
+        ticker_sector_map.get(t, "Unknown")
+        for t in ordered_tickers
+    ]
+
+    # ---- Grid size ----
+    cols = 4
+    rows = (len(ordered_tickers) + cols - 1) // cols
+
+    fig = make_subplots(
+        rows=rows,
+        cols=cols,
+        subplot_titles=subplot_titles,  # ✅ FIXED HERE
+        shared_xaxes=True,
+        vertical_spacing=0.03,
+        horizontal_spacing=0.03
+    )
+
+    # ---- Plot each ticker ----
+    for i, ticker in enumerate(ordered_tickers):
+
+        g = df[df["TICKER"] == ticker]
+
+        if g.empty:
+            continue
+
+        r = i // cols + 1
+        c = i % cols + 1
+
+        fig.add_trace(
+            go.Scatter(
+                x=g["Date"],
+                y=g["Close"],
+                mode="lines",
+                line=dict(width=1),
+                name=g["Sector"].iloc[0],  # (optional now)
+                showlegend=False
+            ),
+            row=r,
+            col=c
+        )
+
+    fig.update_layout(
+        height=300 * rows,
+        title="Futures Price Dashboard",
+        template="plotly_dark"
+    )
+
+    chart = fig.to_html(full_html=False)
+
+    return render(
+        request,
+        "scanner_dashboard/futures.html",
+        {"chart": chart}
+    )
+
 
 
 
@@ -253,9 +367,17 @@ def double_bottom_view(request):
             df = pd.read_parquet(data_path)
 
             if not df.empty:
-                # Keep only available columns
                 available_cols = [c for c in new_order if c in df.columns]
                 df = df[available_cols]
+
+                # -----------------------------
+                # FORMAT DATES (IMPORTANT FIX)
+                # -----------------------------
+                date_cols = ["signal_date", "neckline_date", "L1_date", "L2_date"]
+
+                for col in date_cols:
+                    if col in df.columns:
+                        df[col] = pd.to_datetime(df[col]).dt.strftime("%Y-%m-%d")
 
     except Exception as e:
         print("Double bottom load error:", e)
@@ -266,7 +388,7 @@ def double_bottom_view(request):
         "scanner_dashboard/double_bottom.html",
         {
             "columns": df.columns.tolist(),
-            "rows": df.values.tolist(),
+            "rows": df.to_dict(orient="records"),
         }
     )
 
@@ -282,12 +404,12 @@ def turtle_soup_view(request):
     row_condition = (
             (df["opposite_3days"] == True) &
             (df["K_up_today"] == True) &
-            (df["Close"] > df["50ma"])&
+            (df["K_down_yesterday"] == True) & 
             (df["D_slope"] > 0)
         )
 
     scanner_df = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "Open", "High", "Low", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
+    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "k", "d", "K_slope","D_slope", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
     scanner_df = scanner_df[selected_columns]
 
     return render(
@@ -298,6 +420,35 @@ def turtle_soup_view(request):
             "rows": scanner_df.values.tolist()
         }
     )
+
+
+def stochastic_short_view(request):
+    BASE_DIR = Path(__file__).resolve().parents[2]  # project root
+    data_path = BASE_DIR  /"scanner_site"/ "data" / "all_data.parquet"
+    df = pd.read_parquet(data_path)
+    df = df.reset_index()
+
+    # Define scanner condition  
+    row_condition = (
+            (df["opposite_3days"] == True) &
+            (df["K_down_today"] == True) &
+            (df["K_up_yesterday"] == True) & 
+            (df["D_slope"] < 0)
+        )
+
+    scanner_df = df[row_condition].copy()
+    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "k", "d", "K_slope","D_slope", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
+    scanner_df = scanner_df[selected_columns]
+
+    return render(
+        request,
+        "scanner_dashboard/stochastic_short.html",
+        {
+            "columns": scanner_df.columns.tolist(),
+            "rows": scanner_df.values.tolist()
+        }
+    )
+
 
 
 
@@ -505,73 +656,102 @@ def get_industry_ranking(request):
 
 
 def get_equity_ranking(request):
-    """
-    Returns equity-level ranking vs SPY including:
-    - Cumulative normalized return
-    - Rank
-    - Positions climbed in last 7 and 21 days
-    """
+
     BASE_DIR = Path(__file__).resolve().parents[2]
     data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
     df = pd.read_parquet(data_path)
+
     df["Date"] = pd.to_datetime(df["Date"])
     df = df.sort_values(["TICKER", "Date"])
 
-    # Calculate daily returns
+    # -----------------------------
+    # RETURNS
+    # -----------------------------
     df["Return"] = df.groupby("TICKER")["Close"].pct_change()
 
-    # Merge SPY returns
-    spy_returns = df[df["TICKER"] == "^GSPC"][["Date", "Return"]].rename(columns={"Return": "SPY_Return"})
-    df = df.merge(spy_returns, on="Date", how="left")
+    spy = (
+        df[df["TICKER"] == "^GSPC"][["Date", "Return"]]
+        .rename(columns={"Return": "SPY_Return"})
+    )
 
-    # Raw normalized return vs SPY
-    df["Norm_Return_Raw"] = df["Return"] - df["SPY_Return"]
+    df = df.merge(spy, on="Date", how="left")
 
-    # RMSE normalization (global)
-    rmse = np.sqrt(np.mean(df["Norm_Return_Raw"] ** 2))
-    df["Norm_Return"] = df["Norm_Return_Raw"] / rmse
+    df["RS_Daily"] = df["Return"] - df["SPY_Return"]
 
-    # Pivot to wide format for rolling calculations
-    equity_pivot = df.pivot(index="Date", columns="TICKER", values="Norm_Return").fillna(0)
+    rmse = np.sqrt(np.mean(df["RS_Daily"] ** 2))
+    df["RS_Normalized"] = df["RS_Daily"] / rmse
 
-    # Rolling cumulative sums
-    rolling_cum_7 = equity_pivot.rolling(window=7, min_periods=1).sum()
-    rolling_cum_21 = equity_pivot.rolling(window=21, min_periods=1).sum()
+    # -----------------------------
+    # RS MULTI TIMEFRAME
+    # -----------------------------
+    for period in [7, 21, 50, 100, 200]:
+        df[f"RS_{period}"] = df.groupby("TICKER")["RS_Normalized"].transform(
+            lambda x: x.rolling(period).mean()
+        )
 
-    # Current cumulative return and rank
-    current_cum = equity_pivot.cumsum().iloc[-1]
-    current_rank = current_cum.rank(ascending=False, method="min")
+    # -----------------------------
+    # CUMULATIVE (RAW SCORE, NOT %)
+    # -----------------------------
+    df["Cumulative_Return"] = df.groupby("TICKER")["RS_Normalized"].cumsum()
 
-    last_date = equity_pivot.index.max()
-    # Helper to find closest existing date (handles weekends/holidays)
-    def get_closest_date(target_date):
-        return equity_pivot.index[equity_pivot.index.get_indexer([target_date], method="ffill")[0]]
+    latest_date = df["Date"].max()
+    latest_df = df[df["Date"] == latest_date].copy()
 
-    date_7d_ago = get_closest_date(last_date - pd.Timedelta(days=7))
-    date_21d_ago = get_closest_date(last_date - pd.Timedelta(days=21))
+    # -----------------------------
+    # RS SCORE
+    # -----------------------------
+    latest_df["RS_SCORE"] = (
+        0.30 * latest_df["RS_7"] +
+        0.25 * latest_df["RS_21"] +
+        0.20 * latest_df["RS_50"] +
+        0.15 * latest_df["RS_100"] +
+        0.10 * latest_df["RS_200"]
+    )
 
-    rank_7d_ago = rolling_cum_7.loc[date_7d_ago].rank(ascending=False, method="min")
-    rank_21d_ago = rolling_cum_21.loc[date_21d_ago].rank(ascending=False, method="min")
+    latest_df = latest_df.dropna(subset=[
+        "RS_SCORE", "RS_7", "RS_21", "RS_50", "RS_100", "RS_200"
+    ])
 
-    # Build final table
-    equity_cum = pd.DataFrame({
-        "Ticker": current_cum.index,
-        "Cumulative_Return": current_cum.values,
-        "Rank": current_rank.values,
-        "Pos_Climbed_7d": rank_7d_ago.values - current_rank.values,
-        "Pos_Climbed_21d": rank_21d_ago.values - current_rank.values
-    })
+    # -----------------------------
+    # SORT CONTROL (NEW)
+    # -----------------------------
+    sort_by = request.GET.get("sort", "cumulative")
+    sort_dir = request.GET.get("dir", "desc")
 
-    equity_cum = equity_cum.sort_values("Rank")
+    ascending = False if sort_dir == "desc" else True
 
-    ranking_list = equity_cum.to_dict(orient="records")
+    if sort_by == "rs":
+        latest_df = latest_df.sort_values("RS_SCORE", ascending=ascending)
+    elif sort_by == "ticker":
+        latest_df = latest_df.sort_values("Ticker", ascending=ascending)
+    else:
+        latest_df = latest_df.sort_values("Cumulative_Return", ascending=ascending)
+
+    # -----------------------------
+    # FINAL OUTPUT
+    # -----------------------------
+    ranking_list = latest_df[[
+        "TICKER",
+        "RS_SCORE",
+        "Cumulative_Return",
+        "RS_7",
+        "RS_21",
+        "RS_50",
+        "RS_100",
+        "RS_200"
+    ]].rename(columns={"TICKER": "Ticker"}).to_dict("records")
+
     return render(
         request,
         "scanner_dashboard/equity_ranking.html",
-        {"ranking_list": ranking_list}
+        {
+            "ranking_list": ranking_list,
+            "date": latest_date,
+            "sort_by": sort_by,
+            "sort_dir": sort_dir
+        }
     )
-
 
 def metrics_view(request):
 
@@ -583,73 +763,105 @@ def metrics_view(request):
     # -----------------------------
     # CLEAN COLUMNS
     # -----------------------------
+
     df.columns = df.columns.str.strip()
 
-    # Normalize ticker column
     if "Ticker" in df.columns:
         df.rename(columns={"Ticker": "TICKER"}, inplace=True)
+
     elif "ticker" in df.columns:
         df.rename(columns={"ticker": "TICKER"}, inplace=True)
 
     # -----------------------------
     # FEATURE ENGINEERING
     # -----------------------------
+
     if "Upper" in df.columns and "Close" in df.columns:
-        df["Delta Upper BBand"] = (
+
+        df["Delta_Upper_BBand"] = (
             ((df["Upper"] - df["Close"]) / df["Close"]) * 100
         ).round(2)
 
     if "Lower" in df.columns and "Close" in df.columns:
-        df["Delta Lower BBand"] = (
+
+        df["Delta_Lower_BBand"] = (
             ((df["Close"] - df["Lower"]) / df["Lower"]) * 100
         ).round(2)
 
     # -----------------------------
-    # COLUMN ORDER (KEEP TICKER FIRST)
+    # COLUMN ORDER
     # -----------------------------
+
     selected_columns = [
-        "Date", "TICKER", "perc_change", "Sector", "Industry",
-        "ATR_Pct", "Delta Upper BBand", "Delta Lower BBand",
-        "slope_k", "slope_d", "ADX", "PLUS_DI", "MINUS_DI",
+
+        "Date",
+        "TICKER",
+        "perc_change",
+        "Sector",
+        "Industry",
+        "ATR_Pct",
+        "slope_k",
+        "slope_d",
+        "k",
+        "d",
+        "ADX",
+        "PLUS_DI",
+        "MINUS_DI",
+
         "Candle_Type"
+
     ]
 
-    # keep only available columns safely
-    selected_columns = [c for c in selected_columns if c in df.columns]
+    selected_columns = [
+        c for c in selected_columns if c in df.columns
+    ]
 
     df = df[selected_columns]
 
     # -----------------------------
     # SORTING
     # -----------------------------
+
     sort_col = request.GET.get("sort")
 
     if sort_col and sort_col in df.columns:
-        df = df.sort_values(by=sort_col, ascending=False)
 
-    # default sort
+        df = df.sort_values(
+            by=sort_col,
+            ascending=False
+        )
+
     else:
+
         if "PLUS_DI" in df.columns:
-            df = df.sort_values(by="PLUS_DI", ascending=False)
+
+            df = df.sort_values(
+                by="PLUS_DI",
+                ascending=False
+            )
 
     # -----------------------------
-    # SEARCH (Ticker)
+    # SEARCH
     # -----------------------------
+
     search_query = request.GET.get("search")
+
     highlight_index = None
 
     if search_query:
+
         search_query = search_query.upper().strip()
 
-        if "TICKER" in df.columns:
-            matches = df[df["TICKER"] == search_query]
+        matches = df[df["TICKER"] == search_query]
 
-            if not matches.empty:
-                highlight_index = matches.index[0]
+        if not matches.empty:
+
+            highlight_index = matches.index[0]
 
     # -----------------------------
-    # FINAL CLEANUP
+    # FINAL
     # -----------------------------
+
     df = df.reset_index(drop=True)
 
     return render(
@@ -663,58 +875,83 @@ def metrics_view(request):
         }
     )
 
-def calculate_momentum_strength(request):
-    """
-    Calculates:
-    1. 3-day momentum: 100 * (Current Close / Close 3 days ago)
-    2. Intraday strength: ((High - Open) + (Close - Low)) / (2 * (High - Low))
 
-    Returns:
-        DataFrame with ticker, date, momentum_3d, intraday_strength
-    """
+
+def calculate_momentum_strength(request):
+
     BASE_DIR = Path(__file__).resolve().parents[2]
     data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
-
     df = pd.read_parquet(data_path)
+
     df["Date"] = pd.to_datetime(df["Date"])
     df = df.sort_values(["TICKER", "Date"])
 
-    # Close 3 days ago
+    # ----------------------------
+    # 3-DAY MOMENTUM
+    # ----------------------------
     df["close_3d"] = df.groupby("TICKER")["Close"].shift(3)
 
-    # Metric 1: 3-day momentum
-    df["Momentum_3D"] = 100 * ((df["Close"] / df["close_3d"])) .round(2)
+    df["Momentum_3D"] = (
+        100 * (df["Close"] / df["close_3d"])
+    ).round(2)
 
-    # Metric 2: Intraday strength
+    # ----------------------------
+    # INTRADAY STRENGTH
+    # ----------------------------
     df["Intraday_Strength"] = (
         ((df["High"] - df["Open"]) + (df["Close"] - df["Low"])) /
         (2 * (df["High"] - df["Low"]))
     ).round(2)
 
-    # Latest date snapshot
+    # ----------------------------
+    # AVG VOLUME (EXCLUDING TODAY)
+    # ----------------------------
+    df["Avg_Volume"] = (
+        df.groupby("TICKER")["Volume"]
+        .transform(lambda x: x.shift(1).rolling(3).mean()).round(0)
+    )
+
+    # ----------------------------
+    # LATEST SNAPSHOT
+    # ----------------------------
     latest_date = df["Date"].max()
     df_latest = df[df["Date"] == latest_date].copy()
 
-    # Remove invalid rows
-    df_latest = df_latest.dropna(subset=["Momentum_3D", "Intraday_Strength"])
+    # ----------------------------
+    # CLEAN FILTERS
+    # ----------------------------
+    df_latest = df_latest.dropna(
+        subset=["Momentum_3D", "Intraday_Strength", "Avg_Volume"]
+    )
 
-    # Sort strongest first
-    df_latest = df_latest.sort_values("Momentum_3D", ascending=False)
+    # liquidity filter (historical only)
+    df_latest = df_latest[df_latest["Avg_Volume"] > 50_000_000]
 
-    # Select columns to display
+    # ----------------------------
+    # SORT
+    # ----------------------------
+    df_latest = df_latest.sort_values(
+        [ "Intraday_Strength","Momentum_3D"],
+        ascending=[False, False]
+    )
+
+    # ----------------------------
+    # FINAL TABLE
+    # ----------------------------
     df_latest = df_latest[
-        ["Date","TICKER","Sector","Industry", "Momentum_3D", "Intraday_Strength", "Close", "Volume"]
-        
-    ].sort_values("Intraday_Strength", ascending=False)
-    
+        ["Date", "TICKER", "Sector", "Industry",
+         "Momentum_3D", "Intraday_Strength",
+         "Close", "Volume", "Avg_Volume"]
+    ]
 
     return render(
         request,
         "scanner_dashboard/momentum_strength.html",
         {
             "columns": df_latest.columns.tolist(),
-            "rows": df_latest.values.tolist()
+            "rows": df_latest.to_dict(orient="records"),
+            "date": latest_date
         }
     )
 
@@ -741,27 +978,27 @@ def base_breakout_scanner(request):
     # -----------------------------
     df["ATR_15"] = (
         df.groupby("TICKER")["TR"]
-        .transform(lambda x: x.rolling(15, min_periods=15).mean())
+        .transform(lambda x: x.rolling(15, min_periods=15).mean().round(2))
     )
 
     # -----------------------------
     # 14 BAR HIGH / LOW
     # -----------------------------
     df["low_14"] = (
-        df.groupby("TICKER")["Low"]
+        df.groupby("TICKER")["Close"]
         .transform(lambda x: x.rolling(14, min_periods=14).min())
     )
 
     df["high_14"] = (
-        df.groupby("TICKER")["High"]
+        df.groupby("TICKER")["Close"]
         .transform(lambda x: x.rolling(14, min_periods=14).max())
     )
 
     # -----------------------------
     # WAVE LEVELS
     # -----------------------------
-    df["up_wave"] = (df["low_14"] + 3 * df["ATR_15"]).round(2)
-    df["down_wave"] = (df["high_14"] - 3 * df["ATR_15"]).round(2)
+    df["up_wave"] = (df["low_14"] + 2.5 * df["ATR_15"]).round(2)
+    df["down_wave"] = (df["high_14"] - 2.5 * df["ATR_15"]).round(2)
 
     # -----------------------------
     # CROSS CONDITIONS
@@ -798,7 +1035,7 @@ def base_breakout_scanner(request):
     result = trigger_rows[trigger_rows["Date"] >= last_3_months]
 
     result = result[
-        ["Date", "TICKER","Close", "up_wave", "down_wave", "wave_type"]
+        ["Date", "TICKER","Close","low_14","high_14","ATR_15", "up_wave", "down_wave", "wave_type"]
     ]
 
     result = result.sort_values(["wave_type"])
@@ -814,56 +1051,175 @@ def base_breakout_scanner(request):
 
 
 def breakout_21_view(request):
-    
+
     BASE_DIR = Path(__file__).resolve().parents[2]
-    data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    data_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "full_history.parquet"
+    )
 
     df = pd.read_parquet(data_path)
 
+    # -----------------------------------
+    # CLEAN
+    # -----------------------------------
+
     df["Date"] = pd.to_datetime(df["Date"])
+
     df = df.sort_values(["TICKER", "Date"])
 
     results = []
 
+    # -----------------------------------
+    # LOOP TICKERS
+    # -----------------------------------
+
     for ticker, g in df.groupby("TICKER"):
 
-        g = g.tail(60).copy()  # small optimization
+        g = g.tail(60).copy()
 
         if len(g) < 25:
             continue
 
-        base = g.iloc[-22:-1]  # 21-day base
+        # -----------------------------------
+        # 21 DAY BASE
+        # -----------------------------------
+
+        base = g.iloc[-22:-1]
+
         today = g.iloc[-1]
 
         base_high = base["High"].max()
 
-        # highs within 2% of base high
-        highs_near_top = base[base["High"] >= base_high * 0.98]
+        # -----------------------------------
+        # BASE VALIDATION
+        # -----------------------------------
+
+        highs_near_top = base[
+            base["High"] >= base_high * 0.98
+        ]
 
         if len(highs_near_top) < 2:
             continue
 
-        avg_vol = base["Volume"].mean()
+        # -----------------------------------
+        # VOLUME
+        # -----------------------------------
+
+        avg_vol = round(base["Volume"].mean())
+
+        # -----------------------------------
+        # TODAY DIRECTION FILTER
+        # ONLY STRONG UP DAYS
+        # -----------------------------------
+
+        bullish_today = (
+            today["Close"] > today["Open"]
+        )
+
+        # -----------------------------------
+        # BREAKOUT LOGIC
+        # -----------------------------------
 
         breakout = (
+
             (today["High"] > base_high) and
-            (today["Volume"] >= 1.5 * avg_vol)
+
+            (today["Volume"] >= 1.5 * avg_vol) and
+
+            bullish_today
+
         )
+
+        # -----------------------------------
+        # SAVE RESULT
+        # -----------------------------------
 
         if breakout:
 
+            breakout_pct = round(
+                (
+                    (today["Close"] - base_high)
+                    / base_high
+                ) * 100,
+                2
+            )
+
+            volume_ratio = round(
+                today["Volume"] / avg_vol,
+                2
+            )
+
             results.append({
-                "Breakout_Date": today["Date"],
-                "TICKER": ticker,
-                "Sector": today.get("Sector"),
-                "Industry": today.get("Industry"),
-                "Breakout_Price": today["Close"],
-                "Base_High": base_high,
-                "Volume": today["Volume"],
-                "Avg_Volume": avg_vol
+
+                "Breakout_Date":
+                    today["Date"].strftime("%Y-%m-%d"),
+
+                "TICKER":
+                    ticker,
+
+                "Sector":
+                    today.get("Sector"),
+
+                "Industry":
+                    today.get("Industry"),
+
+                "Breakout_Price":
+                    round(today["Close"], 2),
+
+                "Base_High":
+                    round(base_high, 2),
+
+                "Breakout_%":
+                    breakout_pct,
+
+                "Volume":
+                    int(today["Volume"]),
+
+                "Avg_Volume":
+                    int(avg_vol),
+
+                "Vol_Ratio":
+                    volume_ratio
+
             })
 
+    # -----------------------------------
+    # FINAL DF
+    # -----------------------------------
+
     results_df = pd.DataFrame(results)
+
+    # -----------------------------------
+    # SORT
+    # -----------------------------------
+
+    if not results_df.empty:
+
+        results_df = results_df.sort_values(
+            "Breakout_%",
+            ascending=False
+        )
+
+    return render(
+
+        request,
+
+        "scanner_dashboard/breakout_21.html",
+
+        {
+
+            "columns":
+                results_df.columns.tolist(),
+
+            "rows":
+                results_df.values.tolist(),
+
+        },
+    )
 
     return render(
         request,
@@ -1222,70 +1578,120 @@ def rs_alignment_dashboard(request):
 
     df = pd.read_parquet(data_path)
 
-    # -----------------------------
-    # REMOVE INDEX / MACRO SECTORS
-    # -----------------------------
-    remove_sectors = [
-        "Momentum ",
-        "DOW JONES",
-        "NASDAQ",
-        "NYSE",
-        "IWM",
-        "VOLATILITY",
-        "10 YEAR TREASURY",
-        "FEAR INDEX"
-    ]
+    # =========================================
+    # TIMEFRAME (FIXED OPTIONS ONLY)
+    # =========================================
 
-    df = df[~df["Sector"].isin(remove_sectors)]
-
-    sector_list = df["Sector"].unique()
-
-    color_palette = px.colors.qualitative.Dark24  # best built-in for many categories
-
-    # Map sectors → colors
-    color_map = {
-        sector: color_palette[i % len(color_palette)]
-        for i, sector in enumerate(sector_list)
-}
-
-    # -----------------------------
-    # DEFAULT TIMEFRAME = 21
-    # -----------------------------
+    valid_periods = [7, 21, 50, 200]
     period = int(request.GET.get("period", 21))
+
+    if period not in valid_periods:
+        period = 21
 
     rs_col = f"RS_{period}"
     align_col = f"ALIGN_{period}"
 
-    # drop missing
+    # =========================================
+    # CLEAN DATA
+    # =========================================
+
     df = df.dropna(subset=[rs_col, align_col])
+    df = df[df[rs_col] > 0]
 
-    fig = px.scatter(
-        df,
-        x=rs_col,
-        y=align_col,
-        color="Sector",
-        color_discrete_map=color_map,   # 👈 KEY LINE
-        hover_name="TICKER",
-        hover_data=["Industry"],
-        title=f"RS vs Alignment ({period}-Day)",
-        width=1200,
-        height=800
+    # =========================================
+    # QUADRANTS
+    # =========================================
+
+    strong_df = df[(df[rs_col] >= 1) & (df[align_col] >= period / 2)]
+    weak_df = df[(df[rs_col] < 1) & (df[align_col] < period / 2)]
+    improving_df = df[(df[rs_col] >= 1) & (df[align_col] < period / 2)]
+    weakening_df = df[(df[rs_col] < 1) & (df[align_col] >= period / 2)]
+
+    # =========================================
+    # PLOT
+    # =========================================
+
+    import plotly.graph_objects as go
+
+    fig = go.Figure()
+
+    def add_trace(data, name, color, size=8, opacity=0.7):
+        fig.add_trace(go.Scatter(
+            x=data[rs_col],
+            y=data[align_col],
+            mode="markers",
+            name=name,
+            text=data["TICKER"],
+            customdata=data[["Sector", "Industry"]],
+            marker=dict(size=size, color=color, opacity=opacity),
+            hovertemplate=
+            "<b>%{text}</b><br>" +
+            "Sector: %{customdata[0]}<br>" +
+            "Industry: %{customdata[1]}<br>" +
+            "RS: %{x:.2f}<br>" +
+            "Alignment: %{y}<extra></extra>"
+        ))
+
+    add_trace(strong_df, "Strong and Positive Corr ", "#22c55e", 10, 0.9)
+    add_trace(weak_df, "Weak and Negative Corr", "#ef4444")
+    add_trace(improving_df, "Strong and Negative Corr", "#3b82f6")
+    add_trace(weakening_df, "Weak and Positive Corr", "#f59e0b")
+
+    fig.add_vline(x=1, line_dash="dash", line_color="white", opacity=0.5)
+    fig.add_hline(y=period / 2, line_dash="dash", line_color="white", opacity=0.5)
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=800,
+        paper_bgcolor="#0b1220",
+        plot_bgcolor="#0b1220",
+        title=f"RS vs Alignment ({period}D)",
+        legend=dict(orientation="h", y=1.02, x=0.5, xanchor="center")
     )
-
-    # reference lines
-    fig.add_vline(x=1, line_dash="dash")
-    fig.add_hline(y=period/2, line_dash="dash")
-
-    fig.update_traces(marker=dict(size=8, opacity=0.75))
 
     chart = fig.to_html(full_html=False)
 
-    return render(request, "scanner_dashboard/rs_alignment_dashboard.html", {
+    # =========================================
+    # QUADRANT TABLE DATA
+    # =========================================
+
+    def format_table(df):
+        return df[["TICKER", rs_col, align_col, "Sector", "Industry"]].rename(
+            columns={
+                rs_col: "RS",
+                align_col: "ALIGN"
+            }
+        ).to_dict("records")
+
+    context = {
         "chart": chart,
-        "period": period
-    })
+        "period": period,
+        "valid_periods": valid_periods,
+
+        "strong_table": format_table(strong_df),
+        "weak_table": format_table(weak_df),
+        "improving_table": format_table(improving_df),
+        "weakening_table": format_table(weakening_df),
+
+        "counts": {
+            "strong": len(strong_df),
+            "weak": len(weak_df),
+            "improving": len(improving_df),
+            "weakening": len(weakening_df),
+        }
+    }
+
+    return render(request, "scanner_dashboard/rs_alignment_dashboard.html", context)
+
+
+
 
 #LBR
+
+import pandas as pd
+from django.shortcuts import render
+from pathlib import Path
+import plotly.graph_objects as go
 
 def sector_lbr_view(request):
 
@@ -1293,91 +1699,103 @@ def sector_lbr_view(request):
     data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
     df = pd.read_parquet(data_path)
-    df["Date"] = pd.to_datetime(df["Date"])
 
-    # -----------------------------
-    # SECTOR ETFs ONLY
-    # -----------------------------
-    SECTOR_ETFS = [
-        "^GSPC","XLK","XLV","XLF","XLY","XLP",
-        "XLE","XLI","XLB","XLRE","XLU","XLC"
-    ]
+    df.columns = df.columns.str.lower()
+    df["date"] = pd.to_datetime(df["date"])
+    df["ticker"] = df["ticker"].astype(str)
 
-    df = df[df["TICKER"].isin(SECTOR_ETFS)].copy()
+    df = df[df["ticker"].notna()]
+    df = df[df["ticker"].str.strip() != ""]
+    df = df[df["ticker"].str.lower() != "nan"]
 
-    # -----------------------------
-    # SELECT ETF
-    # -----------------------------
-    selected_etf = request.GET.get("etf", "^GSPC")
+    df = df.sort_values(["ticker", "date"])
+    latest_rows = df.groupby("ticker").tail(1)
 
-    df = df[df["TICKER"] == selected_etf].copy()
-    df = df.sort_values("Date")
+    signal_df = latest_rows[
+        (latest_rows["buy_day"] == True) |
+        (latest_rows["sell_day"] == True)
+    ].copy()
 
-    # -----------------------------
-    # LAST N DAYS
-    # -----------------------------
-    days = int(request.GET.get("days", 60))
-    df = df.tail(days)
+    total_buys = signal_df["buy_day"].sum()
+    total_sells = signal_df["sell_day"].sum()
 
-    # -----------------------------
-    # PLOT
-    # -----------------------------
-    fig = go.Figure()
+    # =========================
+    # AUTO LOAD ^GSPC
+    # =========================
+    selected_ticker = request.GET.get("ticker", "^GSPC")
 
-    # ROC line
-    fig.add_trace(go.Scatter(
-        x=df["Date"],
-        y=df["ROC2"],
-        mode="lines",
-        name="ROC(2)",
-        line=dict(color="black", width=2)
-    ))
+    chart = None
 
-    # BUY (blue)
-    fig.add_trace(go.Scatter(
-        x=df.loc[df["buy_day"], "Date"],
-        y=df.loc[df["buy_day"], "ROC2"],
-        mode="markers",
-        name="Sell Signal",
-        marker=dict(
-            size=10,
-            color="blue",
-            symbol="circle"
+    g = df[df["ticker"] == selected_ticker].copy()
+    g = g.sort_values("date").tail(30)
+
+    if not g.empty:
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(
+            x=g["date"],
+            y=g["roc2"],
+            mode="lines",
+            name="ROC(2)",
+            line=dict(color="#60a5fa", width=2),
+            fill="tozeroy",
+            fillcolor="rgba(96,165,250,0.08)"
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=g.loc[g["buy_day"], "date"],
+            y=g.loc[g["buy_day"], "roc2"],
+            mode="markers",
+            name="Buy",
+            marker=dict(size=10, color="#22c55e", symbol="triangle-up")
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=g.loc[g["sell_day"], "date"],
+            y=g.loc[g["sell_day"], "roc2"],
+            mode="markers",
+            name="Sell",
+            marker=dict(size=10, color="#ef4444", symbol="triangle-down")
+        ))
+
+        fig.add_hline(y=0, line_dash="dash", line_color="#6b7280")
+
+        fig.update_layout(
+            title=f"{selected_ticker} - ROC(2) + LBR Signals",
+            template="plotly_dark",
+            height=520,
+            margin=dict(l=20, r=20, t=50, b=20),
+            paper_bgcolor="#0b1220",
+            plot_bgcolor="#0b1220",
+            font=dict(color="#e5e7eb"),
+            legend=dict(orientation="h", y=1.02)
         )
-    ))
 
-    # SELL (pink)
-    fig.add_trace(go.Scatter(
-        x=df.loc[df["sell_day"], "Date"],
-        y=df.loc[df["sell_day"], "ROC2"],
-        mode="markers",
-        name="Buy Signal",
-        marker=dict(
-            size=10,
-            color="hotpink",
-            symbol="circle"
-        )
-    ))
+        fig.update_xaxes(gridcolor="#1f2937")
+        fig.update_yaxes(gridcolor="#1f2937")
 
-    # zero line
-    fig.add_hline(y=0, line_dash="dash")
+        chart = fig.to_html(full_html=False)
 
-    fig.update_layout(
-        title=f"{selected_etf} - ROC(2) + LBR Signals",
-        xaxis_title="Date",
-        yaxis_title="ROC(2)",
-        height=700
-    )
+    table_data = []
 
-    chart = fig.to_html(full_html=False)
+    for _, row in signal_df.iterrows():
+        table_data.append({
+            "ticker": row["ticker"],
+            "industry": row.get("industry", "N/A"),
+            "volume": int(row["volume"]) if pd.notna(row.get("volume")) else 0,
+            "buy_day": row["buy_day"],
+            "sell_day": row["sell_day"],
+        })
+
+    table_data = sorted(table_data, key=lambda x: x["volume"], reverse=True)
 
     return render(request, "scanner_dashboard/sector_lbr.html", {
         "chart": chart,
-        "etfs": SECTOR_ETFS,
-        "selected_etf": selected_etf,
-        "days": days
+        "data": table_data,
+        "total_buys": int(total_buys),
+        "total_sells": int(total_sells),
+        "selected_ticker": selected_ticker
     })
-
 
 
 from pathlib import Path
@@ -1776,7 +2194,291 @@ def documentation(request):
 
 
 
+def keltner_scan(request):
 
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    latest_path = BASE_DIR / "scanner_site" / "data" / "keltner_latest.parquet"
+    history_path = BASE_DIR / "scanner_site" / "data" / "keltner_history.parquet"
+
+    latest_df = pd.read_parquet(latest_path)
+    history_df = pd.read_parquet(history_path)
+
+    latest_df["Date"] = pd.to_datetime(latest_df["Date"])
+    history_df["Date"] = pd.to_datetime(history_df["Date"])
+
+    # =====================================
+    # SORTING
+    # =====================================
+
+    sort_col = request.GET.get("sort", "pct_above_ema")
+    sort_dir = request.GET.get("dir", "desc")
+
+    valid_cols = [
+        "pct_above_ema",
+        "atr_pct",
+        "days_above_ema",
+        "Close",
+        "ema20",
+        "kc_upper",
+        "kc_lower"
+    ]
+
+    if sort_col not in valid_cols:
+        sort_col = "pct_above_ema"
+
+    ascending = True if sort_dir == "asc" else False
+
+    latest_df = latest_df.sort_values(
+        sort_col,
+        ascending=ascending
+    )
+
+    # =====================================
+    # TABLE DATA
+    # =====================================
+
+    results = latest_df[[
+        "TICKER",
+        "Close",
+        "ema20",
+        "kc_upper",
+        "kc_lower",
+        "pct_above_ema",
+        "atr_pct",
+        "days_above_ema"
+    ]].round(2).to_dict("records")
+
+    # =====================================
+    # CHART
+    # =====================================
+
+    selected_ticker = request.GET.get("ticker", "^GSPC")
+
+    if selected_ticker not in history_df["TICKER"].unique():
+        selected_ticker = "^GSPC"
+
+    chart_df = (
+        history_df[history_df["TICKER"] == selected_ticker]
+        .tail(80)
+        .copy()
+    )
+
+    chart_data = None
+
+    if not chart_df.empty:
+
+        import plotly.graph_objects as go
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["Close"],
+            name="Close",
+            line=dict(color="white", width=2)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["ema20"],
+            name="EMA20",
+            line=dict(color="cyan", width=2)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["kc_upper"],
+            name="KC Upper",
+            line=dict(color="red", width=1)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["kc_lower"],
+            name="KC Lower",
+            line=dict(color="lime", width=1)
+        ))
+
+        fig.update_layout(
+            template="plotly_dark",
+            height=450,
+            margin=dict(l=10, r=10, t=30, b=10),
+            title=f"{selected_ticker} - Keltner Channel"
+        )
+
+        chart_data = fig.to_html(full_html=False)
+
+    return render(request, "scanner_dashboard/keltner_scan.html", {
+        "data": results,
+        "chart": chart_data,
+        "selected_ticker": selected_ticker,
+        "sort_col": sort_col,
+        "sort_dir": sort_dir
+    })
+
+
+
+
+def fib_retracement_scan(request):
+
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    data_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    df = pd.read_parquet(data_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values(["TICKER", "Date"])
+
+    import numpy as np
+    import plotly.graph_objects as go
+
+    selected_ticker = request.GET.get("ticker", "^GSPC")
+    sort_col = request.GET.get("sort")
+
+    results = []
+
+    # =========================
+    # FIB CALCULATION PER TICKER
+    # =========================
+
+    for ticker, g in df.groupby("TICKER"):
+
+        g = g.copy()
+
+        high_max = g["High"].max()
+        low_min = g["Low"].min()
+
+        # avoid divide-by-zero issues
+        denom = (high_max - low_min) if (high_max - low_min) != 0 else 1
+
+        g["retracement"] = ((high_max - g["Close"]) / denom) * 100
+
+        latest = g.iloc[-1]
+
+        results.append({
+            "ticker": ticker,
+            "Close": round(latest["Close"], 2),
+            "high_max": round(high_max, 2),
+            "low_min": round(low_min, 2),
+            "retracement": round(latest["retracement"], 2),
+            "tv_link": f"https://www.tradingview.com/chart/?symbol={ticker}"
+        })
+
+    # =========================
+    # SORTING (IMPORTANT FIX)
+    # =========================
+
+    valid_sort_fields = [
+        "ticker",
+        "Close",
+        "high_max",
+        "low_min",
+        "retracement"
+    ]
+
+    if sort_col in valid_sort_fields:
+
+        # ticker ascending
+        if sort_col == "ticker":
+
+            results = sorted(
+                results,
+                key=lambda x: x.get(sort_col, "")
+            )
+
+        # numeric ascending
+        else:
+
+            results = sorted(
+                results,
+                key=lambda x: x.get(sort_col, 0)
+            )
+
+    else:
+
+        # DEFAULT SORT = retracement ASCENDING
+        results = sorted(
+            results,
+            key=lambda x: x["retracement"]
+        )
+
+    # =========================
+    # CHART (DEFAULT ^GSPC OR SWITCHED)
+    # =========================
+
+    chart = None
+    chart_df = df[df["TICKER"] == selected_ticker].tail(120).copy()
+
+    if not chart_df.empty:
+
+        high_max = chart_df["High"].max()
+        low_min = chart_df["Low"].min()
+
+        denom = (high_max - low_min) if (high_max - low_min) != 0 else 1
+
+        # fib levels
+        chart_df["fib_0"] = high_max
+        chart_df["fib_236"] = high_max - 0.236 * (high_max - low_min)
+        chart_df["fib_382"] = high_max - 0.382 * (high_max - low_min)
+        chart_df["fib_50"] = high_max - 0.5 * (high_max - low_min)
+        chart_df["fib_618"] = high_max - 0.618 * (high_max - low_min)
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["Close"],
+            name="Close",
+            line=dict(color="white", width=2)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["fib_236"],
+            name="23.6%",
+            line=dict(color="green", width=1)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["fib_382"],
+            name="38.2%",
+            line=dict(color="yellow", width=1)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["fib_50"],
+            name="50%",
+            line=dict(color="orange", width=1)
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=chart_df["Date"],
+            y=chart_df["fib_618"],
+            name="61.8%",
+            line=dict(color="red", width=1)
+        ))
+
+        fig.update_layout(
+            template="plotly_dark",
+            height=450,
+            margin=dict(l=10, r=10, t=30, b=10),
+            title=f"{selected_ticker} - Fibonacci Retracement"
+        )
+
+        chart = fig.to_html(full_html=False)
+
+    # =========================
+    # FINAL RETURN
+    # =========================
+
+    return render(request, "scanner_dashboard/fib_scan.html", {
+        "data": results,
+        "chart": chart,
+        "selected_ticker": selected_ticker
+    })
 
 
 

@@ -4,95 +4,138 @@
 <title>Industry Daily Performance</title>
 
 <style>
+
+/* ================= BASE THEME ================= */
+
 body {
-    margin:0;
-    font-family:Arial;
-    background:#f4f6f8;
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial;
+    background: #0b1220;
+    color: #e5e7eb;
 }
+
+/* ================= CONTAINER ================= */
 
 .container {
-    max-width:1150px;
-    margin:30px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #111827;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1f2937;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
+
 .header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .header h2 {
-    margin:0;
+    margin: 0;
+    font-size: 18px;
+    color: #e5e7eb;
 }
 
-/* BACK BUTTON */
+/* ================= BACK BUTTON ================= */
+
 .btn-back {
-    padding:8px 12px;
-    background:#6c757d;
-    color:white;
-    text-decoration:none;
-    border-radius:6px;
-    font-size:13px;
+    padding: 8px 12px;
+    background: #1f2937;
+    color: #e5e7eb;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 12px;
+    border: 1px solid #374151;
 }
 
 .btn-back:hover {
-    background:#5a6268;
+    background: #374151;
 }
 
-/* TABLE */
+/* ================= TABLE ================= */
+
 .table-container {
-    overflow:auto;
-    max-height:75vh;
-    border-radius:10px;
+    overflow: auto;
+    max-height: 75vh;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
 }
 
 table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
 }
 
 /* HEADER */
+
 thead th {
-    position:sticky;
-    top:0;
-    background:#1f2937;
-    color:white;
-    padding:10px;
-    text-align:center;
+    position: sticky;
+    top: 0;
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #1f2937;
 }
 
 /* CELLS */
+
 td {
-    padding:8px;
-    text-align:center;
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #1f2937;
 }
 
-/* ROW STYLING */
-tbody tr:nth-child(even) {
-    background:#f9fafb;
-}
+/* ROW HOVER */
 
 tbody tr:hover {
-    background:#e5e7eb;
+    background: #1f2937;
 }
 
-/* PERFORMANCE COLORS */
-.strong { background:#065f46; color:white; }
-.good { background:#d1fae5; }
-.weak { background:#fef3c7; }
-.bad { background:#fee2e2; }
+/* ================= COLORS (UPDATED FOR DARK THEME) ================= */
+
+.strong {
+    background: #065f46;
+    color: white;
+}
+
+.good {
+    background: rgba(34,197,94,0.15);
+    color: #86efac;
+}
+
+.weak {
+    background: rgba(234,179,8,0.12);
+    color: #fde68a;
+}
+
+.bad {
+    background: rgba(239,68,68,0.12);
+    color: #fca5a5;
+}
 
 /* VOLUME SPIKE */
-.spike { background:#2563eb; color:white; }
+
+.spike {
+    background: rgba(37,99,235,0.18);
+    color: #93c5fd;
+    font-weight: bold;
+}
+
+/* TICKER */
+
+td:first-child {
+    font-weight: 700;
+    color: #93c5fd;
+}
 
 </style>
+
 </head>
 
 <body>
@@ -101,7 +144,7 @@ tbody tr:hover {
 
     <!-- HEADER -->
     <div class="header">
-        <h2>📊 {{ industry }} - Daily Performance </h2>
+        <h2>📊 {{ industry }} - Daily Performance</h2>
         <a href="{% url 'industry_today' %}" class="btn-back">← Back</a>
     </div>
 
@@ -122,11 +165,13 @@ tbody tr:hover {
             </thead>
 
             <tbody>
+
             {% for row in rows %}
+
             <tr>
 
                 <!-- TICKER -->
-                <td style="font-weight:bold;">
+                <td>
                     {{ row.TICKER }}
                 </td>
 
@@ -171,7 +216,9 @@ tbody tr:hover {
                 </td>
 
             </tr>
+
             {% endfor %}
+
             </tbody>
 
         </table>

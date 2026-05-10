@@ -1,238 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Hot 10-Day Scanner</title>
+
 <style>
-  .scanner-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
 
-  .scanner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+/* ================= BASE ================= */
 
-  .scanner-header h2 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 22px;
-  }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+.container {
+  padding: 20px;
+}
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+/* ================= NAV ================= */
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  thead {
-    background-color: #1f2937;
-    color: white;
-  }
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
 
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 14px;
-  }
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
 
-  th {
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
+/* ================= ENTRY MODELS ================= */
 
-  tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
 
-  tbody tr:hover {
-    background-color: #e5e7eb;
-  }
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
 
-  .empty-row td {
-    text-align: center;
-    padding: 24px;
-    color: #6b7280;
-    font-style: italic;
-  }
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #93c5fd;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+tr:hover {
+  background: rgba(59,130,246,0.08);
+}
+
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
 </style>
+</head>
 
-<div class="scanner-container">
+<body>
 
-  <div class="scanner-header">
-    <h2>📈 10/13 Day Theme</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
+<!-- ================= NAVIGATION ================= -->
 
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
+
+
+<!-- ================= TITLE ================= -->
+
+<h1>🔥 Hot 10-Day Scanner</h1>
+
+<div class="sub">
+Momentum reclaim scanner using short-term moving average pullback structures
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="desc">
+
+<strong>Hot 10-Day Scanner Logic</strong><br><br>
+
+✔ Bullish candle confirmation required<br>
+- Bullish Hammer<br>
+- Bullish Marubozu (Strong Buy)<br>
+- Standard Bullish Candle<br><br>
+
+✔ Trend Structure Filters<br>
+- Close > 200 MA (long-term bullish regime)<br>
+- 21 MA > 50 MA (intermediate trend confirmation)<br>
+- 50 MA slope positive<br><br>
+
+✔ Pullback Reclaim Setup<br>
+- Price pierces below 10 MA or 13 MA intraday<br>
+- Then closes back above the MA<br>
+
+✔ Strength & Momentum Filters<br>
+- Positive slope_d momentum<br>
+- lower_count > 0 confirms strength vs prior closes<br><br>
+
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+
+{% for col in columns %}
+  <th>{{ col }}</th>
+{% endfor %}
+
+</tr>
+</thead>
 
 <tbody>
-  {% if rows %}
-    {% for row in rows %}
-      {% with pct=row.2 %}
-        <tr class="
-          {% if pct > 4 %}
-            dark-green
-          {% elif pct > 0 %}
-            light-green
-          {% elif pct >= -4 %}
-            light-red
-          {% else %}
-            dark-red
-          {% endif %}
-        ">
-          {% for cell in row %}
-            {% if forloop.counter == 2 %}
-              <td>
-                <a href="{% url 'equity_chart' cell %}"
-                   target="_blank"
-                   class="ticker-link">
-                  {{ cell }}
-                </a>
-              </td>
-            {% else %}
-              <td>{{ cell }}</td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endwith %}
-    {% endfor %}
-  {% else %}
-    <tr>
-      <td colspan="{{ columns|length }}" class="empty-state">
-        No stocks matched scanner criteria
-      </td>
-    </tr>
-  {% endif %}
+
+{% for row in rows %}
+
+<tr class="
+{% if row.2 > 8 %}
+    purple
+{% elif row.2 > 4 %}
+    light-blue
+{% elif row.2 > 0 %}
+    light-yellow
+{% elif row.2 > -4 %}
+    orange
+{% else %}
+    red
+{% endif %}
+">
+
+  {% for cell in row %}
+
+    {% if forloop.counter == 2 %}
+
+    <td>
+      <a class="ticker"
+         href="{% url 'equity_chart' cell %}">
+         {{ cell }}
+      </a>
+    </td>
+
+    {% else %}
+
+    <td>{{ cell }}</td>
+
+    {% endif %}
+
+  {% endfor %}
+
+</tr>
+
+{% endfor %}
+
 </tbody>
-  </table>
+
+</table>
 
 </div>
 
-
-
-
-<style>
-
-.strategy-box{
-    background:#fff9db;
-    border-left:6px solid #facc15;
-    padding:20px;
-    margin-top:30px;
-    border-radius:8px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    font-family:"Segoe UI", Roboto, Arial, sans-serif;
-}
-
-.strategy-box h3{
-    margin-top:0;
-    color:#1f2937;
-}
-
-.strategy-box p{
-    line-height:1.6;
-    color:#374151;
-}
-
-.strategy-box ul{
-    line-height:1.7;
-    margin-left:18px;
-}
-
-</style>
-
-
-<div class="strategy-box">
-
-<h3>Short-Term Momentum Pullback Strategy</h3>
-
-<p>
-This scanner focuses on stocks that are showing strong momentum but are
-temporarily pulling back toward shorter-term moving averages. Because it uses
-very short moving averages such as the 10-day and 13-day averages, it often
-identifies <strong>hotter themes and faster moving stocks</strong> in the market.
-These stocks tend to move quickly and are commonly used in short-term swing
-trading strategies.
-</p>
-
-<p><strong>The strategy uses the following conditions:</strong></p>
-
-<ul>
-
-<li><strong>Bullish candlestick pattern</strong><br>
-The signal candle must be one of the following:
-<ul>
-<li>Bullish Hammer</li>
-<li>Bullish Marubozu (Strong Buy)</li>
-<li>Standard Bullish Candle</li>
-</ul>
-These patterns indicate strong buying pressure during the session.
-</li>
-
-<li><strong>Long-term trend confirmation</strong><br>
-The stock must be trading above its <strong>200-day moving average</strong>.
-This ensures that the trade is aligned with the long-term market trend.
-</li>
-
-<li><strong>Intermediate trend strength</strong><br>
-The <strong>21-day moving average must be above the 50-day moving average</strong>,
-and the slope of the <strong>50-day moving average must be rising</strong>.
-This confirms that the medium-term trend is upward.
-</li>
-
-<li><strong>Short-term pullback entry</strong><br>
-The scanner looks for situations where price dips below a short-term moving
-average but quickly closes back above it:
-<ul>
-<li>Price falls below the 10-day moving average and closes back above it, or</li>
-<li>Price falls below the 13-day moving average and closes back above it.</li>
-</ul>
-This often signals that buyers stepped in during a short pullback.
-</li>
-
-<li><strong>Momentum confirmation</strong><br>
-Momentum is measured using the <strong>Slow Stochastic oscillator (10, 7, 4)</strong>.
-The slope of the <strong>%D line</strong> must be rising, indicating that
-momentum is turning upward.
-</li>
-
-<li><strong>Recent pullback requirement</strong><br>
-The system requires at least one prior lower candle before the signal occurs.
-This confirms that a short consolidation or pullback happened before the
-bullish reversal.
-</li>
-
-</ul>
-
-<p>
-Because this strategy focuses on shorter moving averages such as the 10-day
-and 13-day averages, it often highlights stocks that are currently attracting
-strong trading interest. These setups can represent early entries into
-stocks that are part of the market’s <strong>strongest or most active themes</strong>.
-</p>
-
 </div>
+
+</body>
+</html>

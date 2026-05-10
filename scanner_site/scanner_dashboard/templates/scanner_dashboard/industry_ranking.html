@@ -1,125 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Equity Ranking Dashboard</title>
+
 <style>
-    /* Table container for scrolling if needed */
-    .industry-table-container {
-        overflow-x: auto;
-        margin: 20px 0;
-        font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    }
 
-    /* Base table styles */
-    table.industry-table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 20px; /* space from back button */
-    }
+/* ================= BASE ================= */
 
-    /* Header styles */
-    table.industry-table thead {
-        background-color: #1f2937; /* Dark gray */
-        color: #f9fafb; /* Light text */
-    }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-    table.industry-table th, table.industry-table td {
-        padding: 12px 16px;
-        text-align: center;
-        font-size: 14px;
-    }
+.container {
+  padding: 20px;
+}
 
-    table.industry-table th {
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+/* ================= NAV ================= */
 
-    /* Alternating row colors */
-    table.industry-table tbody tr:nth-child(even) {
-        background-color: #f3f4f6; /* Light gray */
-    }
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-    /* Row hover effect */
-    table.industry-table tbody tr:hover {
-        background-color: #e5e7eb; /* Slightly darker gray */
-        transition: background-color 0.2s ease-in-out;
-    }
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
 
-    /* Numeric alignment */
-    table.industry-table td.numeric {
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-    }
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
 
-    /* Back button */
-    .btn-back {
-        display: inline-block;
-        margin-bottom: 10px; /* space before table */
-        padding: 8px 14px;
-        background-color: #e5e7eb;
-        color: #111827;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-    }
+/* ================= ENTRY GRID ================= */
 
-    .btn-back:hover {
-        background-color: #d1d5db;
-    }
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
 
-    /* Arrows */
-    .arrow-up {
-        color: green;
-        margin-left: 5px;
-        font-weight: bold;
-    }
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
 
-    .arrow-down {
-        color: red;
-        margin-left: 5px;
-        font-weight: bold;
-    }
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+tr:hover {
+  background: rgba(59,130,246,0.08);
+}
+
+/* ================= ROW COLORS ================= */
+
+.dark-purple {
+  background: rgba(168,85,247,0.22);
+  font-weight: 600;
+}
+
+.light-blue {
+  background: rgba(96,165,250,0.18);
+}
+
+.yellow {
+  background: rgba(234,179,8,0.14);
+}
+
+.orange {
+  background: rgba(249,115,22,0.16);
+}
+
+.red {
+  background: rgba(239,68,68,0.18);
+}
+
+/* ================= TICKER ================= */
+
+.ticker-link {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker-link:hover {
+  text-decoration: underline;
+}
+
+.pos-up {
+  color: #4ade80;
+  font-weight: bold;
+}
+
+.pos-down {
+  color: #f87171;
+  font-weight: bold;
+}
+
 </style>
+</head>
 
-<div class="industry-table-container">
-    <h2>📈 Industry Normalized( SPY) Performance</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+<body>
 
-    <table class="industry-table">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Industry</th>
-                <th>Cumulative Normalized Return</th>
-                <th>Positions Climbed (7d)</th>
-                <th>Positions Climbed (21d)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in ranking_list %}
-            <tr>
-                <td class="numeric">{{ item.Rank|floatformat:0 }}</td>
-                <td>{{ item.Industry }}</td>
-                <td class="numeric">{{ item.Cumulative_Return|floatformat:4 }}</td>
-                <td class="numeric">
-                    {{ item.Pos_Climbed_7d|floatformat:0 }}
-                    {% if item.Pos_Climbed_7d > 0 %}
-                        <span class="arrow-up">▲</span>
-                    {% elif item.Pos_Climbed_7d < 0 %}
-                        <span class="arrow-down">▼</span>
-                    {% endif %}
-                </td>
-                <td class="numeric">
-                    {{ item.Pos_Climbed_21d|floatformat:0 }}
-                    {% if item.Pos_Climbed_21d > 0 %}
-                        <span class="arrow-up">▲</span>
-                    {% elif item.Pos_Climbed_21d < 0 %}
-                        <span class="arrow-down">▼</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- ================= NAVIGATION ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
 </div>
+
+
+<!-- ================= TITLE ================= -->
+
+<h1>📊 Equity Relative Strength Ranking</h1>
+
+<div class="sub">
+Cross-market equity ranking using normalized performance vs SPY benchmark
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="desc">
+
+<strong>Equity Ranking Logic</strong><br><br>
+
+✔ Each stock is benchmarked against SPY (^GSPC) daily returns<br>
+✔ Relative performance normalized using RMSE volatility adjustment<br>
+✔ Rolling cumulative leadership used for ranking strength<br>
+✔ Detects persistent institutional accumulation and momentum leadership<br><br>
+
+<strong>Core Formula</strong><br><br>
+
+Normalized Return =<br>
+(Stock Return − SPY Return) / RMSE<br><br>
+
+<strong>Metrics Explained</strong><br><br>
+
+✔ Cumulative Return → Total normalized outperformance vs SPY<br>
+✔ Rank → Current market leadership ranking<br>
+✔ Pos Climbed 7d → Positions gained/lost over last 7 days<br>
+✔ Pos Climbed 21d → Positions gained/lost over last 21 days<br><br>
+
+<strong>Color Logic</strong><br><br>
+
+🟣 Top 25 ranks → Elite leadership<br>
+🔵 Top 100 ranks → Strong momentum<br>
+🟡 Top 250 ranks → Healthy structure<br>
+🟠 Mid ranks → Neutral<br>
+🔴 Weak relative performance
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+  <th>Rank</th>
+  <th>Ticker</th>
+  <th>Cumulative Return</th>
+  <th>7D Position Change</th>
+  <th>21D Position Change</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for row in ranking_list %}
+
+<tr class="
+{% if row.Rank <= 25 %}
+    dark-purple
+{% elif row.Rank <= 100 %}
+    light-blue
+{% elif row.Rank <= 250 %}
+    yellow
+{% elif row.Rank <= 500 %}
+    orange
+{% else %}
+    red
+{% endif %}
+">
+
+    <td>{{ row.Rank|floatformat:0 }}</td>
+
+    <td>
+        <a class="ticker-link"
+           href="{% url 'equity_chart' row.Ticker %}"
+           target="_blank">
+
+           {{ row.Ticker }}
+
+        </a>
+    </td>
+
+    <td>{{ row.Cumulative_Return|floatformat:2 }}</td>
+
+    <td class="
+    {% if row.Pos_Climbed_7d > 0 %}
+        pos-up
+    {% elif row.Pos_Climbed_7d < 0 %}
+        pos-down
+    {% endif %}
+    ">
+        {{ row.Pos_Climbed_7d|floatformat:0 }}
+    </td>
+
+    <td class="
+    {% if row.Pos_Climbed_21d > 0 %}
+        pos-up
+    {% elif row.Pos_Climbed_21d < 0 %}
+        pos-down
+    {% endif %}
+    ">
+        {{ row.Pos_Climbed_21d|floatformat:0 }}
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

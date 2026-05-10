@@ -1,172 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Sector Performance</title>
+
 <style>
-  .scanner-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
 
-  .scanner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+/* ================= BASE (SCANNER THEME) ================= */
 
-  .scanner-header h2 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 22px;
-  }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+.container {
+  padding: 20px;
+}
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+/* ================= NAV ================= */
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  thead {
-    background-color: #1f2937;
-    color: white;
-  }
-
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 14px;
-  }
-
-  th {
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
-
-  tbody tr:hover {
-    background-color: #e5e7eb;
-  }
-
-  .empty-row td {
-    text-align: center;
-    padding: 24px;
-    color: #6b7280;
-    font-style: italic;
-  }
-
-/* Ticker link must inherit row color */
-.ticker-link {
-  color: inherit;
+.top-nav a {
+  color: #cbd5e1;
   text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 600;
-  display: block;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION (YELLOW LIKE SCANNER) ================= */
+
+.page-description {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= ACTION BAR ================= */
+
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #334155;
+  color: white;
+}
+
+/* ================= TABLE ================= */
+
+.table-card {
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #1f2937;
+}
+
+.table-container {
+  overflow: auto;
+}
+
+table {
   width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
+  font-size: 12px;
+}
+
+thead {
+  background: #111827;
+  color: #93c5fd;
+}
+
+th {
+  padding: 12px 10px;
+  text-align: left;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #1f2937;
+  white-space: nowrap;
+  color: #e5e7eb;
+}
+
+tbody tr:nth-child(even) {
+  background: #0b1220;
+}
+
+tbody tr:hover {
+  background: #1e293b !important;
+}
+
+/* ================= ROW COLORS (KEPT SAME LOGIC) ================= */
+
+tr.light-green {
+  background-color: rgba(34,197,94,0.15) !important;
+}
+
+tr.dark-green {
+  background-color: rgba(34,197,94,0.25) !important;
+  font-weight: 600;
+}
+
+tr.light-red {
+  background-color: rgba(239,68,68,0.15) !important;
+}
+
+tr.dark-red {
+  background-color: rgba(239,68,68,0.25) !important;
+  font-weight: 600;
+}
+
+/* ================= LINKS ================= */
+
+.ticker-link {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 700;
 }
 
 .ticker-link:hover {
   text-decoration: underline;
 }
 
+/* ================= EMPTY ================= */
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+}
 
 </style>
+</head>
 
+<body>
 
-<style>
-  /* --- Percentage change row colors --- */
-  tr.light-green {
-    background-color: #d1fae5 !important; /* 0 to +4 */
-  }
+<div class="container">
 
-  tr.dark-green {
-    background-color: #6ee7b7 !important; /* > +4 */
-    font-weight: 600;
-  }
+<!-- ================= NAV ================= -->
 
-  tr.light-red {
-    background-color: #fee2e2 !important; /* 0 to -4 */
-  }
+<div class="top-nav">
 
-  tr.dark-red {
-    background-color: #fca5a5 !important; /* < -4 */
-    font-weight: 600;
-  }
-</style>
-
-
-<div class="scanner-container">
-
-  <div class="scanner-header">
-    <h2>📈 Sector Performance</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-
-<tbody>
-  {% if rows %}
-    {% for row in rows %}
-      {% with pct=row.2 %}
-        <tr class="
-          {% if pct > 4 %}
-            dark-green
-          {% elif pct > 0 %}
-            light-green
-          {% elif pct >= -4 %}
-            light-red
-          {% else %}
-            dark-red
-          {% endif %}
-        ">
-          {% for cell in row %}
-            {% if forloop.counter == 2 %}
-              <td>
-                <a href="{% url 'equity_chart' cell %}"
-                   target="_blank"
-                   class="ticker-link">
-                  {{ cell }}
-                </a>
-              </td>
-            {% else %}
-              <td>{{ cell }}</td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endwith %}
-    {% endfor %}
-  {% else %}
-    <tr>
-      <td colspan="{{ columns|length }}" class="empty-state">
-        No stocks matched scanner criteria
-      </td>
-    </tr>
-  {% endif %}
-</tbody>
-  </table>
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
 </div>
+
+<!-- ================= TITLE ================= -->
+
+<h1>📈 Sector ETF Performance</h1>
+
+<div class="sub">
+ETF rotation analysis, sector momentum tracking, institutional leadership dashboard
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="page-description">
+
+<strong>Sector Performance Overview</strong><br><br>
+
+This page tracks sector ETF performance using percentage change, and volume behavior.
+Green rows indicate positive momentum while red rows highlight weakness.
+
+</div>
+
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-card">
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+  {% for col in columns %}
+    <th>{{ col }}</th>
+  {% endfor %}
+</tr>
+</thead>
+
+<tbody>
+
+{% if rows %}
+
+    {% for row in rows %}
+
+        {% with pct=row.2 %}
+
+        <tr class="
+            {% if pct > 4 %}
+                dark-green
+            {% elif pct > 0 %}
+                light-green
+            {% elif pct >= -4 %}
+                light-red
+            {% else %}
+                dark-red
+            {% endif %}
+        ">
+
+            {% for cell in row %}
+
+                {% if forloop.counter == 2 %}
+
+                    <td>
+                        <a href="{% url 'equity_chart' cell %}"
+                           target="_blank"
+                           class="ticker-link">
+                            {{ cell }}
+                        </a>
+                    </td>
+
+                {% else %}
+
+                    <td>{{ cell }}</td>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </tr>
+
+        {% endwith %}
+
+    {% endfor %}
+
+{% else %}
+
+<tr>
+  <td colspan="{{ columns|length }}" class="empty-state">
+    No sector data available
+  </td>
+</tr>
+
+{% endif %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

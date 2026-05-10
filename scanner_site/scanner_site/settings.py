@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-7@0#!8i_10(*@2bm9fbsf(vsn-!z74%*ypo0vaf!iz1yd=1vif
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["swingtradesingh.com","www.swingtradesingh.com","146.190.147.47"]
+ALLOWED_HOSTS = ["146.190.147.47", "swingtradesingh.com"]
 
 
 # Application definition
@@ -59,8 +59,8 @@ CRONJOBS = [
     ('15,45 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
     ('15,30 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),
 
-    # Finviz run once daily at 10 PM (Mon–Fri)
-    ('0 22 * * 1-5', 'scanner.tasks.run_finviz_cron'),
+    # Finviz run once daily at 9 PM (Mon–Fri)
+    ('0 21 * * 1-5', 'scanner.tasks.run_finviz_cron'),
 ]
 
 

@@ -1,48 +1,214 @@
-<div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-  
-  <a href="/" style="
-      padding:6px 12px;
-      border-radius:6px;
-      background:#007bff;
-      color:white;
-      text-decoration:none;
-  ">
-    ← Home
-  </a>
+<!DOCTYPE html>
+<html lang="en">
 
-  <h2 style="margin:0;">Industry Dashboard</h2>
+<head>
+<meta charset="UTF-8">
+<title>Industry Today Dashboard</title>
+
+<style>
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= TITLE ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION (YELLOW LIKE SCANNER) ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TILE GRID ================= */
+
+.tile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ================= TILE ================= */
+
+.tile {
+  width: 220px;
+  border-radius: 10px;
+  padding: 10px;
+  text-decoration: none;
+  color: white;
+  border: 1px solid #374151;
+  transition: 0.2s;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+}
+
+/* ================= COLOR LOGIC ================= */
+
+.green {
+  background: rgba(34,197,94,0.18);
+  border-color: rgba(34,197,94,0.4);
+}
+
+.yellow {
+  background: rgba(234,179,8,0.18);
+  border-color: rgba(234,179,8,0.4);
+}
+
+.red {
+  background: rgba(239,68,68,0.18);
+  border-color: rgba(239,68,68,0.4);
+}
+
+/* ================= TEXT ================= */
+
+.tile h3 {
+  margin: 0;
+  font-size: 13px;
+  color: #93c5fd;
+}
+
+.tile p {
+  margin: 5px 0;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
 </div>
 
+<div class="container">
 
+<h1>📊 Industry Today Dashboard</h1>
 
+<div class="sub">
+Latest market breadth across industries (UP vs DOWN pressure + strength distribution)
+</div>
 
-<div style="display:flex; flex-wrap:wrap; gap:15px;">
+<!-- ================= DESCRIPTION ================= -->
 
-  {% for item in data %}
-    <a href="/today/{{ item.Industry|urlencode }}/"
-       style="text-decoration:none; color:inherit;">
+<div class="desc">
 
-      <div style="
-          width:220px;
-          padding:15px;
-          border-radius:12px;
-          background-color:
-            {% if item.RATIO > 0.6 %}#d4edda
-            {% elif item.RATIO < 0.4 %}#f8d7da
-            {% else %}#fff3cd
-            {% endif %};
-          box-shadow:0 2px 6px rgba(0,0,0,0.1);
-      ">
-        <h4>{{ item.Industry }}</h4>
-        <p>📈 Up: {{ item.UP }}</p>
-        <p>📉 Down: {{ item.DOWN }}</p>
-        <p>📊 Total: {{ item.TOTAL }}</p>
-        <p>⚖️ Median: {{ item.MEDIAN_GAIN|floatformat:2 }}%</p>
-        <p><strong>{{ item.RATIO|floatformat:2 }}</strong></p>
-      </div>
+<strong>Logic Overview</strong><br><br>
 
-    </a>
-  {% endfor %}
+Uses ONLY latest trading day<br>
+UP vs DOWN stock distribution per industry<br>
+Ratio = UP stocks for industries in a day / TOTAL industries <br>
+Median Gain used for ranking<br><br>
+
+<strong>Color Logic (based on Ratio)</strong><br>
+🟢 Green → Strong (≥ 0.60)<br>
+🟡 Yellow → Neutral (0.40 – 0.60)<br>
+🔴 Red → Weak (< 0.40)
 
 </div>
+
+<!-- ================= TILES ================= -->
+
+<div class="tile-grid">
+
+{% for row in data %}
+
+<a href="{% url 'industry_today_detail' row.Industry %}"
+
+   class="tile
+   {% if row.RATIO >= 0.60 %}
+       green
+   {% elif row.RATIO >= 0.40 %}
+       yellow
+   {% else %}
+       red
+   {% endif %}">
+
+    <h3>{{ row.Industry }}</h3>
+
+    <p>UP: {{ row.UP }} | DOWN: {{ row.DOWN }}</p>
+
+    <p>Ratio: {{ row.RATIO|floatformat:2 }}</p>
+
+    <p>Median: {{ row.MEDIAN_GAIN|floatformat:2 }}</p>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</body>
+</html>

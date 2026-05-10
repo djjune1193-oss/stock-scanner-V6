@@ -1,247 +1,296 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+<meta charset="UTF-8">
 <title>MA Structure Dashboard</title>
 
 <style>
+
+/* ================= BASE ================= */
+
 body {
-    margin:0;
-    font-family:Arial;
-    background:#f5f7fb;
-    color:#111827;
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
 }
 
 .container {
-    max-width:1300px;
-    margin:25px auto;
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.06);
+  padding: 20px;
 }
 
-/* HEADER */
-.header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.header h2 {
-    margin:0;
-    font-size:20px;
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.nav {
-    display:flex;
-    gap:10px;
-    align-items:center;
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
 }
 
-.btn {
-    padding:6px 12px;
-    border-radius:6px;
-    text-decoration:none;
-    font-size:13px;
-    border:1px solid #e5e7eb;
-    background:#f9fafb;
-    color:#111827;
+/* ================= TITLE ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
 }
 
-.btn:hover {
-    background:#eef2ff;
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
 }
 
-/* TABLE */
-.table-container {
-    overflow:auto;
-    max-height:75vh;
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
 }
+
+/* ================= GROUP CARD ================= */
+
+.group-card {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.group-header {
+  background: #0f172a;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #93c5fd;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ================= TABLE ================= */
 
 table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
 }
 
-thead th {
-    position:sticky;
-    top:0;
-    background:#111827;
-    color:white;
-    padding:10px;
-    text-align:center;
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #93c5fd;
+  text-align: left;
 }
 
 td {
-    padding:8px;
-    text-align:center;
-    border-bottom:1px solid #f1f5f9;
+  padding: 8px;
+  border-bottom: 1px solid #374151;
 }
 
-/* =========================
-   GROUP COLORS (FIXED LOGIC)
-   ========================= */
-
-/* Strong trend */
-.g1 { background:#dcfce7; }
-
-/* Early structure */
-.g2 { background:#ecfdf5; }
-
-/* Expanding range */
-.g3 { background:#d1fae5; }
-
-/* Mid structure */
-.g4 { background:#fef9c3; }
-
-/* Extended range */
-.g5 { background:#fde68a; }
-
-/* Weakening */
-.g6 { background:#fed7aa; }
-
-/* More weakness */
-.g7 { background:#fdba74; }
-
-/* Late stage */
-.g8 { background:#fb923c; }
-
-/* Risk zone */
-.g9 { background:#fecaca; }
-.g10 { background:#fca5a5; }
-
-/* Breakdown */
-.g11 { background:#fda4af; }
-
-/* Default */
-.g12 { background:#e5e7eb; }
-
-/* MOVE */
-.move-up { color:#16a34a; font-weight:bold; }
-.move-down { color:#dc2626; font-weight:bold; }
-
-/* POS/NEG */
-.pos { color:#16a34a; font-weight:bold; }
-.neg { color:#dc2626; font-weight:bold; }
-
-select {
-    padding:6px;
-    border-radius:6px;
-    border:1px solid #e5e7eb;
-    background:white;
+tr:hover {
+  background: rgba(59,130,246,0.08);
 }
+
+/* ================= CUSTOM 5-LEVEL STRUCTURE COLORS ================= */
+
+/* 🟣 strongest */
+.purple {
+  background: rgba(168,85,247,0.18);
+  border-left: 4px solid #a855f7;
+}
+
+/* 🔵 strong trend */
+.light-blue {
+  background: rgba(59,130,246,0.18);
+  border-left: 4px solid #60a5fa;
+}
+
+/* 🟡 neutral / transition */
+.light-yellow {
+  background: rgba(234,179,8,0.18);
+  border-left: 4px solid #facc15;
+}
+
+/* 🟠 weak / deteriorating */
+.orange {
+  background: rgba(249,115,22,0.18);
+  border-left: 4px solid #fb923c;
+}
+
+/* 🔴 bearish breakdown */
+.red {
+  background: rgba(239,68,68,0.18);
+  border-left: 4px solid #ef4444;
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
 <div class="container">
 
-<!-- HEADER -->
-<div class="header">
-    <h2>📊 MA Structure</h2>
+<h1>📊 MA Structure Dashboard</h1>
 
-    <div class="nav">
-        <a class="btn" href="/">🏠 Home</a>
-        <a class="btn" href="?view=group">Group View</a>
-    </div>
+<div class="sub">
+Multi-timeframe moving average structure + institutional regime classification
 </div>
 
-<!-- FILTER -->
-<form method="get">
-    <input type="hidden" name="view" value="{{ view_mode }}">
+<!-- ================= DESCRIPTION ================= -->
 
-    <select name="industry" onchange="this.form.submit()">
-        <option value="">All Industries</option>
+<div class="desc">
 
-        {% for row in rows %}
-            {% ifchanged row.Industry %}
-                <option value="{{ row.Industry }}">
-                    {{ row.Industry }}
-                </option>
-            {% endifchanged %}
-        {% endfor %}
+<strong>Structure Logic Overview</strong><br><br>
 
-    </select>
-</form>
+Tracks Moving average of price for equity alignment across 10 / 21 / 34 / 50 / 100 / 200 days<br>
+MA10 > ALL(strong) : all moving averages bands are in correct order, strong trend <br>
+MA10 > ALL (weak)  : 10 day moving average is above all other averages but other bands are not in order<br>
+MA10: 21-34        : 10 day moving average is between 21 and 34 days, medium trend <br>
+MA10: 34-50        : 10 day moving average is between 34 and 50 days, medium-long trend<br>
+MA10: 50-100       : 10 day moving average is between 50 and 100 days<br>
+MA10: 100-200      : 10 day moving average is between 100 and 200 days  <br>
+MA10 < 200         : NO trend<br><br>
 
-<!-- TABLE -->
-<div class="table-container">
+Distance%          : Percentage different between current close and respective base <br><br>
+Detects compression → breakout → breakdown transitions<br><br>
 
-<table>
+<strong>Color System (Fixed 5-Level Institutional Model)</strong><br>
+🟣 Purple → Strongest structural trend (elite alignment)<br>
+🔵 Blue → Strong trend continuation<br>
+🟡 Yellow → Neutral / consolidation zone<br>
+🟠 Orange → Weak / deteriorating structure<br>
+🔴 Red → Bearish breakdown regime
 
-<thead>
-<tr>
-    <th>Group</th>
-    <th>Ticker</th>
-    <th>Industry</th>
-    <th>MA10</th>
-    <th>Base</th>
-    <th>Base Value</th>
-    <th>Δ %</th>
-    <th>Move</th>
-</tr>
-</thead>
+</div>
 
-<tbody>
+<!-- ================= GROUPS ================= -->
 
-{% for row in rows %}
+{% for group_name, rows in groups.items %}
 
-<tr class="
-    {% if row.group == 'MA10 > ALL' %} g1
+<div class="group-card">
 
-    {% elif row.group == 'MA10: 21–34' %} g2
-    {% elif row.group == 'MA10: 21–50' %} g2
-    {% elif row.group == 'MA10: 21–100' %} g3
-    {% elif row.group == 'MA10: 21–200' %} g3
+  <div class="group-header">
+    <span>{{ group_name }}</span>
+    <span>{{ rows|length }} stocks</span>
+  </div>
 
-    {% elif row.group == 'MA10: 34–50' %} g4
-    {% elif row.group == 'MA10: 34–100' %} g4
-    {% elif row.group == 'MA10: 34–200' %} g5
+  <table>
 
-    {% elif row.group == 'MA10: 50–100' %} g6
-    {% elif row.group == 'MA10: 50–200' %} g7
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Close</th>
+        <th>Distance %</th>
+        <th>Move</th>
+        <th>Base</th>
+      </tr>
+    </thead>
 
-    {% elif row.group == 'MA10: 100–200' %} g8
+    <tbody>
 
-    {% elif row.group == 'MA10 < 200' %} g11
+      {% for r in rows %}
 
-    {% else %} g12
-    {% endif %}
-">
+      <!-- COLOR ASSIGNMENT (SAFE FALLBACK LOGIC) -->
+      <tr class="
+        {% if 'strong' in r.group %}
+            purple
 
-    <td><b>{{ row.group }}</b></td>
-    <td>{{ row.TICKER }}</td>
-    <td>{{ row.Industry }}</td>
-    <td>{{ row.MA_10|floatformat:2 }}</td>
-    <td>{{ row.base_label }}</td>
-    <td>{{ row.base_value|floatformat:2 }}</td>
+        {% elif 'MA10 > ALL (weak)' in r.group %}
+            light-blue
 
-    <td class="{% if row.pct_distance > 0 %}pos{% else %}neg{% endif %}">
-        {{ row.pct_distance|floatformat:2 }}%
-    </td>
+        {% elif '34-50' in r.group or '21-34' in r.group %}
+            light-yellow
 
-    <td>
-        {% if row.move == "⬆" %}
-            <span class="move-up">⬆</span>
-        {% elif row.move == "⬇" %}
-            <span class="move-down">⬇</span>
+        {% elif '50-100' in r.group or 'MA10 < 200' or 'MA10: 100-200'  in r.group %}
+            red
+
+
         {% else %}
-            <span style="color:#9ca3af;">→</span>
+            light-red
         {% endif %}
-    </td>
+      ">
 
-</tr>
+        <td>
+          <a class="ticker"
+             href="{% url 'equity_chart' r.TICKER %}">
+             {{ r.TICKER }}
+          </a>
+        </td>
+
+        <td>{{ r.Close }}</td>
+        <td>{{ r.pct_distance|floatformat:2 }}</td>
+        <td>{{ r.move }}</td>
+        <td>{{ r.base_label }}</td>
+
+      </tr>
+
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
 
 {% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
 
 </div>
 

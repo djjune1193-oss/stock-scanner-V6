@@ -1,201 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Scanner Dashboard</title>
+
 <style>
-  .scanner-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
 
-  .scanner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+/* ================= BASE ================= */
 
-  .scanner-header h2 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 22px;
-  }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+.container {
+  padding: 20px;
+}
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+/* ================= NAV ================= */
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  thead {
-    background-color: #1f2937;
-    color: white;
-  }
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
 
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 14px;
-  }
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
 
-  th {
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
+/* ================= ENTRY MODELS ================= */
 
-  tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
 
-  tbody tr:hover {
-    background-color: #e5e7eb;
-  }
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
 
-  .empty-row td {
-    text-align: center;
-    padding: 24px;
-    color: #6b7280;
-    font-style: italic;
-  }
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+/* ================= ROW COLORS (SOFT) ================= */
+
+.light-green { background: rgba(34,197,94,0.10); }
+.dark-green  { background: rgba(34,197,94,0.18); font-weight: 600; }
+
+.light-red   { background: rgba(239,68,68,0.10); }
+.dark-red    { background: rgba(239,68,68,0.18); font-weight: 600; }
+
+tr:hover {
+  background: rgba(59,130,246,0.08);
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
 </style>
+</head>
 
-<div class="scanner-container">
+<body>
 
-  <div class="scanner-header">
-    <h2>📈 Scanner Results</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
+<!-- ================= NAVIGATION ================= -->
 
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
+
+<!-- ================= TITLE ================= -->
+
+<h1>📊 Scanner Dashboard</h1>
+<div class="sub">Institutional momentum + MA structure + price action scanner</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="desc">
+
+<strong>Scanner Logic (Current Strategy)</strong><br><br>
+
+✔ Candle Types:<br>
+- Bullish Hammer<br>
+- Bullish Marubozu (Strong Buy)<br>
+- Standard Bullish Candle<br><br>
+
+✔ Trend Filter:<br>
+- 21 MA > 50 MA (Uptrend structure)<br>
+- Close > 200 MA (Long-term bullish bias)<br><br>
+
+✔ Pullback Entry Condition:<br>
+- Price dips below 21 or 34 MA<br>
+- Then closes back above MA (reclaim signal)<br><br>
+
+✔ Strength Filter:<br>
+- Lower count > 0 Todays price higher than how many previous day closes <br><br>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Ticker</th>
+  <th>%</th>
+  <th>Sector</th>
+  <th>Industry</th>
+  <th>Close</th>
+  <th>Open</th>
+  <th>High</th>
+  <th>Low</th>
+  <th>Volume</th>
+  <th>Candle</th>
+  <th>Slope 50</th>
+  <th>Lower Count</th>
+</tr>
+</thead>
 
 <tbody>
-  {% if rows %}
-    {% for row in rows %}
-      {% with pct=row.2 %}
-        <tr class="
-          {% if pct > 4 %}
-            dark-green
-          {% elif pct > 0 %}
-            light-green
-          {% elif pct >= -4 %}
-            light-red
-          {% else %}
-            dark-red
-          {% endif %}
-        ">
-          {% for cell in row %}
-            {% if forloop.counter == 2 %}
-              <td>
-                <a href="{% url 'equity_chart' cell %}"
-                   target="_blank"
-                   class="ticker-link">
-                  {{ cell }}
-                </a>
-              </td>
-            {% else %}
-              <td>{{ cell }}</td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endwith %}
-    {% endfor %}
-  {% else %}
-    <tr>
-      <td colspan="{{ columns|length }}" class="empty-state">
-        No stocks matched scanner criteria
-      </td>
-    </tr>
-  {% endif %}
+
+{% for row in rows %}
+
+<tr>
+
+  <td>{{ row.0 }}</td>
+
+  <td>
+    <a class="ticker" href="{% url 'equity_chart' row.1 %}">
+      {{ row.1 }}
+    </a>
+  </td>
+
+  <td>{{ row.2 }}</td>
+  <td>{{ row.3 }}</td>
+  <td>{{ row.4 }}</td>
+  <td>{{ row.5 }}</td>
+  <td>{{ row.6 }}</td>
+  <td>{{ row.7 }}</td>
+  <td>{{ row.8 }}</td>
+  <td>{{ row.9 }}</td>
+  <td>{{ row.10 }}</td>
+  <td>{{ row.11 }}</td>
+  <td>{{ row.12 }}</td>
+  <td>{{ row.13 }}</td>
+
+</tr>
+
+{% endfor %}
+
 </tbody>
 
-  </table>
+</table>
 
 </div>
 
-<style>
-
-.strategy-box{
-    background:#fff9db;
-    border-left:6px solid #facc15;
-    padding:20px;
-    margin-top:30px;
-    border-radius:8px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    font-family:"Segoe UI", Roboto, Arial, sans-serif;
-}
-
-.strategy-box h3{
-    margin-top:0;
-    color:#1f2937;
-}
-
-.strategy-box p{
-    line-height:1.6;
-    color:#374151;
-}
-
-.strategy-box ul{
-    line-height:1.7;
-    margin-left:18px;
-}
-
-</style>
-
-
-<div class="strategy-box">
-
-<h3>Strategy Explanation</h3>
-
-<p>
-This scanner searches for bullish reversal setups in stocks that are already
-trading in a strong uptrend. The goal is to identify pullbacks that may
-provide favorable entry opportunities. Works best in healthy market. 
-</p>
-
-<p><strong>The conditions used are:</strong></p>
-
-<ul>
-<li><strong>Bullish candlestick pattern</strong> such as a Bullish Hammer, Bullish Marubozu, or a strong bullish candle.</li>
-
-<li><strong>Strong trend alignment:</strong> the 21-day moving average is above the 50-day moving average and price is above the 200-day moving average.</li>
-
-<li><strong>Moving average pullback:</strong> price dips below the 21-day or 34-day moving average but closes back above it.</li>
-
-<li><strong>Positive trend momentum:</strong> the 50-day moving average slope is positive.</li>
-
-<li><strong>Positive stochastic information:</strong> the slope of slower stoch (7,10,4) is positive. </li>
-
-<li><strong>Recent pullback:</strong> at least one lower candle occurred before the signal.</li>
-
-</ul>
-
-<p>
-These conditions attempt to identify stocks where buyers step in during
-short-term pullbacks within a broader uptrend.
-</p>
-
 </div>
 
-
+</body>
+</html>

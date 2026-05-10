@@ -1,225 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Double Bottom Scanner</title>
+
 <style>
-  .scanner-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    background: #ffffff;
-    padding: 24px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  }
 
-  .scanner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+/* ================= BASE ================= */
 
-  .scanner-header h2 {
-    margin: 0;
-    color: #1f2937;
-    font-size: 22px;
-  }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+.container {
+  padding: 20px;
+}
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+/* ================= NAV ================= */
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  thead {
-    background-color: #1f2937;
-    color: white;
-  }
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
 
-  th, td {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 14px;
-  }
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
 
-  th {
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-  }
+/* ================= TITLE ================= */
 
-  tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
 
-  tbody tr:hover {
-    background-color: #e5e7eb;
-  }
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
 
-  .empty-row td {
-    text-align: center;
-    padding: 24px;
-    color: #6b7280;
-    font-style: italic;
-  }
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 1400px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+/* ================= COLORS (SYMMETRY BASED) ================= */
+
+.green {
+  background: rgba(34,197,94,0.18);
+}
+
+.yellow {
+  background: rgba(234,179,8,0.18);
+}
+
+.red {
+  background: rgba(239,68,68,0.18);
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
 </style>
+</head>
 
-<div class="scanner-container">
+<body>
 
-  <div class="scanner-header">
-    <h2>📈 Double Bottom L5</h2>
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
+<!-- NAV -->
+<div class="top-nav">
 
-  <table>
-    <thead>
-      <tr>
-        {% for col in columns %}
-          <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+</div>
+
+<div class="container">
+
+<h1>📉 Double Bottom Scanner</h1>
+
+<div class="sub">
+Reversal pattern detection using symmetry + neckline structure + swing lows
+</div>
+
+<!-- DESCRIPTION -->
+
+<div class="desc">
+
+<strong>Logic Overview</strong><br><br>
+
+✔ Detects L1 and L2 swing lows<br>
+✔ Measures neckline resistance breakout zone<br>
+✔ Calculates structural symmetry (quality score)<br>
+✔ Tracks breakout readiness after accumulation phase<br><br>
+
+<strong>Interpretation</strong><br>
+
+Higher symmetry = cleaner base formation<br>
+Lower symmetry = unstable / weak reversal structure<br>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+{% for col in columns %}
+<th>{{ col }}</th>
+{% endfor %}
+</tr>
+</thead>
 
 <tbody>
-  {% if rows %}
-    {% for row in rows %}
-      {% with pct=row.2 %}
-        <tr class="
-          {% if pct > 4 %}
-            dark-green
-          {% elif pct > 0 %}
-            light-green
-          {% elif pct >= -4 %}
-            light-red
-          {% else %}
-            dark-red
-          {% endif %}
-        ">
-          {% for cell in row %}
-            {% if forloop.counter == 2 %}
-              <td>
-                <a href="{% url 'equity_chart' cell %}"
-                   target="_blank"
-                   class="ticker-link">
-                  {{ cell }}
+
+{% for row in rows %}
+
+<tr>
+
+    {% for col, cell in row.items %}
+
+        {% if col == "TICKER" %}
+
+            <td>
+                <a class="ticker"
+                   href="{% url 'equity_chart' cell %}"
+                   target="_blank">
+                    {{ cell }}
                 </a>
-              </td>
-            {% else %}
-              <td>{{ cell }}</td>
-            {% endif %}
-          {% endfor %}
-        </tr>
-      {% endwith %}
+            </td>
+
+        {% else %}
+
+            <td>{{ cell }}</td>
+
+        {% endif %}
+
     {% endfor %}
-  {% else %}
-    <tr>
-      <td colspan="{{ columns|length }}" class="empty-state">
-        No stocks matched scanner criteria
-      </td>
-    </tr>
-  {% endif %}
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="12">No signals found</td>
+</tr>
+
+{% endfor %}
+
 </tbody>
 
-  </table>
+</table>
 
 </div>
 
-
-
-<style>
-
-.strategy-box{
-    background:#fff9db;
-    border-left:6px solid #facc15;
-    padding:20px;
-    margin-top:30px;
-    border-radius:8px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    font-family:"Segoe UI", Roboto, Arial, sans-serif;
-}
-
-.strategy-box h3{
-    margin-top:0;
-    color:#1f2937;
-}
-
-.strategy-box p{
-    line-height:1.6;
-    color:#374151;
-}
-
-.strategy-box ul{
-    line-height:1.7;
-    margin-left:18px;
-}
-
-</style>
-
-<div class="strategy-box">
-
-<h3>Double Bottom Reversal Strategy (Lookback = 5)</h3>
-
-<p>
-This scanner focuses on stocks that have formed a <strong>double bottom pattern</strong>,
-indicating a potential bullish reversal after a short-term downtrend. Using a
-lookback period of 5 candles, it identifies stocks where support has held
-twice and a breakout above the neckline signals renewed buying pressure.
-These setups are commonly used for short- to medium-term swing trades.
-</p>
-
-<p><strong>The strategy uses the following conditions:</strong></p>
-
-<ul>
-
-<li><strong>Double bottom formation</strong><br>
-The price forms two consecutive lows at roughly the same level over the last
-<strong>5 candles</strong>, separated by a local peak (neckline).
-These lows indicate strong support and a potential reversal point.
-</li>
-
-<li><strong>Neckline identification</strong><br>
-The highest point between the two bottoms is the <strong>neckline</strong>.
-A break above this level confirms the bullish reversal and triggers the trade signal.
-</li>
-
-<li><strong>Breakout confirmation</strong><br>
-Price must close above the neckline.
-This breakout is ideally accompanied by higher trading volume, indicating
-strength and conviction in the move.
-</li>
-
-<li><strong>Retracement of neckline</strong><br>
-After breaking above the neckline, price may retrace back to test it.
-A bounce off the neckline confirms it as new support and strengthens the bullish signal.
-</li>
-
-<li><strong>Short-term trend alignment</strong><br>
-The stock should ideally be trading above a key moving average such as the
-<strong>50-day or 200-day moving average</strong> to align with the broader trend.
-</li>
-
-<li><strong>Recent consolidation</strong><br>
-The pattern works best when the market has shown a short consolidation or pullback
-before the second bottom, which increases the reliability of the breakout.
-</li>
-
-</ul>
-
-<p>
-This strategy focuses on identifying strong support zones and
-breakout opportunities, making it suitable for traders looking to
-capture early bullish reversals in stocks that have stabilized
-after a short-term decline.
-</p>
-
 </div>
+
+</body>
+</html>

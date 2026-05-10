@@ -1,178 +1,303 @@
 {% load custom_tags %}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>Industry Relative Strength</title>
+<meta charset="UTF-8">
+<title>Industry Relative Strength Dashboard</title>
 
 <style>
+
+/* ================= BASE ================= */
+
 body {
-    margin:0;
-    font-family:Arial;
-    background:#f4f6f8;
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
 }
 
 .container {
-    max-width:1200px;
-    margin:30px auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  padding: 20px;
 }
 
-/* HEADER */
-.header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.header h2 {
-    margin:0;
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.btn-back {
-    padding:8px 12px;
-    background:#6c757d;
-    color:white;
-    text-decoration:none;
-    border-radius:6px;
-    font-size:13px;
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
 }
 
-/* TABLE */
-.table-container {
-    overflow:auto;
-    max-height:75vh;
-    border-radius:10px;
+/* ================= ENTRY GRID ================= */
+
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
 }
 
-thead th {
-    position:sticky;
-    top:0;
-    background:#1f2937;
-    color:white;
-    padding:10px;
-    text-align:center;
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 td {
-    padding:8px;
-    text-align:center;
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
 }
 
-tbody tr:nth-child(even) {
-    background:#f9fafb;
+tr:hover {
+  background: rgba(59,130,246,0.08);
 }
 
-tbody tr:hover {
-    background:#e5e7eb;
+/* ================= ROW COLORS ================= */
+
+.dark-purple {
+  background: rgba(168,85,247,0.22);
+  font-weight: 600;
 }
 
-/* SCORE COLORS */
-.strong { background:#065f46; color:white; }
-.good { background:#d1fae5; }
-.weak { background:#fef3c7; }
-.bad { background:#fee2e2; }
-
-.industry {
-    font-weight:bold;
+.light-blue {
+  background: rgba(96,165,250,0.18);
 }
+
+.yellow {
+  background: rgba(234,179,8,0.14);
+}
+
+.orange {
+  background: rgba(249,115,22,0.16);
+}
+
+.red {
+  background: rgba(239,68,68,0.18);
+}
+
+/* ================= INDUSTRY LINK ================= */
+
+.industry-link {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.industry-link:hover {
+  text-decoration: underline;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- ================= NAVIGATION ================= -->
 
-    <!-- HEADER -->
-    <div class="header">
-        <h2>📊 Industry Relative Strength (Ranked)</h2>
-        <a href="{% url 'home' %}" class="btn-back">← Home</a>
-    </div>
+<div class="top-nav">
 
-    <!-- TABLE -->
-    <div class="table-container">
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
-        <table>
+</div>
 
-            <!-- HEADER -->
-            <thead>
-                <tr>
-                    {% for col in columns %}
-                        <th>{{ col }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
 
-            <!-- BODY -->
-            <tbody>
+<!-- ================= TITLE ================= -->
 
-            {% for row in rows %}
-            <tr>
+<h1>📊 Industry Relative Strength Dashboard</h1>
 
-                {% for col in columns %}
+<div class="sub">
+Weighted multi-timeframe industry momentum and institutional leadership ranking
+</div>
 
-                    {% if col == "Industry" %}
+<!-- ================= DESCRIPTION ================= -->
 
-                        <td class="industry">
-                            <a href="{% url 'industry_detail_rs' row.Industry %}"
-                               style="text-decoration:none; color:#2563eb;">
-                                {{ row.Industry }}
-                            </a>
-                        </td>
+<div class="desc">
 
-                    {% elif col == "TICKER" %}
+<strong>Industry Relative Strength Logic</strong><br><br>
 
-                        <td class="industry">
-                            <a href="{% url 'equity_chart' row.TICKER %}"
-                               style="text-decoration:none;">
-                                {{ row.TICKER }}
-                            </a>
-                        </td>
+✔ Relative score is the performance of stock against the S&P500 ETF <br>
+✔ Industries ranked using weighted relative strength across multiple trend windows<br>
+✔ Higher RS Score indicates stronger institutional momentum and sustained leadership<br>
+✔ Combines short-term acceleration with long-term trend persistence<br>
+<br>
+<strong>RS Score Formula</strong><br><br>
 
-                    {% elif col == "RS_SCORE" %}
+RS_SCORE =
 
-                        <td
-                            {% if row.RS_SCORE > 1.2 %}
-                                class="strong"
-                            {% elif row.RS_SCORE > 1 %}
-                                class="good"
-                            {% elif row.RS_SCORE > 0.9 %}
-                                class="weak"
-                            {% else %}
-                                class="bad"
-                            {% endif %}
-                        >
-                            {{ row.RS_SCORE|floatformat:2 }}
-                        </td>
+&nbsp;&nbsp;0.30 × RS_7+ 0.25 × RS_21+ 0.20 × RS_50+ 0.15 × RS_100+ 0.10 × RS_200<br><br>
 
-                    {% else %}
+<strong>Color Logic</strong><br><br>
 
-                        <td>
-                            {{ row|get_item:col|floatformat:2 }}
-                        </td>
+🟣 Greater than 1.50 → Exceptional leadership<br>
+🔵 1.25 to 1.50 → Strong relative strength<br>
+🟡 1.00 to 1.25 → Positive trend leadership<br>
+🟠 0.85 to 1.00 → Weak / neutral structure<br>
+🔴 Below 0.85 → Relative weakness
 
-                    {% endif %}
+</div>
 
-                {% endfor %}
+<!-- ================= TABLE ================= -->
 
-            </tr>
-            {% endfor %}
+<div class="table-wrap">
 
-            </tbody>
+<table>
 
-        </table>
+<thead>
+<tr>
 
-    </div>
+{% for col in columns %}
+  <th>{{ col }}</th>
+{% endfor %}
+
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in rows %}
+
+<tr class="
+{% if row.RS_SCORE >= 1.5 %}
+    dark-purple
+{% elif row.RS_SCORE >= 1.25 %}
+    light-blue
+{% elif row.RS_SCORE >= 1.0 %}
+    yellow
+{% elif row.RS_SCORE >= 0.85 %}
+    orange
+{% else %}
+    red
+{% endif %}
+">
+
+{% for col in columns %}
+
+    {% if col == "Industry" %}
+
+        <td>
+
+            <a class="industry-link"
+               href="{% url 'industry_today_detail' row.Industry %}">
+
+               {{ row.Industry }}
+
+            </a>
+
+        </td>
+
+    {% else %}
+
+        {% if col == "RS_SCORE" %}
+    <td>{{ row.RS_SCORE|floatformat:2 }}</td>
+{% else %}
+    <td>{{ row|get_item:col }}</td>
+{% endif %}
+
+    {% endif %}
+
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
 
 </div>
 

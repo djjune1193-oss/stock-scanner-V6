@@ -1,33 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Sector Trend Dashboard</title>
+
 <style>
 
-  .btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-  }
+/* ================= BASE (SCANNER STYLE) ================= */
 
-  .btn-back:hover {
-    background-color: #d1d5db;
-  }
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
 
-  .chart-wrapper {
-    margin-top: 30px;   /* space between header and chart */
-  }
+.container {
+  padding: 20px;
+}
+
+/* ================= TOP NAV (same scanner orientation) ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= ENTRY GRID (scanner-style consistency) ================= */
+
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #374151;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= TITLE ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION (YELLOW SCANNER STYLE) ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TABLE WRAP ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* ================= INFO TABLE ================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+/* ================= TICKER STYLE ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
 
 </style>
+</head>
 
-<div class="scanner-container">
+<body>
 
-  <div class="scanner-header">
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
-  </div>
+<!-- ================= NAVIGATION ================= -->
 
-  <div class="chart-wrapper">
-    {{ chart|safe }}
-  </div>
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
 
 </div>
+
+
+
+<!-- ================= TITLE ================= -->
+
+<h1>📈 Sector Trend Dashboard</h1>
+
+<div class="sub">
+Relative strength rotation across major U.S. sector ETFs
+</div>
+
+<!-- ================= DESCRIPTION (ETF BREAKDOWN ADDED) ================= -->
+
+<div class="desc">
+
+<strong>Sector Relative Strength Logic</strong><br><br>
+
+Each sector ETF is normalized using a 21-day moving average base (trend smoothing).<br><br>
+
+<strong>ETF Breakdown:</strong><br><br>
+
+• XLF — Financials: Banks, insurance, credit cycle sensitivity<br>
+• XLK — Technology: Growth + AI + semiconductor leadership<br>
+• XLV — Healthcare: Defensive growth + pharma + biotech stability<br>
+• XLE — Energy: Oil, gas, commodities-driven cyclical strength<br>
+• XLI — Industrials: Economic expansion + manufacturing + infrastructure<br>
+• XLY — Consumer Discretionary: Retail, Amazon-style growth + consumer demand<br>
+• XLP — Consumer Staples: Defensive stocks, low volatility demand<br>
+• XLB — Materials: Metals, chemicals, construction cycle exposure<br>
+• XLRE — Real Estate: REITs, interest rate sensitivity sector<br>
+• XLU — Utilities: Defensive income, low beta capital preservation<br>
+• XLC — Communication Services: Meta, Google, media + digital ad cycle<br>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="table-wrap">
+
+    {{ chart|safe }}
+
+</div>
+
+</div>
+
+</body>
+</html>

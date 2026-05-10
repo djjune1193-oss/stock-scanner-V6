@@ -1,138 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Equity Ranking</title>
+
 <style>
-    /* Table container for scrolling if needed */
-    .equity-table-container {
-        overflow-x: auto;
-        margin: 20px 0;
-        font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    }
 
-    /* Base table styles */
-    table.equity-table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #ffffff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 20px; /* space from back button */
-    }
+/* ================= BASE ================= */
 
-    /* Header styles */
-    table.equity-table thead {
-        background-color: #1f2937; /* Dark gray */
-        color: #f9fafb; /* Light text */
-    }
-
-    table.equity-table th, table.equity-table td {
-        padding: 12px 16px;
-        text-align: center;
-        font-size: 14px;
-    }
-
-    table.equity-table th {
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Alternating row colors */
-    table.equity-table tbody tr:nth-child(even) {
-        background-color: #f3f4f6; /* Light gray */
-    }
-
-    /* Row hover effect */
-    table.equity-table tbody tr:hover {
-        background-color: #e5e7eb; /* Slightly darker gray */
-        transition: background-color 0.2s ease-in-out;
-    }
-
-    /* Numeric alignment */
-    table.equity-table td.numeric {
-        text-align: right;
-        font-variant-numeric: tabular-nums;
-    }
-
-    /* Back button */
-    .btn-back {
-        display: inline-block;
-        margin-bottom: 10px; /* space before table */
-        padding: 8px 14px;
-        background-color: #e5e7eb;
-        color: #111827;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-    .btn-back:hover {
-        background-color: #d1d5db;
-    }
-
-    /* Arrows for positions climbed */
-    .arrow-up {
-        color: green;
-        margin-left: 5px;
-        font-weight: bold;
-    }
-
-    .arrow-down {
-        color: red;
-        margin-left: 5px;
-        font-weight: bold;
-    }
-
-    .ticker-link {
-   	 color: #1e40af;
-    	text-decoration: none;
-    	font-weight: 600;
-    }
-
-.ticker-link:hover {
-    text-decoration: underline;
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
 }
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 1200px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+}
+
+tbody tr:hover {
+  background: rgba(59,130,246,0.08);
+}
+
+/* ================= COLOR SCALE (CUMULATIVE RETURN) ================= */
+
+.strong {
+  background: rgba(34,197,94,0.18);
+}
+
+.mid {
+  background: rgba(234,179,8,0.18);
+}
+
+.low {
+  background: rgba(249,115,22,0.18);
+}
+
+.negative {
+  background: rgba(239,68,68,0.18);
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
 </style>
+</head>
 
-<div class="equity-table-container">
-    <a href="{% url 'home' %}" class="btn-back">← Back to Home</a>
+<body>
 
-    <table class="equity-table">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Ticker</th>
-                <th>Cumulative Normalized Return</th>
-                <th>Positions Climbed (7d)</th>
-                <th>Positions Climbed (21d)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in ranking_list %}
-            <tr>
-                <td class="numeric">{{ item.Rank|floatformat:0 }}</td>
-                <td>
-    		<a href="{% url 'equity_chart' item.Ticker %}" target="_blank" class="ticker-link">
-        	{{ item.Ticker }}
-    		</a>
-		</td>
-                <td class="numeric">{{ item.Cumulative_Return|floatformat:4 }}</td>
-                <td class="numeric">
-                    {{ item.Pos_Climbed_7d|floatformat:0 }}
-                    {% if item.Pos_Climbed_7d > 0 %}
-                        <span class="arrow-up">▲</span>
-                    {% elif item.Pos_Climbed_7d < 0 %}
-                        <span class="arrow-down">▼</span>
-                    {% endif %}
-                </td>
-                <td class="numeric">
-                    {{ item.Pos_Climbed_21d|floatformat:0 }}
-                    {% if item.Pos_Climbed_21d > 0 %}
-                        <span class="arrow-up">▲</span>
-                    {% elif item.Pos_Climbed_21d < 0 %}
-                        <span class="arrow-down">▼</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="top-nav">
+
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+
+
 </div>
+
+<div class="container">
+
+<h1>📊 Equity Ranking Dashboard</h1>
+
+<div class="sub">
+Latest RS + Cumulative strength vs SPY (institutional relative performance model)
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="desc">
+
+<strong>Ranking Logic</strong><br><br>
+
+RS_SCORE = Relative Performance against S&P500 for 7,21,50,100,200 days<br>
+RS_SCORE 1   :at par with market<br>
+RS_SCORE < 0 :Underperforming market <br>
+RS_SCORE > 1 :Outperforming market <br><br>
+RS_SCORE = 0.30 * RS_7 +0.25 * RS_21 +0.20 * RS_50 +0.15 * RS_100 +0.10 * RS_200<br>
+
+Cumulative Return = Return of equity for 1 year from today(%)<br><br>
+
+
+<strong>Color Logic (based on Cumulative Return)</strong><br>
+🟢 > 50 → Strong Leadership<br>
+🟡 25 – 100 → Positive Trend<br>
+🟠 0 – 25 → Weak Positive<br>
+🔴 < 0 → Negative Trend
+
+</div>
+
+<!-- ================= SORT LINKS ================= -->
+
+<div style="margin-bottom:10px; font-size:12px;">
+
+Sort:
+<a href="?sort=cumulative&dir=desc">Cumulative % Gain</a> |
+<a href="?sort=rs&dir=desc">RS Score</a> |
+<a href="?sort=ticker&dir=asc">Ticker</a>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+  <th>Ticker</th>
+  <th>RS Score</th>
+  <th>Cumulative % Gain</th>
+  <th>RS 7</th>
+  <th>RS 21</th>
+  <th>RS 50</th>
+  <th>RS 100</th>
+  <th>RS 200</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for r in ranking_list %}
+
+<tr
+{% if r.Cumulative_Return > 50 %}
+class="strong"
+{% elif r.Cumulative_Return > 25 %}
+class="mid"
+{% elif r.Cumulative_Return > 0 %}
+class="low"
+{% else %}
+class="negative"
+{% endif %}
+>
+
+  <td><a class="ticker" href="{% url 'equity_chart' r.Ticker %}">{{ r.Ticker }}</a></td>
+
+  <td>{{ r.RS_SCORE|floatformat:2 }}</td>
+  <td>{{ r.Cumulative_Return|floatformat:2 }}</td>
+  <td>{{ r.RS_7|floatformat:2 }}</td>
+  <td>{{ r.RS_21|floatformat:2 }}</td>
+  <td>{{ r.RS_50|floatformat:2 }}</td>
+  <td>{{ r.RS_100|floatformat:2 }}</td>
+  <td>{{ r.RS_200|floatformat:2 }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

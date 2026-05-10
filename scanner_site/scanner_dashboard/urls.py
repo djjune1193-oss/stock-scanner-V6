@@ -13,6 +13,7 @@ urlpatterns = [
     path("industry_weekly/", views.industry_weekly_view, name="industry_weekly"),
     path("double-bottom/", views.double_bottom_view, name="double-bottom"),
     path("turtle_soup/", views.turtle_soup_view, name="turtle_soup"),
+    path("stochastic_short/", views.stochastic_short_view, name="stochastic_short"),
     path("momentum_strength/", views.calculate_momentum_strength, name="momentum_strength"),
     path("chart/<str:ticker>/", views.equity_chart, name="equity_chart"),
     path("sector-chart/", views.sector_ma_chart, name="sector_chart"),
@@ -26,9 +27,13 @@ urlpatterns = [
     path("fundamentals/", fundamentals_view, name="fundamentals"),
     path("industry_rs/", industry_rs_view, name="industry_rs"),
     path("industry/rs/<path:industry_name>/", industry_detail_view, name="industry_detail_rs"),
-    path("rs_alignment/",views.rs_alignment_dashboard,name="rs_alignment_dashboard"),
+    path("rs_alignment/",views.rs_alignment_dashboard,name="rs_alignment"),
     path("sector_lbr/", views.sector_lbr_view, name="sector_lbr"),
     path("today/",views.industry_today_view,name="industry_today"),
     path("today/<str:industry_name>/",views.industry_today_detail,name="industry_today_detail"),
     path("ma_structure/",views.ma_structure_view,name="ma_structure"),
+    path('keltner_scan/', views.keltner_scan, name='keltner_scan'),
+    path("futures/", views.futures_view, name="futures"),
+    path("fib_scan/", views.fib_retracement_scan, name="fib_scan"),
+    
 ]

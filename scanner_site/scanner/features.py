@@ -106,9 +106,14 @@ def build_features(data, tic, meta):
 
     # %K turns up today
     df["K_up_today"] = df["K_slope"] > 0
+    df["K_up_yesterday"] = df["K_slope"].shift(1) > 0
+
+    # %K turns down today
+    df["K_down_today"] = df["K_slope"] < 0
+    df["K_down_yesterday"] = df["K_slope"].shift(1) < 0
 
 
-
+ 
     
 
     # =========================================================
@@ -154,8 +159,7 @@ def build_features(data, tic, meta):
     )
 
     
-    # -----------------------------
-    # OSCILLATOR
+    # -----------------------------   # OSCILLATOR
     # -----------------------------
     df["ROC2"] = df["Close"] - df["Close"].shift(2)
     df["ROC_slope"] = df["ROC2"].diff()
@@ -170,13 +174,13 @@ def build_features(data, tic, meta):
     df["slow_slope"] = df["LBR_slow"].diff()
 
     # Signals
-    df["buy_day"] = (
+    df["sell_day"] = (
         (df["ROC_slope"] > 0) &
         (df["fast_slope"] > 0) &
         (df["slow_slope"] > 0)
     )
 
-    df["sell_day"] = (
+    df["buy_day"] = (
         (df["ROC_slope"] < 0) &
         (df["fast_slope"] < 0) &
         (df["slow_slope"] < 0)

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Keltner Scan</title>
+
+<style>
+
+/* ================= THEME ================= */
+
+body {
+    margin: 0;
+    background: #0b1220;
+    font-family: "Segoe UI", Roboto, Arial;
+    color: #e5e7eb;
+}
+
+.container {
+    padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0f172a;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.top-nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.top-nav a:hover {
+    background: #1f2937;
+    color: white;
+}
+
+/* ================= CARD ================= */
+
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+/* ================= INPUT ================= */
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #0f172a;
+    color: white;
+    width: 260px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+/* ================= TABLE ================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+/* SORTABLE HEADERS */
+th {
+    background: #1f2937;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+}
+
+th a {
+    color: white;
+    text-decoration: none;
+}
+
+th a:hover {
+    color: #93c5fd;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+tr:nth-child(even) {
+    background: #0f172a;
+}
+
+/* TICKER LINK */
+.ticker-link {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.ticker-link:hover {
+    text-decoration: underline;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
+</div>
+
+<div class="container">
+
+<h2>📊 Keltner Channel Scanner</h2>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="card desc">
+
+<strong>Logic Overview</strong><br><br>
+
+✔ EMA20-based trend detection<br>
+✔ ATR-based volatility channel construction<br>
+✔ Upper = EMA20 + 2.5×ATR<br>
+✔ Lower = EMA20 − 2.5×ATR<br>
+✔ Measures breakout strength vs volatility expansion<br><br>
+
+<strong>Interpretation</strong><br>
+
+🟢 Strong trend = % Above EMA high<br>
+🟡 Neutral = inside channel<br>
+🔴 Weak = below EMA compression<br><br>
+
+<strong>Default Chart</strong><br>
+Auto-loads <b>^GSPC</b> Keltner structure
+
+</div>
+
+<!-- ================= INPUT ================= -->
+
+<div class="card">
+
+<form method="get">
+    <input type="text"
+           name="ticker"
+           value="{{ selected_ticker }}"
+           placeholder="Switch ticker (e.g. AAPL)">
+    <button type="submit">Switch</button>
+</form>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="card">
+    {% if chart %}
+        {{ chart|safe }}
+    {% endif %}
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=ticker">Ticker</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Close">Close</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=ema20">EMA20</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=kc_upper">Upper</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=kc_lower">Lower</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=pct_above_ema">% Above EMA</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=atr_pct">ATR %</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=days_above_ema">Days Above EMA</a>
+</th>
+
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in data %}
+
+<tr>
+
+<td>
+    <a class="ticker-link" href="?ticker={{ row.TICKER }}">
+        {{ row.TICKER }}
+    </a>
+</td>
+
+<td>{{ row.Close }}</td>
+<td>{{ row.ema20 }}</td>
+<td>{{ row.kc_upper }}</td>
+<td>{{ row.kc_lower }}</td>
+<td>{{ row.pct_above_ema }}</td>
+<td>{{ row.atr_pct }}</td>
+<td>{{ row.days_above_ema }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>

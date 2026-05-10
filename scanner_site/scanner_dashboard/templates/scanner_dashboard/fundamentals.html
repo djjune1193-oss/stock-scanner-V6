@@ -1,160 +1,262 @@
 {% load custom_tags %}
 
-
-
-
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Fundamentals Dashboard</title>
+<meta charset="UTF-8">
+<title>Fundamentals Dashboard</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial;
-            background: #f4f6f8;
-        }
+<style>
 
-        /* Sticky header fix */
-        thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: #f1f1f1;
-            border-bottom: 1px solid #ddd;
-        }
-    </style>
+/* ================= BASE (MATCH SCANNER) ================= */
+
+body {
+  margin: 0;
+  background: #0b1220;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV (EXACT SCANNER STYLE) ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #1f2937;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= ENTRY MODELS (SAME SCANNER FEEL) ================= */
+
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.entry-grid a {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  color: #cbd5e1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.entry-grid a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* ================= HEADER ================= */
+
+h1 {
+  margin: 15px 0 5px;
+  color: white;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ================= DESCRIPTION (YELLOW SCANNER ALERT STYLE) ================= */
+
+.desc {
+  background: #fef3c7;
+  color: #78350f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ================= TABLE (IDENTICAL SCANNER STYLE) ================= */
+
+.table-wrap {
+  overflow-x: auto;
+  background: #1f2937;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #93c5fd;
+  border-bottom: 1px solid #1f2937;
+}
+
+td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #374151;
+  color: #e5e7eb;
+}
+
+/* ================= ROW COLORS (KEEP OPTIONAL IF YOU USE THEM) ================= */
+
+.light-green { background: rgba(34,197,94,0.10); }
+.dark-green  { background: rgba(34,197,94,0.18); font-weight: 600; }
+
+.light-red   { background: rgba(239,68,68,0.10); }
+.dark-red    { background: rgba(239,68,68,0.18); font-weight: 600; }
+
+tr:hover {
+  background: rgba(59,130,246,0.08);
+}
+
+/* ================= TICKER ================= */
+
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
+</style>
 </head>
 
 <body>
 
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+<!-- ================= NAVIGATION (SAME AS SCANNER) ================= -->
 
-    <h2 style="margin:0;">📊 Fundamentals Dashboard</h2>
+<div class="top-nav">
 
-    <div style="display:flex; gap:10px; align-items:center;">
+  <a href="{% url 'home'%}"> Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'sector' %}">Daily Sector </a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+  <a href="{% url 'metrics' %}">Technical Metrics</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+  <a href="{% url 'rs_alignment' %}">Corelation</a>
 
-        <!-- BACK BUTTON -->
-        <a href="/"
-           style="
-                padding:8px 12px;
-                background:#6c757d;
-                color:white;
-                text-decoration:none;
-                border-radius:6px;
-                font-size:13px;
-           ">
-            ← Back Home
+</div>
+
+
+<!-- ================= TITLE ================= -->
+
+<h1>📊 Fundamentals Dashboard</h1>
+<div class="sub">
+    Equity valuation • profitability • growth scanner
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="desc">
+
+<strong>Fundamentals Logic</strong><br><br>
+
+Valuation metrics (PE, PB, EV/EBITDA)<br>
+Growth filters (Revenue / EPS growth)<br>
+Profitability (ROE, ROCE, margins)<br>
+Financial strength ranking model<br><br>
+
+Click on any column to sort them <br>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+  {% for col in columns %}
+    <th>
+      <a href="?sort={{ col }}" style="color:#93c5fd;">
+        {{ col }}
+      </a>
+    </th>
+  {% endfor %}
+</tr>
+</thead>
+
+<tbody>
+
+{% for row in rows %}
+
+<tr id="row-{{ row.TICKER }}">
+
+  {% for col in columns %}
+
+    {% if col == "TICKER" %}
+
+      <td>
+        <a class="ticker"
+           href="{% url 'equity_chart' row.TICKER %}"
+           target="_blank">
+          {{ row.TICKER }}
         </a>
+      </td>
 
-        <!-- SEARCH -->
-        <form method="GET" style="display:flex; gap:8px;">
-            <input type="text"
-                   name="search"
-                   value="{{ search_query }}"
-                   placeholder="Search Ticker..."
-                   style="padding:8px; border-radius:6px; border:1px solid #ccc;">
+    {% else %}
 
-            <button type="submit"
-                    style="padding:8px 12px; background:#007bff; color:white; border:none; border-radius:6px;">
-                Search
-            </button>
-        </form>
+      <td>
+        {{ row|get_item:col }}
+      </td>
 
-    </div>
+    {% endif %}
+
+  {% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
 
 </div>
 
-    <!-- TABLE SCROLL CONTAINER (IMPORTANT FIX) -->
-    <div id="tableContainer"
-         style="overflow:auto; max-height:80vh; background:white; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
-
-        <table style="min-width:1700px; width:100%; border-collapse:collapse; font-size:12px;">
-
-            <!-- HEADER -->
-            <thead>
-                <tr>
-                    {% for col in columns %}
-                    <th style="padding:8px; text-align:center; white-space:nowrap;">
-                        <a href="?sort={{ col }}" style="text-decoration:none; color:#333;">
-                            {{ col }} ⬇
-                        </a>
-                    </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-            <!-- BODY -->
-            <tbody>
-                {% for row in rows %}
-                <tr id="row-{{ row.TICKER }}"
-                    style="
-                        text-align:center;
-                        border-top:1px solid #eee;
-                        background-color:{% if forloop.counter0|divisibleby:2 %}#f9f9f9{% else %}white{% endif %};
-                    "
-                    onmouseover="this.style.backgroundColor='#eaf3ff'"
-                    onmouseout="this.style.backgroundColor=''">
-
-                    {% for col in columns %}
-
-                        {% if col == "TICKER" %}
-                        <td style="padding:6px; font-weight:bold;">
-                            <a href="{% url 'equity_chart' row.TICKER %}"
-                               target="_blank"
-                               style="color:#007bff; text-decoration:none;">
-                                {{ row.TICKER }}
-                            </a>
-                        </td>
-                        {% else %}
-                        <td style="padding:6px;">
-                            {{ row|get_item:col }}
-                        </td>
-                        {% endif %}
-
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-    </div>
 </div>
-
-<!-- ================= JS ================= -->
-
-<script>
-function focusTickerRow(ticker) {
-    if (!ticker) return;
-
-    ticker = ticker.toUpperCase().trim();
-
-    const row = document.getElementById("row-" + ticker);
-
-    if (row) {
-        const container = document.getElementById("tableContainer");
-
-        // scroll inside container (NOT page)
-        container.scrollTo({
-            top: row.offsetTop - container.offsetTop - 200,
-            behavior: "smooth"
-        });
-
-        row.style.backgroundColor = "#fff3cd";
-    }
-}
-</script>
-
-<script>
-    const searchTicker = "{{ search_query|default:'' }}";
-
-    if (searchTicker) {
-        window.onload = function () {
-            focusTickerRow(searchTicker);
-        }
-    }
-</script>
 
 </body>
 </html>

@@ -1,18 +1,26 @@
 # Python
 __pycache__/
 *.pyc
-*.pyo
+
+# Virtual env
+venv/
+.env
 
 # Django
 db.sqlite3
-*.log
-media/
 staticfiles/
 
-# Env
-.env
-venv/
-env/
+# VSCode
+.vscode/
 
 # OS
 .DS_Store
+
+# Logs
+*.log
+
+# Data
+scanner_site/data/*.parquet
+
+# Jupyter
+.ipynb_checkpoints/

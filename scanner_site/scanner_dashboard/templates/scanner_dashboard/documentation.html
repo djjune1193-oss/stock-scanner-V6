@@ -1,63 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
-<title>Scanner Documentation</title>
+<title>Market Health Documentation</title>
 
 <style>
 
-body{
-    font-family:"Segoe UI", Roboto, Arial, sans-serif;
-    background:#f4f6f9;
-    margin:0;
-    padding:30px;
+/* ================= BASE ================= */
+
+body {
+    margin: 0;
+    background: #111827;
+    font-family: Arial, sans-serif;
+    color: #e5e7eb;
 }
 
-.container{
-    max-width:1000px;
-    margin:auto;
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
 }
 
-.doc-box{
-    background:#fff9db;
-    border-left:6px solid #facc15;
-    padding:28px;
-    border-radius:10px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+/* ================= NAV ================= */
+
+.top-nav {
+    background: #0f172a;
+    padding: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #374151;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-h1{
-    margin-top:0;
-    color:#1f2937;
+.top-nav a {
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-h2{
-    margin-top:30px;
-    color:#374151;
+.top-nav a:hover {
+    background: #1f2937;
+    color: white;
 }
 
-p{
-    line-height:1.6;
-    color:#374151;
+/* ================= BACK BUTTON ================= */
+
+.btn-back {
+    display: inline-block;
+    margin: 18px 0;
+    padding: 8px 14px;
+    background: #1f2937;
+    color: #e5e7eb;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #374151;
 }
 
-ul{
-    line-height:1.7;
+.btn-back:hover {
+    background: #2563eb;
+    color: white;
 }
 
-.btn-back{
-    display:inline-block;
-    margin-bottom:20px;
-    padding:8px 14px;
-    background:#e5e7eb;
-    color:#111827;
-    border-radius:6px;
-    text-decoration:none;
-    font-weight:600;
+/* ================= DOC BOX ================= */
+
+.doc-box {
+    background: #0f172a;
+    border: 1px solid #1f2937;
+    border-left: 5px solid #facc15;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
 
-.btn-back:hover{
-    background:#d1d5db;
+/* ================= TYPOGRAPHY ================= */
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 30px;
+}
+
+.sub {
+    color: #9ca3af;
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+h2, h3 {
+    color: #93c5fd;
+    margin-top: 28px;
+}
+
+p {
+    line-height: 1.7;
+    color: #d1d5db;
+    font-size: 14px;
+}
+
+ul {
+    line-height: 1.8;
+    color: #d1d5db;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+/* ================= INFO BLOCKS ================= */
+
+.info-block {
+    background: #111827;
+    border: 1px solid #1f2937;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-top: 14px;
+}
+
+/* ================= SCORE BOX ================= */
+
+.score-box {
+    margin-top: 20px;
+    background: rgba(59,130,246,0.10);
+    border: 1px solid rgba(59,130,246,0.25);
+    padding: 16px;
+    border-radius: 10px;
+    color: #bfdbfe;
+    font-weight: 600;
+}
+
+/* ================= INTERPRETATION ================= */
+
+.bull {
+    color: #22c55e;
+}
+
+.neutral {
+    color: #facc15;
+}
+
+.bear {
+    color: #ef4444;
 }
 
 </style>
@@ -66,217 +159,221 @@ ul{
 
 <body>
 
+<!-- ================= NAVIGATION ================= -->
+
+<div class="top-nav">
+
+  <a href="{% url 'home'%}">Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+
+</div>
+
 <div class="container">
 
-<a href="{% url 'home' %}" class="btn-back">← Back to Dashboard</a>
+<a href="{% url 'home' %}" class="btn-back">
+← Back to Dashboard
+</a>
 
 <div class="doc-box">
 
-<h1>Stock Scanner Tool Documentation</h1>
+<h1>📘 Market Health Documentation</h1>
 
-<h2>Overview</h2>
+<div class="sub">
+Institutional market regime model combining trend, breadth, volatility, and macro conditions
+</div>
 
 <p>
-This tool provides a dashboard for monitoring the health of the U.S. stock market
-and identifying potential swing trading opportunities. It combines market-wide
-indicators with equity-level scanners to highlight stocks that may present
-short-term trading setups.
+The Market Health indicator is a composite institutional-style score
+designed to evaluate the overall strength and quality of the market environment.
 </p>
 
 <p>
-The system retrieves OHLCV market data using the Yahoo Finance API
-(with approximately 15-minute latency from live markets).
+The score ranges from <strong>0 to 100</strong> and combines six major components:
+trend structure, breadth participation, risk appetite, volatility conditions,
+interest rate pressure, and broad index alignment.
 </p>
 
-<p>
-Ticker symbols are loaded from the <strong>All_Stock_data.csv</strong> file bundled with the
-software. When used as a local application this file can be modified,
-however the website version uses a fixed dataset.
-</p>
-
-<p>
-The scanner includes equities that trade above <strong>$5</strong> and have
-average daily volume greater than <strong>1 million shares</strong>.
-The universe of stocks is refreshed approximately every two weeks.
-</p>
-
-<p>
-The <strong>Refresh Scanner</strong> button downloads the latest market data and
-updates the dashboard. Stocks are displayed in descending order of
-daily volume. Each ticker links directly to an interactive candlestick
-chart for further analysis.
-</p>
-
----
-
-<h2>Market Analysis Tools</h2>
-
-<h3>Sector Trend</h3>
-
-<p>
-This indicator tracks the 21-day moving average of sector ETFs,
-normalized to 100 at the starting point. The purpose is to compare
-relative strength across sectors and observe which sectors are
-leading or lagging the market over time.
-</p>
-
-<h3>Sector Performance</h3>
-
-<p>
-Displays the daily percentage performance of sectors and industries.
-Results are sorted by performance, allowing quick identification of
-which areas of the market are gaining or losing momentum.
-</p>
-
-<h3>Industry Rank</h3>
-
-<p>
-Each stock’s daily performance is normalized against the S&P 500 using
-RMSE normalization and aggregated at the industry level.
-Industries are then ranked based on cumulative performance and
-position changes over 7-day and 21-day windows.
-</p>
-
-<p>
-This helps identify industries demonstrating strong relative
-performance compared to the broader market. Since industries are not
-weighted by market capitalization, rankings may occasionally be
-influenced by a single strong-performing stock.
-</p>
-
-<h3>Equity Rank</h3>
-
-<p>
-Individual stocks and ETFs are ranked based on their normalized
-performance relative to the S&P 500 over 7-day and 21-day periods.
-This indicator highlights equities exhibiting strong relative
-momentum compared to the overall market.
-</p>
-
----
-
-<h2>Market Health Indicator</h2>
-
-<p>
-The Market Health indicator is a composite score designed to measure
-overall market strength using major indexes, volatility conditions,
-and interest rate levels.
-</p>
-
-<p>
-The score ranges from <strong>0 to 100</strong> and combines six components:
-trend, breadth, risk appetite, volatility environment, interest
-rate pressure, and index alignment.
-</p>
+<!-- ================= TREND ================= -->
 
 <h3>1. Market Trend (30 points)</h3>
 
+<div class="info-block">
+
 <p>
-The system evaluates whether the S&P 500, Dow Jones Industrial
-Average, and NYSE Composite are in a strong uptrend.
-An index is considered bullish when:
+The system evaluates whether major indexes are in confirmed uptrends:
+</p>
+
+<ul>
+<li>S&P 500</li>
+<li>Dow Jones Industrial Average</li>
+<li>NYSE Composite</li>
+</ul>
+
+<p>
+An index is bullish when:
 </p>
 
 <ul>
 <li>Price is above the 50-day moving average</li>
-<li>The 50-day moving average is above the 200-day moving average</li>
+<li>50-day moving average is above the 200-day moving average</li>
 </ul>
 
 <ul>
-<li>3 indexes in uptrend → 30 points</li>
-<li>2 indexes in uptrend → 20 points</li>
-<li>1 index in uptrend → 10 points</li>
-<li>None → 0 points</li>
+<li>3 indexes bullish → 30 points</li>
+<li>2 indexes bullish → 20 points</li>
+<li>1 index bullish → 10 points</li>
+<li>None bullish → 0 points</li>
 </ul>
+
+</div>
+
+<!-- ================= BREADTH ================= -->
 
 <h3>2. Market Breadth (15 points)</h3>
 
+<div class="info-block">
+
 <p>
-Breadth measures how widely market gains are distributed.
-The NYSE Composite is compared with the S&P 500.
+Breadth measures how broadly participation is distributed across the market.
+The NYSE Composite is compared against the S&P 500.
 </p>
 
 <ul>
-<li>NYSE stronger than S&P 500 → 15 points</li>
-<li>Both within 1% of each other → 8 points</li>
-<li>Otherwise → 0 points</li>
+<li>NYSE outperforming S&P → 15 points</li>
+<li>Within 1% of S&P → 8 points</li>
+<li>Weak breadth → 0 points</li>
 </ul>
+
+</div>
+
+<!-- ================= RISK APPETITE ================= -->
 
 <h3>3. Risk Appetite (20 points)</h3>
 
+<div class="info-block">
+
 <p>
-Risk appetite reflects whether investors prefer growth and small-cap
-stocks, which typically lead in strong bull markets.
+Risk appetite evaluates whether investors prefer aggressive growth assets.
+Strong bull markets usually show leadership from:
 </p>
 
 <ul>
-<li>Nasdaq and Russell outperform S&P → 20 points</li>
+<li>Nasdaq</li>
+<li>Russell 2000</li>
+</ul>
+
+<ul>
+<li>Nasdaq + Russell outperform S&P → 20 points</li>
 <li>Only Nasdaq leads → 12 points</li>
 <li>Only Russell leads → 8 points</li>
 <li>Neither leads → 0 points</li>
 </ul>
 
+</div>
+
+<!-- ================= VOLATILITY ================= -->
+
 <h3>4. Volatility Environment (15 points)</h3>
 
+<div class="info-block">
+
 <p>
-Market stability is measured using the VIX volatility index.
-Lower volatility usually corresponds to healthier market conditions.
+The VIX volatility index measures market stress.
+Lower volatility generally indicates healthier conditions.
 </p>
 
 <ul>
 <li>VIX below 15 → 15 points</li>
-<li>VIX between 15 and 20 → 10 points</li>
-<li>VIX between 20 and 30 → 5 points</li>
+<li>VIX between 15–20 → 10 points</li>
+<li>VIX between 20–30 → 5 points</li>
 <li>VIX above 30 → 0 points</li>
 </ul>
 
+</div>
+
+<!-- ================= RATES ================= -->
+
 <h3>5. Interest Rate Environment (10 points)</h3>
 
+<div class="info-block">
+
 <p>
-Interest rates influence equity valuations and market liquidity.
-The system evaluates the 10-year and 30-year Treasury yields.
+Interest rates affect liquidity and equity valuations.
+The system evaluates:
 </p>
 
 <ul>
-<li>10-year < 5% and 30-year < 6% → 10 points</li>
-<li>10-year < 5.5% → 6 points</li>
+<li>10-Year Treasury Yield</li>
+<li>30-Year Treasury Yield</li>
+</ul>
+
+<ul>
+<li>10Y &lt; 5% and 30Y &lt; 6% → 10 points</li>
+<li>10Y &lt; 5.5% → 6 points</li>
 <li>Otherwise → 3 points</li>
 </ul>
 
+</div>
+
+<!-- ================= ALIGNMENT ================= -->
+
 <h3>6. Index Alignment (10 points)</h3>
 
+<div class="info-block">
+
 <p>
-This component measures how many major indexes are trading above
-their 50-day moving averages.
+Measures how many major indexes are trading above their 50-day moving averages.
 </p>
 
 <ul>
-<li>5 indexes above → 10 points</li>
+<li>5 indexes above 50DMA → 10 points</li>
 <li>4 indexes above → 7 points</li>
 <li>3 indexes above → 4 points</li>
 <li>Fewer than 3 → 0 points</li>
 </ul>
 
-<h3>Final Score</h3>
+</div>
 
-<p>
-The final Market Health score is the sum of all components:
-</p>
+<!-- ================= FINAL SCORE ================= -->
 
-<p>
-<strong>
-Market Health = Trend + Breadth + Risk Appetite + Volatility + Rates + Alignment
-</strong>
-</p>
+<h3>Final Formula</h3>
+
+<div class="score-box">
+
+Market Health =
+Trend + Breadth + Risk Appetite + Volatility + Rates + Alignment
+
+</div>
+
+<!-- ================= INTERPRETATION ================= -->
 
 <h3>Score Interpretation</h3>
 
+<div class="info-block">
+
 <ul>
-<li><strong>80–100:</strong> Strong bullish market environment</li>
-<li><strong>60–79:</strong> Moderately strong market conditions</li>
-<li><strong>40–59:</strong> Neutral or mixed market</li>
-<li><strong>Below 40:</strong> Weak market conditions with elevated risk</li>
+<li class="bull">
+<strong>80–100:</strong> Strong bullish environment
+</li>
+
+<li class="bull">
+<strong>60–79:</strong> Healthy market conditions
+</li>
+
+<li class="neutral">
+<strong>40–59:</strong> Mixed / neutral market
+</li>
+
+<li class="bear">
+<strong>Below 40:</strong> Weak or risk-off market
+</li>
 </ul>
+
+</div>
 
 </div>
 
