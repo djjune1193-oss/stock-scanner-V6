@@ -14,8 +14,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* ================= NAV ================= */
-
+/* NAV */
 .top-nav {
     background: #0f172a;
     padding: 12px;
@@ -42,8 +41,7 @@ body {
     color: white;
 }
 
-/* ================= PAGE ================= */
-
+/* PAGE */
 .scanner-container {
     padding: 20px 30px;
     min-height: 100vh;
@@ -52,7 +50,6 @@ body {
 .scanner-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
 }
 
@@ -60,54 +57,36 @@ body {
     color: white;
     font-size: 30px;
     font-weight: 700;
-    margin: 0;
 }
 
 .page-subtitle {
     color: #9ca3af;
-    margin-top: 6px;
     font-size: 15px;
 }
 
-.btn-back {
-    padding: 8px 14px;
-    background-color: #e5e7eb;
-    color: #111827;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.btn-back:hover {
-    background-color: #d1d5db;
-}
-
-/* ================= GROUP CARDS ================= */
-
+/* GRID */
 .group-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 16px;
     margin-top: 25px;
-    margin-bottom: 25px;
 }
 
+/* CARD */
 .group-card {
     background-color: #1f2937;
     border: 1px solid #374151;
     border-radius: 14px;
     padding: 18px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
 }
 
 .group-title {
     color: #60a5fa;
     font-size: 18px;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     border-bottom: 1px solid #374151;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 .ticker-list {
@@ -119,9 +98,7 @@ body {
 .ticker-list li {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 6px 0;
     font-size: 14px;
 }
 
@@ -131,25 +108,17 @@ body {
 
 .change {
     font-weight: 700;
-    font-size: 13px;
 }
 
-.pos {
-    color: #22c55e;
-}
+.pos { color: #22c55e; }
+.neg { color: #ef4444; }
 
-.neg {
-    color: #ef4444;
-}
-
-/* ================= CHART ================= */
-
+/* CHART */
 .chart-wrapper {
     margin-top: 30px;
     background-color: #1f2937;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
 }
 
 </style>
@@ -158,223 +127,293 @@ body {
 
 <body>
 
-<!-- ================= NAVIGATION ================= -->
-
+<!-- NAV -->
 <div class="top-nav">
-
     <a href="{% url 'home'%}">Home</a>
     <a href="{% url 'fundamentals' %}">Fundamentals</a>
     <a href="{% url 'futures' %}">Futures</a>
-    <a href="{% url 'sector_chart' %}">Sector Trend</a>
-    <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
-    <a href="{% url 'industry_today' %}">Daily Industry</a>
-    <a href="{% url 'sector' %}">Daily Sector</a>
-    <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-    <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-    <a href="{% url 'metrics' %}">Technical Metrics</a>
-    <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-    <a href="{% url 'rs_alignment' %}">Corelation</a>
-
 </div>
-
-<!-- ================= PAGE ================= -->
 
 <div class="scanner-container">
 
-    <!-- HEADER -->
-
-    <div class="scanner-header">
-
-        <div>
-
-            <h1 class="page-title">
-                Futures Market Dashboard
-            </h1>
-
-            <div class="page-subtitle">
-                Multi-asset futures tracking across global equity indices,
-                bonds, metals, energy, agriculture, softs, and livestock markets.
-            </div>
-
+<!-- HEADER -->
+<div class="scanner-header">
+    <div>
+        <h1 class="page-title">Futures Market Dashboard</h1>
+        <div class="page-subtitle">
+            Multi-asset futures tracking across global markets
         </div>
-
-        <a href="{% url 'home' %}" class="btn-back">
-            ← Back Home
-        </a>
-
     </div>
+</div>
 
-    <!-- ================= GROUP CARDS ================= -->
+<!-- ================= GRID START ================= -->
+<div class="group-grid">
 
-    <div class="group-grid">
+<!-- EQUITIES -->
+<div class="group-card">
+    <div class="group-title">Equities</div>
+    <ul class="ticker-list">
 
-        <!-- EQUITIES -->
+        <li>
+            <span class="ticker-name">ES=F — S&P 500</span>
+            <span class="change {% if display_change.ESF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ESF }}%
+            </span>
+        </li>
 
-        <div class="group-card">
+        <li>
+            <span class="ticker-name">NQ=F — Nasdaq</span>
+            <span class="change {% if display_change.NQF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.NQF }}%
+            </span>
+        </li>
 
-            <div class="group-title">Equities</div>
+        <li>
+            <span class="ticker-name">YM=F — Dow</span>
+            <span class="change {% if display_change.YMF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.YMF }}%
+            </span>
+        </li>
 
-            <ul class="ticker-list">
+        <li>
+            <span class="ticker-name">RTY=F — Russell</span>
+            <span class="change {% if display_change.RTYF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.RTYF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">ES=F — S&P 500</span>
+    </ul>
+</div>
 
-                    <span class="change {% if display_change.ESF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.ESF }}%
-                    </span>
-                </li>
+<!-- BONDS -->
+<div class="group-card">
+    <div class="group-title">Bonds</div>
+    <ul class="ticker-list">
 
-                <li>
-                    <span class="ticker-name">NQ=F — Nasdaq</span>
+        <li>
+            <span class="ticker-name">ZB=F — 30Y Bond</span>
+            <span class="change {% if display_change.ZBF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZBF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.NQF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.NQF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">ZN=F — 10Y Note</span>
+            <span class="change {% if display_change.ZNF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZNF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">YM=F — Dow</span>
+        <li>
+            <span class="ticker-name">ZF=F — 5Y Note</span>
+            <span class="change {% if display_change.ZFF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZFF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.YMF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.YMF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">ZT=F — 2Y Note</span>
+            <span class="change {% if display_change.ZTF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZTF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">RTY=F — Russell</span>
+    </ul>
+</div>
 
-                    <span class="change {% if display_change.RTYF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.RTYF }}%
-                    </span>
-                </li>
+<!-- METALS -->
+<div class="group-card">
+    <div class="group-title">Metals</div>
+    <ul class="ticker-list">
 
-            </ul>
+        <li>
+            <span class="ticker-name">GC=F — Gold</span>
+            <span class="change {% if display_change.GCF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.GCF }}%
+            </span>
+        </li>
 
-        </div>
+        <li>
+            <span class="ticker-name">SI=F — Silver</span>
+            <span class="change {% if display_change.SIF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.SIF }}%
+            </span>
+        </li>
 
-        <!-- BONDS -->
+        <li>
+            <span class="ticker-name">HG=F — Copper</span>
+            <span class="change {% if display_change.HGF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.HGF }}%
+            </span>
+        </li>
 
-        <div class="group-card">
+        <li>
+            <span class="ticker-name">PL=F — Platinum</span>
+            <span class="change {% if display_change.PLF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.PLF }}%
+            </span>
+        </li>
 
-            <div class="group-title">Bonds</div>
+        <li>
+            <span class="ticker-name">PA=F — Palladium</span>
+            <span class="change {% if display_change.PAF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.PAF }}%
+            </span>
+        </li>
 
-            <ul class="ticker-list">
+    </ul>
+</div>
 
-                <li>
-                    <span class="ticker-name">ZB=F — 30Y Bond</span>
+<!-- ENERGY -->
+<div class="group-card">
+    <div class="group-title">Energy</div>
+    <ul class="ticker-list">
 
-                    <span class="change {% if display_change.ZBF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.ZBF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">CL=F — Crude Oil</span>
+            <span class="change {% if display_change.CLF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.CLF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">ZN=F — 10Y Note</span>
+        <li>
+            <span class="ticker-name">NG=F — Natural Gas</span>
+            <span class="change {% if display_change.NGF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.NGF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.ZNF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.ZNF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">BZ=F — Brent</span>
+            <span class="change {% if display_change.BZF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.BZF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">ZF=F — 5Y Note</span>
+    </ul>
+</div>
 
-                    <span class="change {% if display_change.ZFF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.ZFF }}%
-                    </span>
-                </li>
+<!-- AGRICULTURE -->
+<div class="group-card">
+    <div class="group-title">Agriculture</div>
+    <ul class="ticker-list">
 
-                <li>
-                    <span class="ticker-name">ZT=F — 2Y Note</span>
+        <li>
+            <span class="ticker-name">ZC=F — Corn</span>
+            <span class="change {% if display_change.ZCF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZCF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.ZTF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.ZTF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">ZS=F — Soybeans</span>
+            <span class="change {% if display_change.ZSF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZSF }}%
+            </span>
+        </li>
 
-            </ul>
+        <li>
+            <span class="ticker-name">ZM=F — Soy Meal</span>
+            <span class="change {% if display_change.ZMF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZMF }}%
+            </span>
+        </li>
 
-        </div>
+        <li>
+            <span class="ticker-name">ZL=F — Soy Oil</span>
+            <span class="change {% if display_change.ZLF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.ZLF }}%
+            </span>
+        </li>
 
-        <!-- METALS -->
+        <li>
+            <span class="ticker-name">KE=F — Wheat</span>
+            <span class="change {% if display_change.KEF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.KEF }}%
+            </span>
+        </li>
 
-        <div class="group-card">
+    </ul>
+</div>
 
-            <div class="group-title">Metals</div>
+<!-- SOFTS -->
+<div class="group-card">
+    <div class="group-title">Softs</div>
+    <ul class="ticker-list">
 
-            <ul class="ticker-list">
+        <li>
+            <span class="ticker-name">CC=F — Cocoa</span>
+            <span class="change {% if display_change.CCF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.CCF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">GC=F — Gold</span>
+        <li>
+            <span class="ticker-name">KC=F — Coffee</span>
+            <span class="change {% if display_change.KCF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.KCF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.GCF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.GCF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">CT=F — Cotton</span>
+            <span class="change {% if display_change.CTF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.CTF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">SI=F — Silver</span>
+        <li>
+            <span class="ticker-name">SB=F — Sugar</span>
+            <span class="change {% if display_change.SBF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.SBF }}%
+            </span>
+        </li>
 
-                    <span class="change {% if display_change.SIF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.SIF }}%
-                    </span>
-                </li>
+        <li>
+            <span class="ticker-name">OJ=F — Orange Juice</span>
+            <span class="change {% if display_change.OJF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.OJF }}%
+            </span>
+        </li>
 
-                <li>
-                    <span class="ticker-name">HG=F — Copper</span>
+    </ul>
+</div>
 
-                    <span class="change {% if display_change.HGF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.HGF }}%
-                    </span>
-                </li>
+<!-- LIVESTOCK -->
+<div class="group-card">
+    <div class="group-title">Livestock</div>
+    <ul class="ticker-list">
 
-            </ul>
+        <li>
+            <span class="ticker-name">LE=F — Live Cattle</span>
+            <span class="change {% if display_change.LEF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.LEF }}%
+            </span>
+        </li>
 
-        </div>
+        <li>
+            <span class="ticker-name">HE=F — Lean Hogs</span>
+            <span class="change {% if display_change.HEF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.HEF }}%
+            </span>
+        </li>
 
-        <!-- ENERGY -->
+        <li>
+            <span class="ticker-name">GF=F — Feeder Cattle</span>
+            <span class="change {% if display_change.GFF > 0 %}pos{% else %}neg{% endif %}">
+                {{ display_change.GFF }}%
+            </span>
+        </li>
 
-        <div class="group-card">
+    </ul>
+</div>
 
-            <div class="group-title">Energy</div>
+</div>
 
-            <ul class="ticker-list">
-
-                <li>
-                    <span class="ticker-name">CL=F — Crude Oil</span>
-
-                    <span class="change {% if display_change.CLF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.CLF }}%
-                    </span>
-                </li>
-
-                <li>
-                    <span class="ticker-name">NG=F — Natural Gas</span>
-
-                    <span class="change {% if display_change.NGF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.NGF }}%
-                    </span>
-                </li>
-
-                <li>
-                    <span class="ticker-name">BZ=F — Brent</span>
-
-                    <span class="change {% if display_change.BZF > 0 %}pos{% else %}neg{% endif %}">
-                        {{ display_change.BZF }}%
-                    </span>
-                </li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
-    <!-- ================= CHART ================= -->
-
-    <div class="chart-wrapper">
-        {{ chart|safe }}
-    </div>
+<!-- CHART -->
+<div class="chart-wrapper">
+    {{ chart|safe }}
+</div>
 
 </div>
 
