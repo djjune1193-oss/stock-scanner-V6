@@ -266,7 +266,49 @@ def futures_view(request):
     df["Date"] = pd.to_datetime(df["Date"])
     df = df.sort_values(["TICKER", "Date"])
 
-    # ---- Logical grouping ----
+    # =============================
+    # DAILY % CHANGE
+    # =============================
+
+    df["Prev_Close"] = df.groupby("TICKER")["Close"].shift(1)
+
+    df["Pct_Change"] = (
+        (df["Close"] - df["Prev_Close"])
+        / df["Prev_Close"]
+    ) * 100
+
+    latest_change = (
+        df.sort_values("Date")
+          .groupby("TICKER")
+          .tail(1)[["TICKER", "Pct_Change"]]
+    )
+
+    change_map = dict(
+        zip(
+            latest_change["TICKER"],
+            latest_change["Pct_Change"]
+        )
+    )
+
+    display_change = {}
+
+    for k, v in change_map.items():
+
+        clean_key = (
+            k.replace("=", "")
+             .replace("^", "")
+             .replace("-", "")
+        )
+
+        try:
+            display_change[clean_key] = round(float(v), 2)
+        except:
+            display_change[clean_key] = 0
+
+    # =============================
+    # FUTURES GROUPS
+    # =============================
+
     groups = {
         "Equities": ["ES=F","NQ=F","YM=F","RTY=F"],
         "Bonds": ["ZB=F","ZN=F","ZF=F","ZT=F"],
@@ -277,38 +319,47 @@ def futures_view(request):
         "Livestock": ["LE=F","HE=F","GF=F"]
     }
 
-    # Flatten in logical order
-    ordered_tickers = [t for g in groups.values() for t in g]
+    ordered_tickers = [
+        t for g in groups.values() for t in g
+    ]
 
     df = df[df["TICKER"].isin(ordered_tickers)]
 
-    # ✅ Create ticker → sector map
+    # =============================
+    # SUBPLOT TITLES
+    # =============================
+
     ticker_sector_map = (
         df.groupby("TICKER")["Sector"]
         .first()
         .to_dict()
     )
 
-    # ✅ Use Sector as subplot title
     subplot_titles = [
         ticker_sector_map.get(t, "Unknown")
         for t in ordered_tickers
     ]
 
-    # ---- Grid size ----
+    # =============================
+    # GRID
+    # =============================
+
     cols = 4
     rows = (len(ordered_tickers) + cols - 1) // cols
 
     fig = make_subplots(
         rows=rows,
         cols=cols,
-        subplot_titles=subplot_titles,  # ✅ FIXED HERE
+        subplot_titles=subplot_titles,
         shared_xaxes=True,
         vertical_spacing=0.03,
         horizontal_spacing=0.03
     )
 
-    # ---- Plot each ticker ----
+    # =============================
+    # CHARTS
+    # =============================
+
     for i, ticker in enumerate(ordered_tickers):
 
         g = df[df["TICKER"] == ticker]
@@ -325,7 +376,7 @@ def futures_view(request):
                 y=g["Close"],
                 mode="lines",
                 line=dict(width=1),
-                name=g["Sector"].iloc[0],  # (optional now)
+                name=g["Sector"].iloc[0],
                 showlegend=False
             ),
             row=r,
@@ -343,10 +394,11 @@ def futures_view(request):
     return render(
         request,
         "scanner_dashboard/futures.html",
-        {"chart": chart}
+        {
+            "chart": chart,
+            "display_change": display_change
+        }
     )
-
-
 
 
 def double_bottom_view(request):

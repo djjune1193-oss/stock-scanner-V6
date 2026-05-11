@@ -285,6 +285,14 @@ tr:hover {
   </div>
 
   <div class="card">
+    <h4>VIX</h4>
+    <div class="big">{{ index_values.VIX.close }}</div>
+    <div class="small {% if index_values.VIX.pct < 0 %}pos{% else %}neg{% endif %}">
+      {{ index_values.VIX.pct }}%
+    </div>
+  </div>
+
+  <div class="card">
     <h4>BREADTH</h4>
     <div class="small">🟢 {{ up_count }}</div>
     <div class="small">🔴 {{ down_count }}</div>
