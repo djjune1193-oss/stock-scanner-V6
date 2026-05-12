@@ -3,246 +3,272 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Stochastic Short Scanner</title>
+<title>Anti Short Scanner</title>
 
 <style>
 
-/* ================= BASE ================= */
+/* ================= THEME ================= */
 
 body {
-  margin: 0;
-  background: #111827;
-  font-family: Arial;
-  color: #e5e7eb;
+    margin: 0;
+    background: #0b1220;
+    font-family: "Segoe UI", Roboto, Arial;
+    color: #e5e7eb;
 }
 
 .container {
-  padding: 20px;
+    padding: 20px;
 }
 
 /* ================= NAV ================= */
 
 .top-nav {
-  background: #0f172a;
-  padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  border-bottom: 1px solid #374151;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0f172a;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
 }
 
 .top-nav a {
-  color: #cbd5e1;
-  text-decoration: none;
-  padding: 7px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
+    color: #cbd5e1;
+    text-decoration: none;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12px;
 }
 
 .top-nav a:hover {
-  background: #1f2937;
-  color: white;
+    background: #1f2937;
+    color: white;
 }
 
-/* ================= ENTRY GRID ================= */
+/* ================= CARD ================= */
 
-.entry-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 18px 0;
-}
-
-.entry-grid a {
-  background: #0f172a;
-  border: 1px solid #374151;
-  color: #cbd5e1;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  text-decoration: none;
-}
-
-.entry-grid a:hover {
-  background: #1f2937;
-  color: white;
-}
-
-/* ================= HEADER ================= */
-
-h1 {
-  margin: 15px 0 5px;
-  color: white;
-}
-
-.sub {
-  color: #9ca3af;
-  font-size: 13px;
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
 }
 
 /* ================= DESCRIPTION ================= */
 
 .desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.6;
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+/* ================= INPUT ================= */
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #0f172a;
+    color: white;
+    width: 260px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
 }
 
 /* ================= TABLE ================= */
 
 .table-wrap {
-  overflow-x: auto;
-  background: #1f2937;
-  padding: 10px;
-  border-radius: 10px;
+    overflow-x: auto;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  min-width: 1400px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 1400px;
 }
 
 th {
-  background: #111827;
-  padding: 10px;
-  text-transform: uppercase;
-  font-size: 11px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+    background: #1f2937;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+}
+
+th a {
+    color: white;
+    text-decoration: none;
+}
+
+th a:hover {
+    color: #93c5fd;
 }
 
 td {
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid #374151;
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+tr:nth-child(even) {
+    background: #0f172a;
 }
 
 /* ================= ROW COLORS ================= */
 
 .light-green {
-  background: rgba(34,197,94,0.10);
+    background: rgba(34,197,94,0.10);
 }
 
 .dark-green {
-  background: rgba(34,197,94,0.18);
-  font-weight: 600;
+    background: rgba(34,197,94,0.18);
+    font-weight: 600;
 }
 
 .light-red {
-  background: rgba(239,68,68,0.10);
+    background: rgba(239,68,68,0.10);
 }
 
 .dark-red {
-  background: rgba(239,68,68,0.18);
-  font-weight: 600;
+    background: rgba(239,68,68,0.18);
+    font-weight: 600;
 }
 
-tr:hover {
-  background: rgba(59,130,246,0.08);
+/* ================= TICKER LINK ================= */
+
+.ticker-link {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
 }
 
-/* ================= TICKER ================= */
-
-.ticker {
-  color: #60a5fa;
-  font-weight: bold;
-  text-decoration: none;
+.ticker-link:hover {
+    text-decoration: underline;
 }
 
-.ticker:hover {
-  text-decoration: underline;
+/* ================= CHART ================= */
+
+.chart-card {
+    overflow: hidden;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- ================= NAVIGATION ================= -->
+<!-- ================= NAV ================= -->
 
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
-  <a href="{% url 'fundamentals' %}">Fundamentals</a>
-  <a href="{% url 'futures' %}">Futures</a>
-  <a href="{% url 'sector_chart' %}">Sector Trend</a>
-  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
-  <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+    <a href="{% url 'home'%}">Home</a>
+    <a href="{% url 'fundamentals' %}">Fundamentals</a>
+    <a href="{% url 'futures' %}">Futures</a>
+    <a href="{% url 'sector_chart' %}">Sector Trend</a>
+    <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+    <a href="{% url 'industry_today' %}">Daily Industry</a>
+    <a href="{% url 'sector' %}">Daily Sector</a>
+    <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
+    <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
+    <a href="{% url 'metrics' %}">Technical Metrics</a>
+    <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
+    <a href="{% url 'rs_alignment' %}">Corelation</a>
 
 </div>
 
 <div class="container">
 
-<!-- ================= ENTRY MODELS ================= -->
-
-<div class="entry-grid">
-
-  <a href="{% url 'scanner' %}">21/34 MA Scanner</a>
-  <a href="{% url 'flat_bollinger' %}">Flat Bollinger</a>
-  <a href="{% url 'hot_ten_day' %}">Hot Theme</a>
-  <a href="{% url 'double-bottom' %}">Double Bottom</a>
-  <a href="{% url 'turtle_soup' %}">Turtle Soup</a>
-  <a href="{% url 'stochastic_short' %}">Short Setup</a>
-  <a href="{% url 'momentum_strength' %}">Momentum</a>
-  <a href="{% url 'base_breakout' %}">Base Breakout</a>
-  <a href="{% url 'breakout_21' %}">Breakout 21</a>
-
-</div>
-
-<!-- ================= TITLE ================= -->
-
-<h1>📉 Stochastic Short Scanner</h1>
-
-<div class="sub">
-Short-side stochastic momentum reversal scanner for detecting weakening trend structure and downside rotation
-</div>
+<h2>📈 Anti Short Scanner</h2>
 
 <!-- ================= DESCRIPTION ================= -->
 
-<div class="desc">
+<div class="card desc">
 
-<strong>Anti Short Stoch(7,10,4)</strong><br><br>
+<strong>Anti Short Logic</strong><br><br>
 
 ✔ opposite_3days = True<br>
-→ Detects prior directional exhaustion or failed momentum continuation<br><br>
+→ Prior 3 sessions had opposing stochastic slope structure<br><br>
 
 ✔ K_down_today = True<br>
-→ Stochastic K line turns downward today (bearish reversal trigger)<br><br>
+→ %K stochastic line turns downward today<br><br>
 
 ✔ K_up_yesterday = True<br>
-→ K line was rising previously before reversal weakness appeared<br><br>
+→ %K line was rising the prior session before reversal<br><br>
 
-✔ D_slope &lt; 0<br>
-→ Confirms weakening stochastic trend structure and downside momentum expansion<br><br>
+✔ D_slope < 0<br>
+→ %D trend decling<br><br>
 
-<strong>Interpretation</strong><br>
+<strong>Interpretation</strong><br><br>
 
-This scanner focuses on early downside reversal conditions after temporary strength.
-The setup attempts to identify failed rallies, weakening momentum, and potential
-short-term breakdown opportunities where sellers may be regaining control.
+Scanner attempts to detect early reversal structures after short-term weakness,
+where stochastic momentum begins improving before broader trend continuation.
+
+<br><br>
+
+<strong>Default Chart</strong><br>
+Auto-loads <b>^GSPC</b> stochastic structure
+
+</div>
+
+<!-- ================= INPUT ================= -->
+
+<div class="card">
+
+<form method="get">
+
+    <input
+        type="text"
+        name="ticker"
+        value="{{ selected_ticker }}"
+        placeholder="Switch ticker (e.g. AAPL)"
+    >
+
+    <button type="submit">
+        Switch
+    </button>
+
+</form>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="card chart-card">
+
+{% if chart %}
+    {{ chart|safe }}
+{% endif %}
 
 </div>
 
 <!-- ================= TABLE ================= -->
 
-<div class="table-wrap">
+<div class="card table-wrap">
 
 <table>
 
@@ -250,11 +276,57 @@ short-term breakdown opportunities where sellers may be regaining control.
 
 <tr>
 
-{% for col in columns %}
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=TICKER&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+Ticker
+</a>
+</th>
 
-<th>{{ col }}</th>
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=perc_change&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+% Change
+</a>
+</th>
 
-{% endfor %}
+<th>Sector</th>
+
+<th>Industry</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Close&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+Close
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=k&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+K
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=d&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+D
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=K_slope&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+K Slope
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=D_slope&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+D Slope
+</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Volume&dir={% if sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+Volume
+</a>
+</th>
 
 </tr>
 
@@ -262,42 +334,49 @@ short-term breakdown opportunities where sellers may be regaining control.
 
 <tbody>
 
-{% for row in rows %}
+{% for row in data %}
 
 <tr class="
-{% if row.2 > 4 %}
+{% if row.perc_change > 4 %}
 dark-green
-{% elif row.2 > 0 %}
+{% elif row.perc_change > 0 %}
 light-green
-{% elif row.2 >= -4 %}
+{% elif row.perc_change >= -4 %}
 light-red
 {% else %}
 dark-red
 {% endif %}
 ">
 
-  <td>{{ row.0 }}</td>
+<td>
 
-  <td>
-    <a class="ticker"
-       href="{% url 'equity_chart' row.1 %}">
-       {{ row.1 }}
+    <a class="ticker-link"
+       href="?ticker={{ row.TICKER }}">
+
+        {{ row.TICKER }}
+
     </a>
-  </td>
 
-  <td>{{ row.2 }}</td>
-  <td>{{ row.3 }}</td>
-  <td>{{ row.4 }}</td>
-  <td>{{ row.5 }}</td>
-  <td>{{ row.6 }}</td>
-  <td>{{ row.7 }}</td>
-  <td>{{ row.8 }}</td>
-  <td>{{ row.9 }}</td>
-  <td>{{ row.10 }}</td>
-  <td>{{ row.11 }}</td>
-  <td>{{ row.12 }}</td>
-  <td>{{ row.13 }}</td>
-  <td>{{ row.14 }}</td>
+</td>
+
+<td>{{ row.perc_change }}</td>
+
+<td>{{ row.Sector }}</td>
+
+<td>{{ row.Industry }}</td>
+
+<td>{{ row.Close }}</td>
+
+<td>{{ row.k }}</td>
+
+<td>{{ row.d }}</td>
+
+<td>{{ row.K_slope }}</td>
+
+<td>{{ row.D_slope }}</td>
+
+<td>{{ row.Volume }}</td>
+
 
 </tr>
 
