@@ -573,60 +573,669 @@ def double_bottom_view(request):
 
 
 def turtle_soup_view(request):
-    BASE_DIR = Path(__file__).resolve().parents[2]  # project root
-    data_path = BASE_DIR  /"scanner_site"/ "data" / "all_data.parquet"
-    df = pd.read_parquet(data_path)
-    df = df.reset_index()
 
-    # Define scanner condition  
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    data_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "full_history.parquet"
+    )
+
+    df = pd.read_parquet(data_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    df = df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    # =========================================
+    # STOCH(7,10,4)
+    # =========================================
+
+    df["pmin"] = (
+        df.groupby("TICKER")["Low"]
+        .transform(lambda x: x.rolling(7).min())
+    )
+
+    df["pmax"] = (
+        df.groupby("TICKER")["High"]
+        .transform(lambda x: x.rolling(7).max())
+    )
+
+    df["fast_stoch"] = 100 * (
+        (df["Close"] - df["pmin"]) /
+        (df["pmax"] - df["pmin"])
+    )
+
+    df["k"] = (
+        df.groupby("TICKER")["fast_stoch"]
+        .transform(lambda x: x.rolling(4).mean())
+    )
+
+    df["d"] = (
+        df.groupby("TICKER")["k"]
+        .transform(lambda x: x.rolling(10).mean())
+    )
+
+    df["K_slope"] = (
+        df.groupby("TICKER")["k"]
+        .diff()
+    )
+
+    df["D_slope"] = (
+        df.groupby("TICKER")["d"]
+        .diff()
+    )
+
+    # =========================================
+    # ORIGINAL TURTLE SOUP LOGIC
+    # =========================================
+
+    df["opposite_slope"] = (
+        ((df["K_slope"] > 0) & (df["D_slope"] < 0)) |
+        ((df["K_slope"] < 0) & (df["D_slope"] > 0))
+    )
+
+    df["opposite_3days"] = (
+        df.groupby("TICKER")["opposite_slope"]
+        .transform(
+            lambda x:
+            x.shift(1).rolling(3).sum() == 3
+        )
+    )
+
+    df["K_up_today"] = (
+        df["K_slope"] > 0
+    )
+
+    df["K_down_yesterday"] = (
+        df.groupby("TICKER")["K_slope"]
+        .shift(1) < 0
+    )
+
+    # =========================================
+    # TODAY ONLY
+    # =========================================
+
+    latest_date = df["Date"].max()
+
+    today_df = df[
+        df["Date"] == latest_date
+    ].copy()
+
+    # =========================================
+    # FINAL SCANNER FILTER
+    # =========================================
+
     row_condition = (
-            (df["opposite_3days"] == True) &
-            (df["K_up_today"] == True) &
-            (df["K_down_yesterday"] == True) & 
-            (df["D_slope"] > 0)
+        (today_df["opposite_3days"] == True) &
+        (today_df["K_up_today"] == True) &
+        (today_df["K_down_yesterday"] == True) &
+        (today_df["D_slope"] > 0)
+    )
+
+    scanner_df = today_df[
+        row_condition
+    ].copy()
+
+    # =========================================
+    # TABLE COLUMNS
+    # =========================================
+
+    selected_columns = [
+        "Date",
+        "TICKER",
+        "perc_change",
+        "Sector",
+        "Industry",
+        "Close",
+        "k",
+        "d",
+        "K_slope",
+        "D_slope",
+        "Volume"
+    ]
+
+    scanner_df = scanner_df[
+        selected_columns
+    ]
+
+    # =========================================
+    # SORTING
+    # =========================================
+
+    sort_col = request.GET.get(
+        "sort",
+        "perc_change"
+    )
+
+    if sort_col in scanner_df.columns:
+
+        scanner_df = scanner_df.sort_values(
+            by=sort_col,
+            ascending=False
         )
 
-    scanner_df = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "k", "d", "K_slope","D_slope", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
-    scanner_df = scanner_df[selected_columns]
+    # =========================================
+    # TABLE DATA
+    # =========================================
+
+    results = (
+        scanner_df
+        .round(2)
+        .to_dict("records")
+    )
+
+    # =========================================
+    # CHART
+    # =========================================
+
+    selected_ticker = request.GET.get(
+        "ticker",
+        "^GSPC"
+    )
+
+    chart_df = (
+        df[df["TICKER"] == selected_ticker]
+        .sort_values("Date")
+        .tail(120)
+        .copy()
+    )
+
+    chart = None
+
+    if not chart_df.empty:
+
+        from plotly.subplots import make_subplots
+        import plotly.graph_objects as go
+
+        fig = make_subplots(
+            rows=2,
+            cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.05,
+            row_heights=[0.7, 0.3]
+        )
+
+        # =====================================
+        # PRICE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["Close"],
+                mode="lines",
+                name="Close",
+                line=dict(
+                    color="white",
+                    width=2
+                )
+            ),
+            row=1,
+            col=1
+        )
+
+        # =====================================
+        # K LINE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["k"],
+                mode="lines",
+                name="%K",
+                line=dict(
+                    color="#22c55e",
+                    width=2
+                )
+            ),
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # D LINE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["d"],
+                mode="lines",
+                name="%D",
+                line=dict(
+                    color="#ef4444",
+                    width=2
+                )
+            ),
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # 20 / 80 LEVELS
+        # =====================================
+
+        fig.add_hline(
+            y=80,
+            line_dash="dash",
+            line_color="#9ca3af",
+            opacity=0.6,
+            row=2,
+            col=1
+        )
+
+        fig.add_hline(
+            y=20,
+            line_dash="dash",
+            line_color="#9ca3af",
+            opacity=0.6,
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # LAYOUT
+        # =====================================
+
+        fig.update_layout(
+
+            template="plotly_dark",
+
+            height=700,
+
+            paper_bgcolor="#111827",
+            plot_bgcolor="#111827",
+
+            margin=dict(
+                l=30,
+                r=30,
+                t=40,
+                b=30
+            ),
+
+            title=f"{selected_ticker}",
+
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+
+        fig.update_xaxes(
+            showgrid=False
+        )
+
+        fig.update_yaxes(
+            title_text="Price",
+            row=1,
+            col=1,
+            gridcolor="rgba(255,255,255,0.05)"
+        )
+
+        fig.update_yaxes(
+            title_text="Stoch",
+            range=[0, 100],
+            row=2,
+            col=1,
+            gridcolor="rgba(255,255,255,0.05)"
+        )
+
+        chart = fig.to_html(
+            full_html=False
+        )
 
     return render(
         request,
         "scanner_dashboard/turtle_soup.html",
         {
-            "columns": scanner_df.columns.tolist(),
-            "rows": scanner_df.values.tolist()
+            "data": results,
+            "chart": chart,
+            "selected_ticker": selected_ticker,
+            "sort_col": sort_col
         }
     )
 
 
 def stochastic_short_view(request):
-    BASE_DIR = Path(__file__).resolve().parents[2]  # project root
-    data_path = BASE_DIR  /"scanner_site"/ "data" / "all_data.parquet"
-    df = pd.read_parquet(data_path)
-    df = df.reset_index()
 
-    # Define scanner condition  
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    data_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "full_history.parquet"
+    )
+
+    df = pd.read_parquet(data_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    df = df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    # =========================================
+    # STOCH(7,10,4)
+    # =========================================
+
+    df["pmin"] = (
+        df.groupby("TICKER")["Low"]
+        .transform(lambda x: x.rolling(7).min())
+    )
+
+    df["pmax"] = (
+        df.groupby("TICKER")["High"]
+        .transform(lambda x: x.rolling(7).max())
+    )
+
+    df["fast_stoch"] = 100 * (
+        (df["Close"] - df["pmin"]) /
+        (df["pmax"] - df["pmin"])
+    )
+
+    df["k"] = (
+        df.groupby("TICKER")["fast_stoch"]
+        .transform(lambda x: x.rolling(4).mean())
+    )
+
+    df["d"] = (
+        df.groupby("TICKER")["k"]
+        .transform(lambda x: x.rolling(10).mean())
+    )
+
+    df["K_slope"] = (
+        df.groupby("TICKER")["k"]
+        .diff()
+    )
+
+    df["D_slope"] = (
+        df.groupby("TICKER")["d"]
+        .diff()
+    )
+
+    # =========================================
+    # ORIGINAL TURTLE SOUP LOGIC
+    # =========================================
+
+    df["opposite_slope"] = (
+        ((df["K_slope"] > 0) & (df["D_slope"] < 0)) |
+        ((df["K_slope"] < 0) & (df["D_slope"] > 0))
+    )
+
+    df["opposite_3days"] = (
+        df.groupby("TICKER")["opposite_slope"]
+        .transform(
+            lambda x:
+            x.shift(1).rolling(3).sum() == 3
+        )
+    )
+
+    df["K_up_today"] = (
+        df["K_slope"] > 0
+    )
+
+    df["K_down_yesterday"] = (
+        df.groupby("TICKER")["K_slope"]
+        .shift(1) < 0
+    )
+
+    # =========================================
+    # TODAY ONLY
+    # =========================================
+
+    latest_date = df["Date"].max()
+
+    today_df = df[
+        df["Date"] == latest_date
+    ].copy()
+
+    # =========================================
+    # FINAL SCANNER FILTER
+    # =========================================
+
     row_condition = (
-            (df["opposite_3days"] == True) &
-            (df["K_down_today"] == True) &
-            (df["K_up_yesterday"] == True) & 
-            (df["D_slope"] < 0)
+        (today_df["opposite_3days"] == True) &
+        (today_df["K_up_today"] == False) &
+        (today_df["K_down_yesterday"] == False) &
+        (today_df["D_slope"] < 0)
+    )
+
+    scanner_df = today_df[
+        row_condition
+    ].copy()
+
+    # =========================================
+    # TABLE COLUMNS
+    # =========================================
+
+    selected_columns = [
+        "Date",
+        "TICKER",
+        "perc_change",
+        "Sector",
+        "Industry",
+        "Close",
+        "k",
+        "d",
+        "K_slope",
+        "D_slope",
+        "Volume"
+    ]
+
+    scanner_df = scanner_df[
+        selected_columns
+    ]
+
+    # =========================================
+    # SORTING
+    # =========================================
+
+    sort_col = request.GET.get(
+        "sort",
+        "perc_change"
+    )
+
+    if sort_col in scanner_df.columns:
+
+        scanner_df = scanner_df.sort_values(
+            by=sort_col,
+            ascending=False
         )
 
-    scanner_df = df[row_condition].copy()
-    selected_columns = ["Date","TICKER","perc_change","Sector","Industry", "Close", "k", "d", "K_slope","D_slope", "Volume",  "Candle_Type","slope_50","lower_count","Position_Size"]
-    scanner_df = scanner_df[selected_columns]
+    # =========================================
+    # TABLE DATA
+    # =========================================
+
+    results = (
+        scanner_df
+        .round(2)
+        .to_dict("records")
+    )
+
+    # =========================================
+    # CHART
+    # =========================================
+
+    selected_ticker = request.GET.get(
+        "ticker",
+        "^GSPC"
+    )
+
+    chart_df = (
+        df[df["TICKER"] == selected_ticker]
+        .sort_values("Date")
+        .tail(120)
+        .copy()
+    )
+
+    chart = None
+
+    if not chart_df.empty:
+
+        from plotly.subplots import make_subplots
+        import plotly.graph_objects as go
+
+        fig = make_subplots(
+            rows=2,
+            cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.05,
+            row_heights=[0.7, 0.3]
+        )
+
+        # =====================================
+        # PRICE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["Close"],
+                mode="lines",
+                name="Close",
+                line=dict(
+                    color="white",
+                    width=2
+                )
+            ),
+            row=1,
+            col=1
+        )
+
+        # =====================================
+        # K LINE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["k"],
+                mode="lines",
+                name="%K",
+                line=dict(
+                    color="#22c55e",
+                    width=2
+                )
+            ),
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # D LINE
+        # =====================================
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["d"],
+                mode="lines",
+                name="%D",
+                line=dict(
+                    color="#ef4444",
+                    width=2
+                )
+            ),
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # 20 / 80 LEVELS
+        # =====================================
+
+        fig.add_hline(
+            y=80,
+            line_dash="dash",
+            line_color="#9ca3af",
+            opacity=0.6,
+            row=2,
+            col=1
+        )
+
+        fig.add_hline(
+            y=20,
+            line_dash="dash",
+            line_color="#9ca3af",
+            opacity=0.6,
+            row=2,
+            col=1
+        )
+
+        # =====================================
+        # LAYOUT
+        # =====================================
+
+        fig.update_layout(
+
+            template="plotly_dark",
+
+            height=700,
+
+            paper_bgcolor="#111827",
+            plot_bgcolor="#111827",
+
+            margin=dict(
+                l=30,
+                r=30,
+                t=40,
+                b=30
+            ),
+
+            title=f"{selected_ticker} ",
+
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+
+        fig.update_xaxes(
+            showgrid=False
+        )
+
+        fig.update_yaxes(
+            title_text="Price",
+            row=1,
+            col=1,
+            gridcolor="rgba(255,255,255,0.05)"
+        )
+
+        fig.update_yaxes(
+            title_text="Stoch",
+            range=[0, 100],
+            row=2,
+            col=1,
+            gridcolor="rgba(255,255,255,0.05)"
+        )
+
+        chart = fig.to_html(
+            full_html=False
+        )
 
     return render(
         request,
         "scanner_dashboard/stochastic_short.html",
         {
-            "columns": scanner_df.columns.tolist(),
-            "rows": scanner_df.values.tolist()
+            "data": results,
+            "chart": chart,
+            "selected_ticker": selected_ticker,
+            "sort_col": sort_col
         }
     )
-
 
 
 
