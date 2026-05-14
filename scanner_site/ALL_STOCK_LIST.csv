@@ -1531,8 +1531,6 @@ XLRE,ETF,Real Estate,Real Estate Sector ETF
 XLU,ETF,Utilities,Utilities Sector ETF
 XBI,ETF,Health Care,Biotechnology ETF
 XHB,ETF,Consumer Discretionary,Homebuilders ETF
-CARZ,ETF,Consumer Discretionary,Auto Manufacturers ETF
-XHE,ETF,Health Care,Medical Equipment ETF
 KIE,ETF,Financials,Insurance ETF
 XAR,ETF,Industrials,Aerospace & Defense ETF
 SMH,ETF,Technology,Semiconductors ETF
@@ -1541,81 +1539,44 @@ XRT,ETF,Consumer Discretionary,Retail ETF
 XOP,ETF,Energy,Oil & Gas Exploration ETF
 XME,ETF,Materials,Metals & Mining ETF
 KBE,ETF,Financials,Banking ETF
-PBJ,ETF,Consumer Staples,Food & Beverage ETF
-KCE,ETF,Financials,Capital Markets ETF
 FDN,ETF,Communication Services,Internet ETF
-PEJ,ETF,Consumer Discretionary,Leisure & Entertainment ETF
 VHT,ETF,Health Care,Broad Health Care ETF
-VAW,ETF,Materials,Broad Materials ETF
 IYT,ETF,Industrials,Transportation ETF
 VGT,ETF,Technology,Broad Technology ETF
 ITB,ETF,Consumer Discretionary,Home Construction ETF
-IDRV,ETF,Consumer Discretionary,Self-Driving / EV ETF
 IBB,ETF,Health Care,Biotechnology ETF
-VCR,ETF,Consumer Discretionary,Broad Consumer Discretionary ETF
 VNQ,ETF,Real Estate,REIT ETF
 IHI,ETF,Health Care,Medical Devices ETF
-IAK,ETF,Financials,Insurance ETF
 ITA,ETF,Industrials,Aerospace & Defense ETF
-VDC,ETF,Consumer Staples,Broad Consumer Staples ETF
-VIS,ETF,Industrials,Broad Industrials ETF
 SOXX,ETF,Technology,Semiconductors ETF
-XSW,ETF,Technology,Software & Services ETF
-RTH,ETF,Consumer Discretionary,Retail ETF
 VPU,ETF,Utilities,Broad Utilities ETF
 VFH,ETF,Financials,Broad Financials ETF
-XES,ETF,Energy,Oil & Gas Equipment ETF
 PICK,ETF,Materials,Global Metals & Mining ETF
-VOX,ETF,Communication Services,Telecom ETF
 KRE,ETF,Financials,Regional Banks ETF
-FTXG,ETF,Industrials,Global Industrials ETF
-IAI,ETF,Financials,Broker-Dealers ETF
-PNQI,ETF,Communication Services,Internet ETF
 VDE,ETF,Energy,Broad Energy ETF
-PBS,ETF,Consumer Staples,Media & Publishing ETF
-IXJ,ETF,Health Care,Global Health Care ETF
-IYM,ETF,Materials,Basic Materials ETF
-FTXR,ETF,Industrials,Transportation ETF
 QQQ,ETF,Technology,Nasdaq-100 ETF
-PKB,ETF,Consumer Discretionary,Building & Construction ETF
-DRIV,ETF,Consumer Discretionary,Autonomous & EV ETF
 ARKG,ETF,Health Care,Genomics & Biotech ETF
-IYC,ETF,Consumer Discretionary,Consumer Services ETF
 SCHH,ETF,Real Estate,REIT ETF
 PPA,ETF,Industrials,Aerospace & Defense ETF
-IYK,ETF,Consumer Staples,Consumer Staples ETF
-IYJ,ETF,Industrials,Industrials ETF
 XSD,ETF,Technology,Semiconductor Equipment ETF
 FTEC,ETF,Technology,Technology ETF
-ONLN,ETF,Consumer Discretionary,Online Retail ETF
-IDU,ETF,Utilities,Utilities ETF
-IYF,ETF,Financials,Financials ETF
-PXE,ETF,Energy,Oil & Gas Production ETF
 REMX,ETF,Materials,Rare Earth & Strategic Metals ETF
-IXP,ETF,Communication Services,Global Telecom ETF
 TAN,ETF,Energy,Solar Energy ETF
-IAT,ETF,Financials,Regional Banks ETF
 ARKW,ETF,Technology,Internet & Innovation ETF
 IYE,ETF,Energy,Energy ETF
-BJK,ETF,Consumer Discretionary,Gaming & Casinos ETF
 MTUM,ETF,Momentum ,Momentum ETF
 IBIT,ETF,Bitcoin,Bitcoin ETF
-CLOU,ETF,Cloud Computing,Cloud Computing ETF
 WCLD,ETF,Cloud Computing,Cloud Computing ETF
 SKYY,ETF,Cloud Computing,Cloud Computing ETF
 BOTZ,ETF,Robotics & AI,Robotics & AI ETF
 ROBO,ETF,Robotics,Robotics ETF
 AIQ,ETF,Artificial Intelligence,AI ETF
-FINX,ETF,Fintech,Fintech ETF
-IPAY,ETF,Digital Payments,Digital Payments ETF
 PAVE,ETF,Infrastructure,US Infrastructure ETF
 IFRA,ETF,Infrastructure,Global Infrastructure ETF
 AMLP,ETF,Midstream Energy,MLP Infrastructure ETF
 MLPX,ETF,Energy Infrastructure,Energy Infrastructure ETF
 ICLN,ETF,Clean Energy,Clean Energy ETF
 QCLN,ETF,Clean Energy,Clean Energy ETF
-SRVR,ETF,Data Center REIT,Data Center REIT ETF
-HSMV,ETF,Cell Tower REIT,Cell Tower REIT ETF
 DIA,ETF,Dow Jones,Dow Jones ETF
 ^GSPC,MARKET INDICATOR,S&P,MARKET INDICATOR
 ^DJI,MARKET INDICATOR,DOW JONES,MARKET INDICATOR

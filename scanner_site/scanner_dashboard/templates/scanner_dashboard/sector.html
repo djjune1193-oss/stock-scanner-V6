@@ -60,7 +60,7 @@ h1 {
   font-size: 13px;
 }
 
-/* ================= DESCRIPTION (YELLOW LIKE SCANNER) ================= */
+/* ================= DESCRIPTION ================= */
 
 .page-description {
   background: #fef3c7;
@@ -72,30 +72,6 @@ h1 {
   line-height: 1.5;
 }
 
-/* ================= ACTION BAR ================= */
-
-.action-bar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.btn {
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-.btn-secondary {
-  background: #334155;
-  color: white;
-}
-
 /* ================= TABLE ================= */
 
 .table-card {
@@ -103,16 +79,18 @@ h1 {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #1f2937;
+  margin-bottom: 25px;
 }
 
 .table-container {
   overflow: auto;
+  max-height: 700px;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1200px;
+  min-width: 1400px;
   font-size: 12px;
 }
 
@@ -148,7 +126,7 @@ tbody tr:hover {
   background: #1e293b !important;
 }
 
-/* ================= ROW COLORS (KEPT SAME LOGIC) ================= */
+/* ================= ROW COLORS ================= */
 
 tr.light-green {
   background-color: rgba(34,197,94,0.15) !important;
@@ -186,6 +164,23 @@ tr.dark-red {
   text-align: center;
   padding: 40px;
   color: #9ca3af;
+}
+
+/* ================= CHARTS ================= */
+
+.chart-card {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 25px;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 10px;
 }
 
 </style>
@@ -228,11 +223,16 @@ ETF rotation analysis, sector momentum tracking, institutional leadership dashbo
 
 <strong>Sector Performance Overview</strong><br><br>
 
-This page tracks sector ETF performance using percentage change, and volume behavior.
-Green rows indicate positive momentum while red rows highlight weakness.
+Tracks ETF momentum, liquidity, and multi-timeframe return behavior.
+
+<br><br>
+
+✔ Daily % Change<br>
+✔ 5-Day Return Histogram<br>
+✔ 21-Day Return Histogram<br>
+✔ Volume leadership ranking<br>
 
 </div>
-
 
 <!-- ================= TABLE ================= -->
 
@@ -311,6 +311,30 @@ Green rows indicate positive momentum while red rows highlight weakness.
 </table>
 
 </div>
+
+</div>
+
+<!-- ================= 5 DAY HISTOGRAM ================= -->
+
+<div class="chart-card">
+
+<div class="chart-title">
+📊 5-Day Sector ETF Returns
+</div>
+
+{{ chart_5d|safe }}
+
+</div>
+
+<!-- ================= 21 DAY HISTOGRAM ================= -->
+
+<div class="chart-card">
+
+<div class="chart-title">
+📈 21-Day Sector ETF Returns
+</div>
+
+{{ chart_21d|safe }}
 
 </div>
 
