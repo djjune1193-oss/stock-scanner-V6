@@ -24,3 +24,10 @@ scanner_site/data/*.parquet
 
 # Jupyter
 .ipynb_checkpoints/
+
+
+*.parquet
+*.csv
+__pycache__/
+.env
+db.sqlite3
