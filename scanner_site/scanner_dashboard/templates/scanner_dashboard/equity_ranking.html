@@ -7,6 +7,56 @@
 
 <style>
 
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
 /* ================= BASE ================= */
 
 body {
@@ -32,6 +82,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  align-items: center;
 }
 
 .top-nav a {
@@ -48,88 +99,266 @@ body {
   color: white;
 }
 
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
 /* ================= HEADER ================= */
 
-h1 {
-  margin: 15px 0 5px;
-  color: white;
+.page-header{
+  margin-bottom:22px;
 }
 
-.sub {
-  color: #9ca3af;
-  font-size: 13px;
+.page-title{
+  font-size:30px;
+  font-weight:800;
+  color:white;
+  margin-bottom:6px;
 }
 
-/* ================= DESCRIPTION ================= */
+.page-subtitle{
+  color:#9ca3af;
+  font-size:14px;
+}
 
-.desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.5;
+/* ================= INFO BOX ================= */
+
+.desc{
+  background:#1f2937;
+  border:1px solid #374151;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:22px;
+  font-size:13px;
+  line-height:1.7;
+  color:#d1d5db;
+}
+
+.desc strong{
+  color:white;
 }
 
 /* ================= TABLE ================= */
 
-.table-wrap {
-  overflow-x: auto;
-  background: #1f2937;
-  padding: 10px;
-  border-radius: 10px;
+.table-wrap{
+  overflow:auto;
+  background:#1f2937;
+  border:1px solid #374151;
+  border-radius:16px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  min-width: 1200px;
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1200px;
 }
 
-th {
-  background: #111827;
-  padding: 10px;
-  text-transform: uppercase;
-  font-size: 11px;
-  cursor: pointer;
+thead{
+  background:#0f172a;
 }
 
-td {
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid #374151;
+th{
+  padding:14px 10px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  border-bottom:1px solid #374151;
+  text-align:center;
 }
 
-tbody tr:hover {
-  background: rgba(59,130,246,0.08);
+th a{
+  color:#cbd5e1;
+  text-decoration:none;
+  display:block;
 }
 
-/* ================= COLOR SCALE (CUMULATIVE RETURN) ================= */
-
-.strong {
-  background: rgba(34,197,94,0.18);
+th a:hover{
+  color:#60a5fa;
 }
 
-.mid {
-  background: rgba(234,179,8,0.18);
+td{
+  padding:11px 10px;
+  border-bottom:1px solid #374151;
+  text-align:center;
+  font-size:13px;
 }
 
-.low {
-  background: rgba(249,115,22,0.18);
+tbody tr{
+  transition:0.15s ease;
 }
 
-.negative {
-  background: rgba(239,68,68,0.18);
+tbody tr:hover{
+  background:rgba(59,130,246,0.08);
+}
+
+/* ================= ROW COLORS ================= */
+
+.strong{
+  background:rgba(34,197,94,0.16);
+}
+
+.mid{
+  background:rgba(234,179,8,0.14);
+}
+
+.low{
+  background:rgba(249,115,22,0.14);
+}
+
+.negative{
+  background:rgba(239,68,68,0.14);
 }
 
 /* ================= TICKER ================= */
 
-.ticker {
-  color: #60a5fa;
-  font-weight: bold;
-  text-decoration: none;
+.ticker{
+  color:#60a5fa;
+  font-weight:700;
+  text-decoration:none;
+}
+
+.ticker:hover{
+  color:#93c5fd;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+  .container{
+    padding:16px;
+  }
+
+  .page-title{
+    font-size:24px;
+  }
+
 }
 
 </style>
@@ -137,120 +366,233 @@ tbody tr:hover {
 
 <body>
 
+{% load static %}
+
+<!-- ================= MASTER NAV ================= -->
+
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <a href="{% url 'home'%}">Home</a>
   <a href="{% url 'fundamentals' %}">Fundamentals</a>
   <a href="{% url 'futures' %}">Futures</a>
   <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
 
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </div>
+
+<!-- ================= PAGE ================= -->
 
 <div class="container">
 
-<h1>📊 Equity Ranking Dashboard</h1>
+  <div class="page-header">
 
-<div class="sub">
-Latest RS + Cumulative strength vs SPY (institutional relative performance model)
-</div>
+    <div class="page-title">
+      Equity Ranking Dashboard
+    </div>
 
-<!-- ================= DESCRIPTION ================= -->
+    <div class="page-subtitle">
+      Equity Relative Strength vs S&P500
+    </div>
 
-<div class="desc">
+  </div>
 
-<strong>Ranking Logic</strong><br><br>
+  <!-- ================= DESCRIPTION ================= -->
 
-RS_SCORE = Relative Performance against S&P500 for 7,21,50,100,200 days<br>
-RS_SCORE 1   :at par with market<br>
-RS_SCORE < 0 :Underperforming market <br>
-RS_SCORE > 1 :Outperforming market <br><br>
-RS_SCORE = 0.30 * RS_7 +0.25 * RS_21 +0.20 * RS_50 +0.15 * RS_100 +0.10 * RS_200<br>
+  <div class="desc">
 
-Cumulative Return = Return of equity for 1 year from today(%)<br><br>
+    <strong>Ranking Logic</strong><br><br>
 
+    RS_SCORE compares stock performance against S&P500 over
+    7, 21, 50, 100 and 200 day periods.<br><br>
 
-<strong>Color Logic (based on Cumulative Return)</strong><br>
-🟢 > 50 → Strong Leadership<br>
-🟡 25 – 100 → Positive Trend<br>
-🟠 0 – 25 → Weak Positive<br>
-🔴 < 0 → Negative Trend
+    RS_SCORE = 1 → Equal to market performance<br>
+    RS_SCORE > 1 → Outperforming market<br>
+    RS_SCORE < 1 → Underperforming market<br><br>
 
-</div>
+    RS SCORE:<br>
+    0.30 × RS_7 +
+    0.25 × RS_21 +
+    0.20 × RS_50 +
+    0.15 × RS_100 +
+    0.10 × RS_200<br><br>
 
-<!-- ================= SORT LINKS ================= -->
+    Cumulative Return represents long-term trend strength over ~1 year.<br><br>
 
-<div style="margin-bottom:10px; font-size:12px;">
+    <strong>Color Logic</strong><br>
 
-Sort:
-<a href="?sort=cumulative&dir=desc">Cumulative % Gain</a> |
-<a href="?sort=rs&dir=desc">RS Score</a> |
-<a href="?sort=ticker&dir=asc">Ticker</a>
+    🟢 Strong Leadership (>50%)<br>
+    🟡 Positive Trend (25–50%)<br>
+    🟠 Weak Positive (0–25%)<br>
+    🔴 Negative Trend (<0%)
 
-</div>
+  </div>
 
-<!-- ================= TABLE ================= -->
+  <!-- ================= TABLE ================= -->
 
-<div class="table-wrap">
+  <div class="table-wrap">
 
-<table>
+    <table>
 
-<thead>
-<tr>
-  <th>Ticker</th>
-  <th>RS Score</th>
-  <th>Cumulative % Gain</th>
-  <th>RS 7</th>
-  <th>RS 21</th>
-  <th>RS 50</th>
-  <th>RS 100</th>
-  <th>RS 200</th>
-</tr>
-</thead>
+      <thead>
 
-<tbody>
+        <tr>
 
-{% for r in ranking_list %}
+          <th>
+            <a href="?sort=TICKER&dir={% if sort_by == 'TICKER' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+              Ticker
+            </a>
+          </th>
 
-<tr
-{% if r.Cumulative_Return > 50 %}
-class="strong"
-{% elif r.Cumulative_Return > 25 %}
-class="mid"
-{% elif r.Cumulative_Return > 0 %}
-class="low"
-{% else %}
-class="negative"
-{% endif %}
->
+          <th>
+            <a href="?sort=RS_SCORE&dir={% if sort_by == 'RS_SCORE' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS Score
+            </a>
+          </th>
 
-  <td><a class="ticker" href="{% url 'equity_chart' r.Ticker %}">{{ r.Ticker }}</a></td>
+          <th>
+            <a href="?sort=Cumulative_Return&dir={% if sort_by == 'Cumulative_Return' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              Cumulative % Gain
+            </a>
+          </th>
 
-  <td>{{ r.RS_SCORE|floatformat:2 }}</td>
-  <td>{{ r.Cumulative_Return|floatformat:2 }}</td>
-  <td>{{ r.RS_7|floatformat:2 }}</td>
-  <td>{{ r.RS_21|floatformat:2 }}</td>
-  <td>{{ r.RS_50|floatformat:2 }}</td>
-  <td>{{ r.RS_100|floatformat:2 }}</td>
-  <td>{{ r.RS_200|floatformat:2 }}</td>
+          <th>
+            <a href="?sort=RS_7&dir={% if sort_by == 'RS_7' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS 7
+            </a>
+          </th>
 
-</tr>
+          <th>
+            <a href="?sort=RS_21&dir={% if sort_by == 'RS_21' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS 21
+            </a>
+          </th>
 
-{% endfor %}
+          <th>
+            <a href="?sort=RS_50&dir={% if sort_by == 'RS_50' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS 50
+            </a>
+          </th>
 
-</tbody>
+          <th>
+            <a href="?sort=RS_100&dir={% if sort_by == 'RS_100' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS 100
+            </a>
+          </th>
 
-</table>
+          <th>
+            <a href="?sort=RS_200&dir={% if sort_by == 'RS_200' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+              RS 200
+            </a>
+          </th>
 
-</div>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        {% for r in ranking_list %}
+
+        <tr
+
+        {% if r.Cumulative_Return > 50 %}
+          class="strong"
+
+        {% elif r.Cumulative_Return > 25 %}
+          class="mid"
+
+        {% elif r.Cumulative_Return > 0 %}
+          class="low"
+
+        {% else %}
+          class="negative"
+
+        {% endif %}
+        >
+
+          <td>
+            <a class="ticker"
+               href="{% url 'equity_chart' r.Ticker %}">
+               {{ r.Ticker }}
+            </a>
+          </td>
+
+          <td>{{ r.RS_SCORE|floatformat:2 }}</td>
+          <td>{{ r.Cumulative_Return|floatformat:2 }}</td>
+          <td>{{ r.RS_7|floatformat:2 }}</td>
+          <td>{{ r.RS_21|floatformat:2 }}</td>
+          <td>{{ r.RS_50|floatformat:2 }}</td>
+          <td>{{ r.RS_100|floatformat:2 }}</td>
+          <td>{{ r.RS_200|floatformat:2 }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
 
 </div>
 

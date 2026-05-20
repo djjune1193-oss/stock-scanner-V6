@@ -24,9 +24,9 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)  # ensure it exists
 SECRET_KEY = 'django-insecure-7@0#!8i_10(*@2bm9fbsf(vsn-!z74%*ypo0vaf!iz1yd=1vif'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["146.190.147.47", "swingtradesingh.com"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -53,15 +53,15 @@ MIDDLEWARE = [
 ]
 
 
-CRONJOBS = [
+#CRONJOBS = [
     # Every 30 minutes from 9:15 AM to 4:30 PM (Mon–Fri)
-    ('15,45 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),
-    ('15,45 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
-    ('15,30 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+#    ('15,45 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+#   ('15,45 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+#    ('15,30 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),
 
     # Finviz run once daily at 9 PM (Mon–Fri)
-    ('0 21 * * 1-5', 'scanner.tasks.run_finviz_cron'),
-]
+#    ('0 21 * * 1-5', 'scanner.tasks.run_finviz_cron'),
+#]
 
 
 FULL_HISTORY_FILE = DATA_DIR / "full_history.parquet"
@@ -129,6 +129,20 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
+LOGIN_URL = "login"
+
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "goprofessionaltrader@gmail.com"
+EMAIL_HOST_PASSWORD = "rcms mdvp xcwh vhkf"
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -144,7 +158,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

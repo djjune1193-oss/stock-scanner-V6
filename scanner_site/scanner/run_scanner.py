@@ -14,16 +14,332 @@ csv_path = BASE_DIR / "ALL_STOCK_LIST.csv"
 DATA_DIR = settings.DATA_DIR
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# -----------------------------
-# HELPER: DAILY → WEEKLY (CALENDAR)
-# -----------------------------
 
 
+
+def build_equity_ranking(df):
+
+    df = df.copy()
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    df = df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    # =====================================
+    # RETURNS
+    # =====================================
+
+    df["Return"] = (
+        df.groupby("TICKER")["Close"]
+        .pct_change()
+    )
+
+    spy = (
+        df[df["TICKER"] == "^GSPC"][["Date", "Return"]]
+        .rename(columns={
+            "Return": "SPY_Return"
+        })
+    )
+
+    df = df.merge(
+        spy,
+        on="Date",
+        how="left"
+    )
+
+    # =====================================
+    # DAILY RELATIVE STRENGTH
+    # =====================================
+
+    df["RS_Daily"] = (
+        df["Return"] -
+        df["SPY_Return"]
+    )
+
+    rmse = np.sqrt(
+        np.mean(df["RS_Daily"] ** 2)
+    )
+
+    df["RS_Normalized"] = (
+        df["RS_Daily"] / rmse
+    )
+
+    # =====================================
+    # MULTI-TIMEFRAME RS
+    # =====================================
+
+    for period in [7, 21, 50, 100, 200]:
+
+        df[f"RS_{period}"] = (
+            df.groupby("TICKER")["RS_Normalized"]
+            .transform(
+                lambda x:
+                x.rolling(period).mean()
+            )
+        )
+
+    # =====================================
+    # CUMULATIVE SCORE
+    # =====================================
+
+    df["Cumulative_Return"] = (
+        df.groupby("TICKER")["RS_Normalized"]
+        .cumsum()
+    )
+
+    # =====================================
+    # LATEST SNAPSHOT
+    # =====================================
+
+    latest_date = df["Date"].max()
+
+    latest_df = df[
+        df["Date"] == latest_date
+    ].copy()
+
+    # =====================================
+    # FINAL RS SCORE
+    # =====================================
+
+    latest_df["RS_SCORE"] = (
+        0.30 * latest_df["RS_7"] +
+        0.25 * latest_df["RS_21"] +
+        0.20 * latest_df["RS_50"] +
+        0.15 * latest_df["RS_100"] +
+        0.10 * latest_df["RS_200"]
+    )
+
+    latest_df = latest_df.dropna(
+        subset=[
+            "RS_SCORE",
+            "RS_7",
+            "RS_21",
+            "RS_50",
+            "RS_100",
+            "RS_200"
+        ]
+    )
+
+    # =====================================
+    # FINAL SORT DEFAULT
+    # =====================================
+
+    latest_df = latest_df.sort_values(
+        "Cumulative_Return",
+        ascending=False
+    )
+
+    return df, latest_df
+
+
+
+# =========================================================
+# BUILD FIB RETRACEMENT DATA
+# =========================================================
+
+def build_fib_retracement_data(df):
+
+    df = df.copy()
+
+    # =====================================================
+    # CLEANING
+    # =====================================================
+
+    df["Date"] = pd.to_datetime(
+        df["Date"]
+    )
+
+    df = df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    # =====================================================
+    # HIGH / LOW PER TICKER
+    # =====================================================
+
+    df["high_max"] = (
+        df.groupby("TICKER")["High"]
+        .transform("max")
+    )
+
+    df["low_min"] = (
+        df.groupby("TICKER")["Low"]
+        .transform("min")
+    )
+
+    # =====================================================
+    # SAFE DENOMINATOR
+    # =====================================================
+
+    diff = (
+        df["high_max"] - df["low_min"]
+    ).replace(0, 1)
+
+    # =====================================================
+    # RETRACEMENT %
+    # =====================================================
+
+    df["retracement"] = (
+        (df["high_max"] - df["Close"]) / diff
+    ) * 100
+
+    # =====================================================
+    # FIB LEVELS
+    # =====================================================
+
+    df["fib_0"] = df["high_max"]
+
+    df["fib_236"] = (
+        df["high_max"] - 0.236 * diff
+    )
+
+    df["fib_382"] = (
+        df["high_max"] - 0.382 * diff
+    )
+
+    df["fib_50"] = (
+        df["high_max"] - 0.5 * diff
+    )
+
+    df["fib_618"] = (
+        df["high_max"] - 0.618 * diff
+    )
+
+    # =====================================================
+    # LATEST SNAPSHOT
+    # =====================================================
+
+    latest_df = (
+        df.sort_values("Date")
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
+
+    # =====================================================
+    # FINAL TABLE
+    # =====================================================
+
+    latest_df = latest_df[[
+        "TICKER",
+        "Close",
+        "high_max",
+        "low_min",
+        "retracement",
+        "fib_236",
+        "fib_382",
+        "fib_50",
+        "fib_618"
+    ]].copy()
+
+    latest_df["tv_link"] = (
+        "https://www.tradingview.com/chart/?symbol="
+        + latest_df["TICKER"]
+    )
+
+    latest_df = latest_df.round(2)
+
+    latest_df = latest_df.sort_values(
+        "retracement",
+        ascending=True
+    )
+
+    return df, latest_df
 
 
 import numpy as np
 import pandas as pd
 
+def build_turtle_soup_signals(df):
+
+    df = df.copy()
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values(["TICKER", "Date"])
+
+    # =========================
+    # STOCH
+    # =========================
+
+    df["pmin"] = df.groupby("TICKER")["Low"].transform(lambda x: x.rolling(7).min())
+    df["pmax"] = df.groupby("TICKER")["High"].transform(lambda x: x.rolling(7).max())
+
+    df["fast_stoch"] = 100 * ((df["Close"] - df["pmin"]) / (df["pmax"] - df["pmin"]))
+    df["k"] = df.groupby("TICKER")["fast_stoch"].transform(lambda x: x.rolling(4).mean())
+    df["d"] = df.groupby("TICKER")["k"].transform(lambda x: x.rolling(10).mean())
+
+    df["K_slope"] = df.groupby("TICKER")["k"].diff()
+    df["D_slope"] = df.groupby("TICKER")["d"].diff()
+
+    # =========================
+    # CORE LOGIC
+    # =========================
+
+    df["opposite_slope"] = (
+        ((df["K_slope"] > 0) & (df["D_slope"] < 0)) |
+        ((df["K_slope"] < 0) & (df["D_slope"] > 0))
+    )
+
+    df["opposite_3days"] = df.groupby("TICKER")["opposite_slope"].transform(
+        lambda x: x.shift(1).rolling(3).sum() == 3
+    )
+
+    df["K_up_today"] = df["K_slope"] > 0
+    df["K_down_yesterday"] = df.groupby("TICKER")["K_slope"].shift(1) < 0
+
+    latest_date = df["Date"].max()
+    today_df = df[df["Date"] == latest_date].copy()
+
+    signal_df = today_df[
+        (today_df["opposite_3days"]) &
+        (today_df["K_up_today"]) &
+        (today_df["K_down_yesterday"]) &
+        (today_df["D_slope"] > 0)
+    ].copy()
+
+    return df, signal_df
+
+
+def build_stochastic_short_signals(df):
+
+    df = df.copy()
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values(["TICKER", "Date"])
+
+    df["pmin"] = df.groupby("TICKER")["Low"].transform(lambda x: x.rolling(7).min())
+    df["pmax"] = df.groupby("TICKER")["High"].transform(lambda x: x.rolling(7).max())
+
+    df["fast_stoch"] = 100 * ((df["Close"] - df["pmin"]) / (df["pmax"] - df["pmin"]))
+    df["k"] = df.groupby("TICKER")["fast_stoch"].transform(lambda x: x.rolling(4).mean())
+    df["d"] = df.groupby("TICKER")["k"].transform(lambda x: x.rolling(10).mean())
+
+    df["K_slope"] = df.groupby("TICKER")["k"].diff()
+    df["D_slope"] = df.groupby("TICKER")["d"].diff()
+
+    df["opposite_slope"] = (
+        ((df["K_slope"] > 0) & (df["D_slope"] < 0)) |
+        ((df["K_slope"] < 0) & (df["D_slope"] > 0))
+    )
+
+    df["opposite_3days"] = df.groupby("TICKER")["opposite_slope"].transform(
+        lambda x: x.shift(1).rolling(3).sum() == 3
+    )
+
+    df["K_up_today"] = df["K_slope"] > 0
+    df["K_down_yesterday"] = df.groupby("TICKER")["K_slope"].shift(1) < 0
+
+    latest_date = df["Date"].max()
+    today_df = df[df["Date"] == latest_date].copy()
+
+    signal_df = today_df[
+        (today_df["opposite_3days"]) &
+        (~today_df["K_up_today"]) &
+        (~today_df["K_down_yesterday"]) &
+        (today_df["D_slope"] < 0)
+    ].copy()
+
+    return df, signal_df
 
 
 def build_keltner_data(df):
@@ -98,6 +414,288 @@ def build_keltner_data(df):
 
     return df
 
+
+def build_ma_structure(df):
+
+    df = df.copy()
+
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values(["TICKER", "Date"])
+
+    # =========================
+    # MOVING AVERAGES
+    # =========================
+    for ma in [10, 21, 34, 50, 100, 200]:
+        df[f"MA_{ma}"] = df.groupby("TICKER")["Close"].transform(
+            lambda x: x.rolling(ma).mean()
+        )
+
+    # =========================
+    # CLASSIFIER
+    # =========================
+    def classify(row):
+
+        ma10 = row["MA_10"]
+        ma21 = row["MA_21"]
+        ma34 = row["MA_34"]
+        ma50 = row["MA_50"]
+        ma100 = row["MA_100"]
+        ma200 = row["MA_200"]
+
+        if ma10 < ma200:
+            return "MA10 < 200", ma200, "MA200"
+
+        if ma10 < ma100:
+            return "MA10: 100-200", ma200, "MA200"
+
+        if ma10 < ma50:
+            return "MA10: 50-100", ma100, "MA100"
+
+        if ma10 < ma34:
+            return "MA10: 34-50", ma50, "MA50"
+
+        if ma10 < ma21:
+            return "MA10: 21-34", ma34, "MA34"
+
+        if ma10 >= ma21:
+            if ma10 > ma21 > ma34 > ma50 > ma100 > ma200:
+                return "MA10 > ALL (strong)", ma10, "MA10"
+            return "MA10 > ALL (weak)", ma10, "MA10"
+
+        return "MA10 < 200", ma200, "MA200"
+
+    # =========================
+    # APPLY CLASSIFICATION
+    # =========================
+    latest_date = df["Date"].max()
+
+    latest_df = df[df["Date"] == latest_date].copy()
+    prev_df = df[df["Date"] < latest_date].groupby("TICKER").tail(1).copy()
+
+    latest_df[["group", "base_value", "base_label"]] = latest_df.apply(
+        lambda r: pd.Series(classify(r)),
+        axis=1
+    )
+
+    if not prev_df.empty:
+        prev_df[["group", "_", "__"]] = prev_df.apply(
+            lambda r: pd.Series(classify(r)),
+            axis=1
+        )
+
+        prev_map = prev_df[["TICKER", "group"]].rename(columns={"group": "prev_group"})
+        latest_df = latest_df.merge(prev_map, on="TICKER", how="left")
+    else:
+        latest_df["prev_group"] = latest_df["group"]
+
+    latest_df["prev_group"] = latest_df["prev_group"].fillna(latest_df["group"])
+
+    # =========================
+    # RANK SYSTEM
+    # =========================
+    rank = {
+        "MA10 > ALL (strong)": 7,
+        "MA10 > ALL (weak)": 6,
+        "MA10: 21-34": 5,
+        "MA10: 34-50": 4,
+        "MA10: 50-100": 3,
+        "MA10: 100-200": 2,
+        "MA10 < 200": 1
+    }
+
+    def movement(row):
+        if row["group"] == row["prev_group"]:
+            return ""
+        return "⬆" if rank[row["group"]] > rank[row["prev_group"]] else "⬇"
+
+    latest_df["move"] = latest_df.apply(movement, axis=1)
+
+    # =========================
+    # DISTANCE
+    # =========================
+    latest_df["pct_distance"] = (
+        (latest_df["Close"] - latest_df["base_value"]) / latest_df["base_value"]
+    ) * 100
+
+    # =========================
+    # SORTING
+    # =========================
+    group_order = {
+        "MA10 > ALL (strong)": 0,
+        "MA10 > ALL (weak)": 1,
+        "MA10: 21-34": 2,
+        "MA10: 34-50": 3,
+        "MA10: 50-100": 4,
+        "MA10: 100-200": 5,
+        "MA10 < 200": 6
+    }
+
+    latest_df["group_rank"] = latest_df["group"].map(group_order)
+
+    latest_df = latest_df.sort_values(
+        ["group_rank", "pct_distance"],
+        ascending=[True, False]
+    )
+
+    return df, latest_df
+
+# =========================================================
+# 21 DAY BREAKOUT SCANNER
+# =========================================================
+
+def build_breakout_21_signals(df):
+
+    df = df.copy()
+
+    # =========================================
+    # CLEAN
+    # =========================================
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    df = df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    results = []
+
+    # =========================================
+    # BREAKOUT LOGIC
+    # =========================================
+
+    for ticker, g in df.groupby("TICKER"):
+
+        g = g.tail(60).copy()
+
+        if len(g) < 25:
+            continue
+
+        # -------------------------------------
+        # BASE STRUCTURE
+        # -------------------------------------
+
+        base = g.iloc[-22:-1]
+
+        today = g.iloc[-1]
+
+        base_high = base["High"].max()
+
+        highs_near_top = base[
+            base["High"] >= base_high * 0.98
+        ]
+
+        # Need at least 2 touches
+        if len(highs_near_top) < 2:
+            continue
+
+        # -------------------------------------
+        # VOLUME
+        # -------------------------------------
+
+        avg_vol = base["Volume"].mean()
+
+        if pd.isna(avg_vol) or avg_vol <= 0:
+            continue
+
+        avg_vol = round(avg_vol)
+
+        # -------------------------------------
+        # CANDLE
+        # -------------------------------------
+
+        bullish_today = (
+            today["Close"] > today["Open"]
+        )
+
+        # -------------------------------------
+        # BREAKOUT
+        # -------------------------------------
+
+        breakout = (
+
+            (today["High"] > base_high)
+
+            and
+
+            (
+                today["Volume"]
+                >= 1.5 * avg_vol
+            )
+
+            and
+
+            bullish_today
+        )
+
+        if breakout:
+
+            breakout_pct = round(
+
+                (
+                    (
+                        today["Close"]
+                        - base_high
+                    )
+                    / base_high
+                ) * 100,
+
+                2
+            )
+
+            volume_ratio = round(
+
+                today["Volume"] / avg_vol,
+
+                2
+            )
+
+            results.append({
+
+                "Breakout_Date":
+                    today["Date"].strftime("%Y-%m-%d"),
+
+                "TICKER":
+                    ticker,
+
+                "Sector":
+                    today.get("Sector"),
+
+                "Industry":
+                    today.get("Industry"),
+
+                "Breakout_Price":
+                    round(today["Close"], 2),
+
+                "Base_High":
+                    round(base_high, 2),
+
+                "Breakout_%":
+                    breakout_pct,
+
+                "Volume":
+                    int(today["Volume"]),
+
+                "Avg_Volume":
+                    int(avg_vol),
+
+                "Vol_Ratio":
+                    volume_ratio
+            })
+
+    # =========================================
+    # FINAL DF
+    # =========================================
+
+    results_df = pd.DataFrame(results)
+
+    if not results_df.empty:
+
+        results_df = results_df.sort_values(
+            "Breakout_%",
+            ascending=False
+        )
+
+    return results_df
 
 
 def compute_relative_strength(df, spy_df, periods=[7, 21, 50, 100, 200]):
@@ -304,26 +902,76 @@ def run_scanner():
         keltner_df = build_keltner_data(history_df)
 
         # full history with KC columns
-        keltner_df.to_parquet(
-            DATA_DIR / "keltner_history.parquet",
-            index=False
-        )
+        keltner_df.to_parquet(DATA_DIR / "keltner_history.parquet",index=False)
 
         # latest snapshot only
-        latest_keltner = (
-            keltner_df
-            .groupby("TICKER")
-            .tail(1)
-            .reset_index(drop=True)
+        latest_keltner = (keltner_df.groupby("TICKER").tail(1).reset_index(drop=True))
+
+        latest_keltner.to_parquet(DATA_DIR / "keltner_latest.parquet",index=False)
+        print("Keltner finsished")
+
+
+        # =========================
+        # TURTLE SOUP
+        # =========================
+        ts_df, ts_signals = build_turtle_soup_signals(history_df)
+
+        ts_df.to_parquet(DATA_DIR / "turtle_soup_history.parquet", index=False)
+        ts_signals.to_parquet(DATA_DIR / "turtle_soup_signals.parquet", index=False)
+
+        # =========================
+        # STOCH SHORT
+        # =========================
+        ss_df, ss_signals = build_stochastic_short_signals(history_df)
+
+        ss_df.to_parquet(DATA_DIR / "stochastic_short_history.parquet", index=False)
+        ss_signals.to_parquet(DATA_DIR / "stochastic_short_signals.parquet", index=False)
+        print("stoch_short finished")
+
+        # =====================================
+        # 21 DAY BREAKOUT
+        # =====================================
+
+        breakout_21_df = build_breakout_21_signals(
+            history_df
         )
 
-        latest_keltner.to_parquet(
-            DATA_DIR / "keltner_latest.parquet",
+        breakout_21_df.to_parquet(
+            DATA_DIR / "breakout_21.parquet",
             index=False
         )
 
+        print("21 Day Breakout finished")
 
-        
+
+
+
+        # =====================================
+        # FIB RETRACEMENT
+        # =====================================
+
+        fib_history, fib_latest = build_fib_retracement_data(history_df)
+        fib_history.to_parquet(DATA_DIR / "fib_retracement_history.parquet",index=False)
+        fib_latest.to_parquet(DATA_DIR / "fib_retracement_latest.parquet",index=False)
+        print("Fib finished")
+
+
+        # =====================================
+        # EQUITY RANKING
+        # =====================================
+
+        ranking_history, ranking_latest = build_equity_ranking(history_df)
+        ranking_history.to_parquet(DATA_DIR / "equity_ranking_history.parquet",index=False)
+        ranking_latest.to_parquet(DATA_DIR / "equity_ranking_latest.parquet",index=False)
+
+        # =====================================
+        # MA 
+        # =====================================
+
+
+        ma_history, ma_latest = build_ma_structure(history_df)
+        ma_history.to_parquet(DATA_DIR / "ma_structure_history.parquet",index=False)
+        ma_latest.to_parquet(DATA_DIR / "ma_structure_latest.parquet",index=False)
 
         # SPY data (^GSPC)
         spy_df = history_df[history_df["TICKER"] == "^GSPC"][["Date", "Close"]].sort_values("Date")

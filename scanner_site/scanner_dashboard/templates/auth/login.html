@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Login • Stock Scanner</title>
+
+<style>
+
+/* ================= BASE ================= */
+
+body {
+    margin: 0;
+    background: #0b1220;
+    font-family: Arial, sans-serif;
+    color: #e5e7eb;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+}
+
+/* ================= CARD ================= */
+
+.login-card {
+
+    width: 400px;
+
+    background: #111827;
+
+    border: 1px solid #1f2937;
+
+    border-radius: 18px;
+
+    padding: 34px;
+
+    box-shadow:
+        0 0 30px rgba(37,99,235,0.15);
+
+}
+
+/* ================= TITLE ================= */
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 6px;
+    color: white;
+    font-size: 28px;
+}
+
+.sub {
+    color: #9ca3af;
+    font-size: 13px;
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+/* ================= FORM ================= */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ================= LABEL ================= */
+
+label {
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+    display: block;
+}
+
+/* ================= INPUT ================= */
+
+input {
+
+    width: 100%;
+
+    padding: 12px;
+
+    background: #0f172a;
+
+    border: 1px solid #374151;
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+}
+
+input:focus {
+
+    outline: none;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 2px rgba(37,99,235,0.20);
+}
+
+/* ================= BUTTON ================= */
+
+button {
+
+    margin-top: 8px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+/* ================= SIGNUP ================= */
+
+.signup {
+
+    margin-top: 22px;
+
+    text-align: center;
+
+    font-size: 13px;
+
+    color: #9ca3af;
+}
+
+.signup a {
+
+    color: #60a5fa;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.signup a:hover {
+    text-decoration: underline;
+}
+
+/* ================= ERROR BOX ================= */
+
+.errorlist {
+
+    list-style: none;
+
+    padding: 10px;
+
+    margin: 0 0 10px 0;
+
+    background: rgba(239,68,68,0.12);
+
+    border: 1px solid rgba(239,68,68,0.30);
+
+    border-radius: 10px;
+
+    color: #fca5a5;
+
+    font-size: 12px;
+}
+
+/* ================= GLOBAL ERROR ================= */
+
+.nonfield-errors {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.30);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #fca5a5;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <h1>🔐 Sign In</h1>
+
+    <div class="sub">
+        Access institutional scanners, momentum dashboards,
+        and advanced market analytics.
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <!-- ================= GLOBAL ERRORS ================= -->
+        {% if form.non_field_errors %}
+            <div class="nonfield-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <!-- ================= USERNAME ================= -->
+        <div>
+            <label>Username</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+        <!-- ================= PASSWORD ================= -->
+        <div>
+        <label>Password</label>
+        {{ form.password }}
+        {{ form.password.errors }}
+        </div>
+
+        <div style="text-align:right; margin-top:-6px;">
+
+          <a href="{% url 'forgot_password' %}"
+           style="
+              color:#60a5fa;
+              font-size:12px;
+              text-decoration:none;
+              font-weight:600;
+           ">
+
+        Forgot Password?
+
+        </a>
+
+        </div>
+
+       <button type="submit">
+        Login
+       </button>
+
+    </form>
+
+    <div class="signup">
+
+        Don’t have an account?
+
+        <a href="{% url 'signup' %}">
+            Create Account
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

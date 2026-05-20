@@ -7,6 +7,56 @@
 
 <style>
 
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
 /* ================= BASE ================= */
 
 body {
@@ -32,6 +82,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  align-items: center;
 }
 
 .top-nav a {
@@ -48,7 +99,137 @@ body {
   color: white;
 }
 
-/* ================= TITLE ================= */
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
 
 h1 {
   margin: 15px 0 5px;
@@ -63,15 +244,18 @@ h1 {
 /* ================= DESCRIPTION (YELLOW LIKE SCANNER) ================= */
 
 .desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.5;
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
 }
 
+.desc strong {
+    color: #93c5fd;
+}
 /* ================= TILE GRID ================= */
 
 .tile-grid {
@@ -132,31 +316,95 @@ h1 {
 
 <body>
 
-<!-- ================= NAV ================= -->
+{% load static %}
+
+<!-- ================= MASTER TOP NAV ================= -->
 
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
   <a href="{% url 'fundamentals' %}">Fundamentals</a>
   <a href="{% url 'futures' %}">Futures</a>
   <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </div>
 
 <div class="container">
 
-<h1>📊 Industry Weekly Dashboard</h1>
+
+<div class="container">
+
+<!-- ================= TITLE ================= -->
+
+<div class="container">
+
+<h1>Industry Weekly Dashboard</h1>
 
 <div class="sub">
-Weekly market breadth across industries (UP vs DOWN pressure + strength distribution)
+Weekly market breadth across industries (UP vs DOWN pressure + strength distribution)<br><br>
 </div>
 
 <!-- ================= DESCRIPTION ================= -->

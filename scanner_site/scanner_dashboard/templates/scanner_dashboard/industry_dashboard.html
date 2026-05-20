@@ -1,0 +1,762 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>Industry Dashboard</title>
+
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <style>
+
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  align-items: center;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+    /* =====================================
+       MAIN LAYOUT
+    ===================================== */
+
+    .layout {
+      display: flex;
+      height: calc(100vh - 84px);
+    }
+
+    /* =====================================
+       SIDEBAR
+    ===================================== */
+
+    .sidebar {
+      width: 260px;
+      background: #111827;
+      border-right: 1px solid #1f2937;
+
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+
+      padding: 18px;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      border-bottom: 1px solid #1f2937;
+
+      position: sticky;
+      top: 0;
+
+      background: #111827;
+      z-index: 20;
+    }
+
+    .industry-list {
+      padding: 10px;
+    }
+
+    .industry-link {
+
+      display: block;
+
+      padding: 10px 12px;
+
+      margin-bottom: 6px;
+
+      border-radius: 10px;
+
+      color: #cbd5e1;
+
+      text-decoration: none;
+
+      font-size: 13px;
+      font-weight: 600;
+
+      transition: all 0.15s ease;
+    }
+
+    .industry-link:hover {
+      background: #1e293b;
+      color: white;
+    }
+
+    .industry-link.active {
+      background: #2563eb;
+      color: white;
+
+      box-shadow:
+          0 0 12px rgba(37,99,235,0.25);
+    }
+
+    /* =====================================
+       CONTENT
+    ===================================== */
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .topbar {
+
+      position: sticky;
+      top: 0;
+
+      z-index: 30;
+
+      background: #0b1220;
+
+      border-bottom: 1px solid #1f2937;
+
+      padding: 16px 22px;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    /* =====================================
+       CHART GRID
+    ===================================== */
+
+    .chart-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(auto-fill, minmax(520px, 1fr));
+
+      gap: 18px;
+
+      padding: 22px;
+    }
+
+    .chart-card {
+
+      background: #111827;
+
+      border: 1px solid #1f2937;
+
+      border-radius: 14px;
+
+      overflow: hidden;
+    }
+
+    .chart-title {
+
+      padding: 12px 14px;
+
+      border-bottom: 1px solid #1f2937;
+
+      color: #93c5fd;
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .chart-box {
+      width: 100%;
+      height: 420px;
+    }
+
+    /* =====================================
+       SCROLLBAR
+    ===================================== */
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 999px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<!-- =====================================
+     TOP NAVIGATION
+===================================== -->
+
+<div class="top-nav">
+
+  <!-- LEFT -->
+
+  <div class="nav-left">
+
+    <div class="brand">
+
+      <img
+        src="{% static 'images/bull_bear_logo.png' %}"
+        alt="Logo"
+      >
+
+      <div class="brand-text">
+
+        <div class="brand-title">
+          ScannerX
+        </div>
+
+        <div class="brand-sub">
+          Market Intelligence
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CENTER -->
+
+  <div class="nav-center">
+
+    <a href="{% url 'home'%}">Home</a>
+
+    <a href="{% url 'fundamentals' %}">
+      Fundamentals
+    </a>
+
+    <a href="{% url 'futures' %}">
+      Futures
+    </a>
+
+    <a href="{% url 'sector_chart' %}">
+      Sector Trend
+    </a>
+
+    <a href="{% url 'sector' %}">
+      Daily Sector
+    </a>
+
+    <a href="{% url 'industry_weekly' %}">
+      Weekly Industry
+    </a>
+
+    <a href="{% url 'industry_today' %}">
+      Daily Industry
+    </a>
+
+    <a href="{% url 'industry_rs' %}">
+      Industry RS
+    </a>
+
+    <a href="{% url 'equity_ranking' %}">
+      Equity Rank
+    </a>
+
+    <a href="{% url 'metrics' %}">
+      Metrics
+    </a>
+
+    <a href="{% url 'ma_structure' %}">
+      Moving Avg
+    </a>
+
+    <a href="{% url 'keltner_scan' %}">
+      Keltner
+    </a>
+
+    <a href="{% url 'fib_scan' %}">
+      Fibonacci
+    </a>
+
+    <a href="{% url 'rs_alignment' %}">
+      Correlation
+    </a>
+
+    <a href="{% url 'industry_dashboard' %}">
+      Charts
+    </a>
+
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+
+            <div class="user-label">
+              Signed in
+            </div>
+
+            <div class="user-name">
+              {{ request.user.username }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <form method="post"
+              action="{% url 'logout' %}">
+
+          {% csrf_token %}
+
+          <button
+            type="submit"
+            class="auth-btn logout-btn"
+          >
+            Logout
+          </button>
+
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}"
+         class="auth-btn">
+
+         Login
+
+      </a>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+<!-- =====================================
+     MAIN DASHBOARD
+===================================== -->
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+
+  <div class="sidebar">
+
+    <div class="sidebar-header">
+      Industries
+    </div>
+
+    <div class="industry-list">
+
+      {% for industry in industries %}
+
+        <a
+          href="?industry={{ industry|urlencode }}"
+          class="industry-link {% if industry == selected_industry %}active{% endif %}"
+        >
+          {{ industry }}
+        </a>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT CONTENT -->
+
+  <div class="content">
+
+    <div class="topbar">
+      <h1>{{ selected_industry }}</h1>
+    </div>
+
+    <div class="chart-grid">
+
+      {% for row in ticker_data %}
+
+        <div class="chart-card">
+
+          <div class="chart-title">
+            {{ row.ticker }}
+          </div>
+
+          <div
+            id="chart_{{ forloop.counter }}"
+            class="chart-box"
+          ></div>
+
+        </div>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+{% for row in ticker_data %}
+
+(function() {
+
+  const dates = {{ row.dates|safe }};
+  const open = {{ row.open|safe }};
+  const high = {{ row.high|safe }};
+  const low = {{ row.low|safe }};
+  const close = {{ row.close|safe }};
+  const volume = {{ row.volume|safe }};
+
+  const price = {
+
+    x: dates,
+
+    open: open,
+    high: high,
+    low: low,
+    close: close,
+
+    type: 'candlestick',
+
+    increasing: {
+      line: { color: '#22c55e' }
+    },
+
+    decreasing: {
+      line: { color: '#ef4444' }
+    },
+
+    yaxis: 'y'
+  };
+
+  const vol = {
+
+    x: dates,
+
+    y: volume,
+
+    type: 'bar',
+
+    yaxis: 'y2',
+
+    marker: {
+      color: '#64748b',
+      opacity: 0.35
+    }
+  };
+
+  const layout = {
+
+    paper_bgcolor: '#111827',
+    plot_bgcolor: '#111827',
+
+    font: {
+      color: '#e5e7eb',
+      size: 10
+    },
+
+    margin: {
+      l: 40,
+      r: 12,
+      t: 10,
+      b: 30
+    },
+
+    showlegend: false,
+
+    xaxis: {
+
+      rangeslider: {
+        visible: false
+      },
+
+      showgrid: false
+    },
+
+    yaxis: {
+
+      domain: [0.26, 1],
+
+      showgrid: true,
+
+      gridcolor: 'rgba(255,255,255,0.05)'
+    },
+
+    yaxis2: {
+
+      domain: [0, 0.18],
+
+      showgrid: false
+    }
+  };
+
+  Plotly.newPlot(
+    'chart_{{ forloop.counter }}',
+    [price, vol],
+    layout,
+    {
+      responsive: true,
+      displayModeBar: false
+    }
+  );
+
+})();
+
+{% endfor %}
+
+</script>
+
+<script>
+
+  // SAVE SIDEBAR SCROLL
+
+  const sidebar = document.querySelector('.sidebar');
+
+  const savedScroll = localStorage.getItem(
+      'industrySidebarScroll'
+  );
+
+  if (savedScroll !== null) {
+      sidebar.scrollTop = savedScroll;
+  }
+
+  sidebar.addEventListener('scroll', () => {
+
+      localStorage.setItem(
+          'industrySidebarScroll',
+          sidebar.scrollTop
+      );
+
+  });
+
+</script>
+
+</body>
+</html>

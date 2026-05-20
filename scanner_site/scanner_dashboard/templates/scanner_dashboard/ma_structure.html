@@ -7,6 +7,56 @@
 
 <style>
 
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
 /* ================= BASE ================= */
 
 body {
@@ -32,6 +82,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  align-items: center;
 }
 
 .top-nav a {
@@ -48,118 +99,312 @@ body {
   color: white;
 }
 
-/* ================= TITLE ================= */
-
-h1 {
-  margin: 15px 0 5px;
-  color: white;
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
 }
 
-.sub {
-  color: #9ca3af;
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
   font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+.dashboard-title{
+    font-size:30px;
+    font-weight:800;
+    color:white;
+    margin-bottom:6px;
+}
+
+.dashboard-sub{
+    color:#94a3b8;
+    font-size:13px;
+    margin-bottom:18px;
 }
 
 /* ================= DESCRIPTION ================= */
 
-.desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.5;
+.desc{
+    background:#111827;
+    border:1px solid #1f2937;
+    padding:18px;
+    border-radius:16px;
+    margin-bottom:24px;
+    font-size:12px;
+    line-height:1.8;
+    color:#cbd5e1;
 }
 
-/* ================= GROUP CARD ================= */
+/* ================= CARD ================= */
 
-.group-card {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 10px;
-  margin-bottom: 14px;
-  overflow: hidden;
+.group-card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    margin-bottom:22px;
+    overflow:hidden;
 }
 
-.group-header {
-  background: #0f172a;
-  padding: 10px 12px;
-  font-weight: 700;
-  font-size: 12px;
-  color: #93c5fd;
-  display: flex;
-  justify-content: space-between;
+.group-header{
+    background:#0f172a;
+    padding:14px 16px;
+    font-weight:700;
+    font-size:13px;
+    color:#93c5fd;
+    display:flex;
+    justify-content:space-between;
+    border-bottom:1px solid #1e293b;
 }
 
 /* ================= TABLE ================= */
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
+.table-wrap{
+    overflow-x:auto;
 }
 
-th {
-  background: #111827;
-  padding: 10px;
-  text-transform: uppercase;
-  font-size: 11px;
-  color: #93c5fd;
-  text-align: left;
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:950px;
 }
 
-td {
-  padding: 8px;
-  border-bottom: 1px solid #374151;
+th{
+    background:#0f172a;
+    padding:12px;
+    text-transform:uppercase;
+    font-size:11px;
+    color:#93c5fd;
+    text-align:left;
+    border-bottom:1px solid #1e293b;
 }
 
-tr:hover {
-  background: rgba(59,130,246,0.08);
+td{
+    padding:11px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:12px;
 }
 
-/* ================= CUSTOM 5-LEVEL STRUCTURE COLORS ================= */
-
-/* 🟣 strongest */
-.purple {
-  background: rgba(168,85,247,0.18);
-  border-left: 4px solid #a855f7;
+tr:hover{
+    background:rgba(59,130,246,0.08);
 }
 
-/* 🔵 strong trend */
-.light-blue {
-  background: rgba(59,130,246,0.18);
-  border-left: 4px solid #60a5fa;
+/* ================= COLORS ================= */
+
+.purple{
+    background:rgba(168,85,247,0.12);
+    border-left:4px solid #a855f7;
 }
 
-/* 🟡 neutral / transition */
-.light-yellow {
-  background: rgba(234,179,8,0.18);
-  border-left: 4px solid #facc15;
+.light-blue{
+    background:rgba(59,130,246,0.12);
+    border-left:4px solid #60a5fa;
 }
 
-/* 🟠 weak / deteriorating */
-.orange {
-  background: rgba(249,115,22,0.18);
-  border-left: 4px solid #fb923c;
+.light-yellow{
+    background:rgba(234,179,8,0.12);
+    border-left:4px solid #facc15;
 }
 
-/* 🔴 bearish breakdown */
-.red {
-  background: rgba(239,68,68,0.18);
-  border-left: 4px solid #ef4444;
+.orange{
+    background:rgba(249,115,22,0.12);
+    border-left:4px solid #fb923c;
+}
+
+.red{
+    background:rgba(239,68,68,0.12);
+    border-left:4px solid #ef4444;
 }
 
 /* ================= TICKER ================= */
 
-.ticker {
-  color: #60a5fa;
-  font-weight: bold;
-  text-decoration: none;
+.ticker{
+    color:#60a5fa;
+    font-weight:700;
+    text-decoration:none;
 }
 
-.ticker:hover {
-  text-decoration: underline;
+.ticker:hover{
+    text-decoration:underline;
+}
+
+/* ================= BADGES ================= */
+
+.badge{
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    display:inline-block;
+}
+
+.move-up{
+    background:rgba(34,197,94,0.18);
+    color:#4ade80;
+}
+
+.move-down{
+    background:rgba(239,68,68,0.18);
+    color:#f87171;
+}
+
+.move-flat{
+    background:rgba(148,163,184,0.18);
+    color:#cbd5e1;
+}
+
+/* ================= CHART ================= */
+
+.chart-wrap{
+    position:relative;
+    height:520px;
+    width:100%;
+    padding:20px;
+    box-sizing:border-box;
+    background:#0b1220;
+}
+
+#maChart{
+    width:100% !important;
+    height:100% !important;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .dashboard-title{
+        font-size:24px;
+    }
+
+    .container{
+        padding:14px;
+    }
+
+    .chart-wrap{
+        height:380px;
+    }
 }
 
 </style>
@@ -167,132 +412,415 @@ tr:hover {
 
 <body>
 
-<!-- ================= NAV ================= -->
+{% load static %}
+
+
+<!-- ================= MASTER TOP NAV ================= -->
 
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
   <a href="{% url 'fundamentals' %}">Fundamentals</a>
   <a href="{% url 'futures' %}">Futures</a>
   <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </div>
 
 <div class="container">
 
-<h1>📊 MA Structure Dashboard</h1>
+    <div class="dashboard-title">
+        MA Structure Dashboard
+    </div>
 
-<div class="sub">
-Multi-timeframe moving average structure + institutional regime classification
-</div>
+    <div class="dashboard-sub">
+        Multi-timeframe institutional moving average structure engine
+    </div>
 
-<!-- ================= DESCRIPTION ================= -->
+    <!-- ================= DESCRIPTION ================= -->
 
-<div class="desc">
+    <div class="desc">
 
-<strong>Structure Logic Overview</strong><br><br>
+        <strong>Structure Logic</strong><br><br>
 
+Auto loads S&P500<br>
 Tracks Moving average of price for equity alignment across 10 / 21 / 34 / 50 / 100 / 200 days<br>
-MA10 > ALL(strong) : all moving averages bands are in correct order, strong trend <br>
-MA10 > ALL (weak)  : 10 day moving average is above all other averages but other bands are not in order<br>
-MA10: 21-34        : 10 day moving average is between 21 and 34 days, medium trend <br>
-MA10: 34-50        : 10 day moving average is between 34 and 50 days, medium-long trend<br>
-MA10: 50-100       : 10 day moving average is between 50 and 100 days<br>
-MA10: 100-200      : 10 day moving average is between 100 and 200 days  <br>
-MA10 < 200         : NO trend<br><br>
+MA10 > ALL(strong) : all moving averages bands are in correct order, strong trend<br>
+MA10 > ALL (weak) : 10 day moving average is above all other averages but other bands are not in order<br>
+MA10: 21-34 : 10 day moving average is between 21 and 34 days, medium trend<br>
+MA10: 34-50 : 10 day moving average is between 34 and 50 days, medium-long trend<br>
+MA10: 50-100 : 10 day moving average is between 50 and 100 days<br>
+MA10: 100-200 : 10 day moving average is between 100 and 200 days<br>
+MA10 < 200 : NO trend<br>
 
-Distance%          : Percentage different between current close and respective base <br><br>
-Detects compression → breakout → breakdown transitions<br><br>
+Distance% : Percentage different between current close and respective base<br>
 
-<strong>Color System (Fixed 5-Level Institutional Model)</strong><br>
-🟣 Purple → Strongest structural trend (elite alignment)<br>
-🔵 Blue → Strong trend continuation<br>
-🟡 Yellow → Neutral / consolidation zone<br>
-🟠 Orange → Weak / deteriorating structure<br>
+Detects compression → breakout → breakdown transitions<br>
+
+Color System
+🟣 Purple → Strongest structural trend (elite alignment)
+🔵 Blue → Strong trend continuation
+🟡 Yellow → Neutral / consolidation zone
+🟠 Orange → Weak / deteriorating structure
 🔴 Red → Bearish breakdown regime
 
+    </div>
+
+    <!-- ================= CHART AFTER DESCRIPTION ================= -->
+
+    <div class="group-card">
+
+        <div class="group-header">
+
+            <span>
+                📈 {{ selected_ticker|default:"SPY" }} Structure Chart
+            </span>
+
+            <span>
+                300 Trading Days
+            </span>
+
+        </div>
+
+        <div class="chart-wrap">
+
+            <canvas id="maChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- ================= TABLES ================= -->
+
+    {% for group_name, rows in groups.items %}
+
+    <div class="group-card">
+
+        <div class="group-header">
+
+            <span>{{ group_name }}</span>
+
+            <span>{{ rows|length }} stocks</span>
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Ticker</th>
+                        <th>Close</th>
+                        <th>Distance %</th>
+                        <th>Move</th>
+                        <th>Base</th>
+                        <th>Industry</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for r in rows %}
+
+                    <tr class="
+                        {% if 'strong' in r.group %}
+                            purple
+
+                        {% elif 'weak' in r.group %}
+                            light-blue
+
+                        {% elif '21-34' in r.group or '34-50' in r.group %}
+                            light-yellow
+
+                        {% elif '50-100' in r.group %}
+                            orange
+
+                        {% else %}
+                            red
+                        {% endif %}
+                    ">
+
+                        <td>
+
+                            <a class="ticker"
+                               href="?ticker={{ r.TICKER }}">
+
+                               {{ r.TICKER }}
+
+                            </a>
+
+                        </td>
+
+                        <td>
+                            {{ r.Close|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            {{ r.pct_distance|floatformat:2 }}%
+                        </td>
+
+                        <td>
+
+                            {% if r.move == '⬆' %}
+
+                                <span class="badge move-up">
+                                    ⬆ Improving
+                                </span>
+
+                            {% elif r.move == '⬇' %}
+
+                                <span class="badge move-down">
+                                    ⬇ Weakening
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge move-flat">
+                                    Stable
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ r.base_label }}
+                        </td>
+
+                        <td>
+                            {{ r.Industry }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
 </div>
 
-<!-- ================= GROUPS ================= -->
+<!-- ================= CHART JS ================= -->
 
-{% for group_name, rows in groups.items %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<div class="group-card">
+<script>
 
-  <div class="group-header">
-    <span>{{ group_name }}</span>
-    <span>{{ rows|length }} stocks</span>
-  </div>
+document.addEventListener("DOMContentLoaded", function () {
 
-  <table>
+    const raw = '{{ chart_data|safe }}';
 
-    <thead>
-      <tr>
-        <th>Ticker</th>
-        <th>Close</th>
-        <th>Distance %</th>
-        <th>Move</th>
-        <th>Base</th>
-      </tr>
-    </thead>
+    if (!raw) {
+        console.log("No chart data");
+        return;
+    }
 
-    <tbody>
+    const chartData = JSON.parse(raw);
 
-      {% for r in rows %}
+    const canvas = document.getElementById("maChart");
 
-      <!-- COLOR ASSIGNMENT (SAFE FALLBACK LOGIC) -->
-      <tr class="
-        {% if 'strong' in r.group %}
-            purple
+    if (!canvas) {
+        console.log("Canvas missing");
+        return;
+    }
 
-        {% elif 'MA10 > ALL (weak)' in r.group %}
-            light-blue
+    const ctx = canvas.getContext("2d");
 
-        {% elif '34-50' in r.group or '21-34' in r.group %}
-            light-yellow
+    new Chart(ctx, {
 
-        {% elif '50-100' in r.group or 'MA10 < 200' or 'MA10: 100-200'  in r.group %}
-            red
+        type: "line",
 
+        data: {
 
-        {% else %}
-            light-red
-        {% endif %}
-      ">
+            labels: chartData.dates,
 
-        <td>
-          <a class="ticker"
-             href="{% url 'equity_chart' r.TICKER %}">
-             {{ r.TICKER }}
-          </a>
-        </td>
+            datasets: [
 
-        <td>{{ r.Close }}</td>
-        <td>{{ r.pct_distance|floatformat:2 }}</td>
-        <td>{{ r.move }}</td>
-        <td>{{ r.base_label }}</td>
+                {
+                    label: "Close",
+                    data: chartData.close,
+                    borderColor: "#ffffff",
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.1
+                },
 
-      </tr>
+                {
+                    label: "MA10",
+                    data: chartData.ma10,
+                    borderColor: "#a855f7",
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
 
-      {% endfor %}
+                {
+                    label: "MA21",
+                    data: chartData.ma21,
+                    borderColor: "#3b82f6",
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
 
-    </tbody>
+                {
+                    label: "MA34",
+                    data: chartData.ma34,
+                    borderColor: "#22c55e",
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
 
-  </table>
+                {
+                    label: "MA50",
+                    data: chartData.ma50,
+                    borderColor: "#facc15",
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
 
-</div>
+                {
+                    label: "MA100",
+                    data: chartData.ma100,
+                    borderColor: "#fb923c",
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
 
-{% endfor %}
+                {
+                    label: "MA200",
+                    data: chartData.ma200,
+                    borderColor: "#ef4444",
+                    borderWidth: 2,
+                    pointRadius: 0
+                }
+            ]
+        },
 
-</div>
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+
+            plugins: {
+
+                legend: {
+
+                    labels: {
+                        color: "#e5e7eb"
+                    }
+                }
+            },
+
+            scales: {
+
+                x: {
+
+                    ticks: {
+                        color: "#94a3b8",
+                        maxTicksLimit: 14
+                    },
+
+                    grid: {
+                        color: "rgba(255,255,255,0.04)"
+                    }
+                },
+
+                y: {
+
+                    ticks: {
+                        color: "#94a3b8"
+                    },
+
+                    grid: {
+                        color: "rgba(255,255,255,0.05)"
+                    }
+                }
+            }
+        }
+    });
+
+});
+
+</script>
 
 </body>
 </html>

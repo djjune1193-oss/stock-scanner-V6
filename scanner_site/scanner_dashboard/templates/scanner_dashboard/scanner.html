@@ -3,9 +3,61 @@
 
 <head>
 <meta charset="UTF-8">
-<title>Scanner Dashboard</title>
+<title>21/34 Moving Average Entry</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
 
 /* ================= BASE ================= */
 
@@ -32,6 +84,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  align-items: center;
 }
 
 .top-nav a {
@@ -48,104 +101,348 @@ body {
   color: white;
 }
 
-/* ================= ENTRY MODELS ================= */
-
-.entry-grid {
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 18px 0;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
 }
 
-.entry-grid a {
-  background: #0f172a;
-  border: 1px solid #374151;
-  color: #cbd5e1;
-  padding: 8px 10px;
-  border-radius: 8px;
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
   font-size: 12px;
-  text-decoration: none;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
 }
 
-.entry-grid a:hover {
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
   background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
 }
 
 /* ================= HEADER ================= */
 
+
 h1 {
-  margin: 15px 0 5px;
-  color: white;
+    margin: 15px 0 5px;
+    color: white;
 }
 
 .sub {
-  color: #9ca3af;
-  font-size: 13px;
+    color: #9ca3af;
+    font-size: 13px;
 }
 
 /* ================= DESCRIPTION ================= */
 
 .desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.5;
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+/* ================= CHART CARD ================= */
+
+.chart-card {
+
+    background: #0f172a;
+
+    border: 1px solid #1f2937;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+}
+
+/* ================= SEARCH ================= */
+
+.search-row {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.search-input {
+
+    flex: 1;
+
+    padding: 12px;
+
+    background: #111827;
+
+    border: 1px solid #374151;
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 14px;
+}
+
+.search-input:focus {
+
+    outline: none;
+
+    border-color: #2563eb;
+}
+
+.search-btn {
+
+    padding: 12px 18px;
+
+    background: #2563eb;
+
+    border: none;
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background: #1d4ed8;
+}
+
+/* ================= CURRENT TICKER ================= */
+
+.current-ticker {
+
+    margin-bottom: 15px;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #60a5fa;
+}
+
+/* ================= LOCK BANNER ================= */
+
+.lock-banner {
+
+    background: #0f172a;
+
+    border: 1px solid #2563eb;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    margin-bottom: 12px;
+
+    color: #cbd5e1;
+
+    font-size: 13px;
 }
 
 /* ================= TABLE ================= */
 
 .table-wrap {
-  overflow-x: auto;
-  background: #1f2937;
-  padding: 10px;
-  border-radius: 10px;
+
+    overflow-x: auto;
+
+    background: #1f2937;
+
+    padding: 10px;
+
+    border-radius: 10px;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 12px;
 }
 
 th {
-  background: #111827;
-  padding: 10px;
-  text-transform: uppercase;
-  font-size: 11px;
+
+    background: #111827;
+
+    padding: 10px;
+
+    text-transform: uppercase;
+
+    font-size: 11px;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
 }
 
 td {
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid #374151;
+
+    padding: 8px;
+
+    text-align: center;
+
+    border-bottom: 1px solid #374151;
 }
 
-/* ================= ROW COLORS (SOFT) ================= */
-
-.light-green { background: rgba(34,197,94,0.10); }
-.dark-green  { background: rgba(34,197,94,0.18); font-weight: 600; }
-
-.light-red   { background: rgba(239,68,68,0.10); }
-.dark-red    { background: rgba(239,68,68,0.18); font-weight: 600; }
-
 tr:hover {
-  background: rgba(59,130,246,0.08);
+    background: rgba(59,130,246,0.08);
+}
+
+/* ================= LOCKED ================= */
+
+.locked-content {
+
+    filter: blur(6px);
+
+    opacity: 0.6;
+
+    user-select: none;
 }
 
 /* ================= TICKER ================= */
 
 .ticker {
-  color: #60a5fa;
-  font-weight: bold;
-  text-decoration: none;
+
+    color: #60a5fa;
+
+    font-weight: bold;
+
+    text-decoration: none;
 }
 
 .ticker:hover {
-  text-decoration: underline;
+    text-decoration: underline;
+}
+
+canvas {
+    max-height: 550px;
 }
 
 </style>
@@ -153,77 +450,182 @@ tr:hover {
 
 <body>
 
-<!-- ================= NAVIGATION ================= -->
+{% load static %}
+
+<!-- ================= MASTER TOP NAV ================= -->
 
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
   <a href="{% url 'fundamentals' %}">Fundamentals</a>
   <a href="{% url 'futures' %}">Futures</a>
   <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </div>
 
+<!-- ================= MAIN ================= -->
 
-<!-- ================= TITLE ================= -->
+<div class="container">
 
-<h1>📊 Scanner Dashboard</h1>
-<div class="sub">Institutional momentum + MA structure + price action scanner</div>
+<h1>21/34 Moving Average Entry</h1>
 
-<!-- ================= DESCRIPTION ================= -->
+<div class="sub">
+Institutional momentum + MA structure + price action scanner<br><br>
+</div>
 
 <div class="desc">
 
-<strong>Scanner Logic (Current Strategy)</strong><br><br>
+<strong>Scanner Logic</strong><br><br>
 
-✔ Candle Types:<br>
-- Bullish Hammer<br>
-- Bullish Marubozu (Strong Buy)<br>
-- Standard Bullish Candle<br><br>
+Bullish candles + trend alignment +
+Price dipped below the 21 or 34 day moving average and reclaimed it.<br><br>
 
-✔ Trend Filter:<br>
-- 21 MA > 50 MA (Uptrend structure)<br>
-- Close > 200 MA (Long-term bullish bias)<br><br>
-
-✔ Pullback Entry Condition:<br>
-- Price dips below 21 or 34 MA<br>
-- Then closes back above MA (reclaim signal)<br><br>
-
-✔ Strength Filter:<br>
-- Lower count > 0 Todays price higher than how many previous day closes <br><br>
+Lower count = number of previous closes today's price is above.
 
 </div>
 
+<!-- ================= CHART ================= -->
+
+<div class="chart-card">
+
+    <form method="get">
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                name="ticker"
+                class="search-input"
+                placeholder="Search ticker (Example: AAPL, NVDA, ^GSPC)"
+                value="{{ selected_ticker }}"
+            >
+
+            <button type="submit" class="search-btn">
+                Load Chart
+            </button>
+
+        </div>
+
+    </form>
+
+    <div class="current-ticker">
+        {{ selected_ticker }}
+    </div>
+
+    <canvas id="priceChart"></canvas>
+
+</div>
+
+<!-- ================= LOGIN BANNER ================= -->
+
+{% if locked %}
+
+<div class="lock-banner">
+
+    🔒 You are viewing preview data.
+
+    <a href="{% url 'login' %}"
+       style="color:#60a5fa;font-weight:600;margin-left:10px;">
+
+        Login
+
+    </a>
+
+    to unlock full scanner signals and institutional setups.
+
+</div>
+
+{% endif %}
+
 <!-- ================= TABLE ================= -->
+
+<div class="{% if locked %}locked-content{% endif %}">
 
 <div class="table-wrap">
 
 <table>
 
 <thead>
+
 <tr>
-  <th>Date</th>
-  <th>Ticker</th>
-  <th>%</th>
-  <th>Sector</th>
-  <th>Industry</th>
-  <th>Close</th>
-  <th>Open</th>
-  <th>High</th>
-  <th>Low</th>
-  <th>Volume</th>
-  <th>Candle</th>
-  <th>Slope 50</th>
-  <th>Lower Count</th>
+    <th>Date</th>
+    <th>Ticker</th>
+    <th>%</th>
+    <th>Sector</th>
+    <th>Industry</th>
+    <th>Close</th>
+    <th>Open</th>
+    <th>High</th>
+    <th>Low</th>
+    <th>Volume</th>
+    <th>Candle</th>
+    <th>Slope 50</th>
+    <th>Lower Count</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -232,26 +634,30 @@ tr:hover {
 
 <tr>
 
-  <td>{{ row.0 }}</td>
+    <td>{{ row.0 }}</td>
 
-  <td>
-    <a class="ticker" href="{% url 'equity_chart' row.1 %}">
-      {{ row.1 }}
-    </a>
-  </td>
+    <td>
 
-  <td>{{ row.2 }}</td>
-  <td>{{ row.3 }}</td>
-  <td>{{ row.4 }}</td>
-  <td>{{ row.5 }}</td>
-  <td>{{ row.6 }}</td>
-  <td>{{ row.7 }}</td>
-  <td>{{ row.8 }}</td>
-  <td>{{ row.9 }}</td>
-  <td>{{ row.10 }}</td>
-  <td>{{ row.11 }}</td>
-  <td>{{ row.12 }}</td>
-  <td>{{ row.13 }}</td>
+        <a class="ticker"
+           href="?ticker={{ row.1 }}">
+
+            {{ row.1 }}
+
+        </a>
+
+    </td>
+
+    <td>{{ row.2 }}</td>
+    <td>{{ row.3 }}</td>
+    <td>{{ row.4 }}</td>
+    <td>{{ row.5 }}</td>
+    <td>{{ row.6 }}</td>
+    <td>{{ row.7 }}</td>
+    <td>{{ row.8 }}</td>
+    <td>{{ row.9 }}</td>
+    <td>{{ row.10 }}</td>
+    <td>{{ row.11 }}</td>
+    <td>{{ row.12 }}</td>
 
 </tr>
 
@@ -264,6 +670,135 @@ tr:hover {
 </div>
 
 </div>
+
+</div>
+
+<!-- ================= CHART JS ================= -->
+
+<script>
+
+const chartData = JSON.parse('{{ chart_data|escapejs }}');
+
+const ctx = document.getElementById('priceChart');
+
+new Chart(ctx, {
+
+    type: 'line',
+
+    data: {
+
+        labels: chartData.dates,
+
+        datasets: [
+
+            {
+                label: 'Price',
+                data: chartData.close,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                pointRadius: 0
+            },
+
+            {
+                label: '10 MA',
+                data: chartData.ma10,
+                borderColor: '#a855f7',
+                borderWidth: 1.5,
+                pointRadius: 0
+            },
+
+            {
+                label: '21 MA',
+                data: chartData.ma21,
+                borderColor: '#16a34a',
+                borderWidth: 1.5,
+                pointRadius: 0
+            },
+
+            {
+                label: '34 MA',
+                data: chartData.ma34,
+                borderColor: '#fde047',
+                borderWidth: 1.5,
+                pointRadius: 0
+            },
+
+            {
+                label: '50 MA',
+                data: chartData.ma50,
+                borderColor: '#fb923c',
+                borderWidth: 1.5,
+                pointRadius: 0
+            },
+
+            {
+                label: '100 MA',
+                data: chartData.ma100,
+                borderColor: '#ef4444',
+                borderWidth: 1.5,
+                pointRadius: 0
+            },
+
+            {
+                label: '200 MA',
+                data: chartData.ma200,
+                borderColor: '#dc2626',
+                borderWidth: 2,
+                pointRadius: 0
+            }
+
+        ]
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+                    color: '#ffffff'
+                }
+            }
+        },
+
+        scales: {
+
+            x: {
+
+                ticks: {
+                    color: '#a855f7'
+                },
+
+                grid: {
+                    color: 'rgba(255,255,255,0.05)'
+                }
+            },
+
+            y: {
+
+                ticks: {
+                    color: '#94a3b8'
+                },
+
+                grid: {
+                    color: 'rgba(255,255,255,0.05)'
+                }
+            }
+        }
+    }
+});
+
+</script>
 
 </body>
 </html>

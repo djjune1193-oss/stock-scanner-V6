@@ -3,6 +3,8 @@ from . import views
 from .views import sector_view, industry_detail_view, industry_rs_view, rs_alignment_dashboard, industry_detail_view_change
 from .views import fundamentals_view
 
+from django.contrib.auth import views as auth_views
+
 urlpatterns = [
     path("", views.home, name="home"),
     path("refresh-scanner/", views.refresh_scanner, name="refresh_scanner"),
@@ -35,5 +37,14 @@ urlpatterns = [
     path('keltner_scan/', views.keltner_scan, name='keltner_scan'),
     path("futures/", views.futures_view, name="futures"),
     path("fib_scan/", views.fib_retracement_scan, name="fib_scan"),
+    path('industry_dashboard/',views.industry_dashboard,name='industry_dashboard'),
+    path("login/",auth_views.LoginView.as_view(template_name="auth/login.html"),name="login"),
+    path("logout/",auth_views.LogoutView.as_view(),name="logout"),
+    path("signup/",views.signup_view,name="signup"),
+    path("verify-email/", views.verify_email, name="verify_email"),
+    path("resend-code/", views.resend_code, name="resend_code"),
+    path("forgot-password/", views.forgot_password, name="forgot_password"),
+    path("reset-password-verify/", views.reset_password_verify, name="reset_password_verify"),
+    path("new-password/", views.new_password, name="new_password"),
     
 ]

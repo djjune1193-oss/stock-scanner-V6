@@ -879,7 +879,6 @@ MT,ArcelorMittal,Basic Materials,Steel
 MTCH,Match Group Inc,Communication Services,Internet Content & Information
 MTDR,Matador Resources Co,Energy,Oil & Gas E&P
 MTG,MGIC Investment Corp,Financial,Insurance - Specialty
-MTNE-U,CH4 Natural Solutions Corp,Financial,Shell Companies
 MTZ,Mastec Inc,Industrials,Engineering & Construction
 MU,Micron Technology Inc,Technology,Semiconductors
 MUFG,Mitsubishi UFJ Financial Group Inc ADR,Financial,Banks - Diversified
@@ -1096,7 +1095,6 @@ QBTS,D-Wave Quantum Inc,Technology,Computer Hardware
 QCOM,Qualcomm Inc,Technology,Semiconductors
 QDEL,QuidelOrtho Corp,Healthcare,Medical Devices
 QGEN,Qiagen NV,Healthcare,Diagnostics & Research
-QLEP-U,Quantum Leap Acquisition Corp,Financial,Shell Companies
 QRVO,Qorvo Inc,Technology,Semiconductors
 QS,QuantumScape Corp,Consumer Cyclical,Auto Parts
 QSR,Restaurant Brands International Inc,Consumer Cyclical,Restaurants
@@ -1619,6 +1617,5 @@ LE=F,FUTURES,Live Cattle Futures,FUTURES
 CC=F,FUTURES,Cocoa,FUTURES
 KC=F,FUTURES,Coffee,FUTURES
 CT=F,FUTURES,Cotton,FUTURES
-LBS=F,FUTURES,Lumber Futures,FUTURES
 OJ=F,FUTURES,Orange Juice,FUTURES
 SB=F,FUTURES,Sugar ,FUTURES

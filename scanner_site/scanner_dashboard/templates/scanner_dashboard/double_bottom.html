@@ -2,45 +2,67 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
+
 <title>Double Bottom Scanner</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
 /* ================= BASE ================= */
 
-body {
-  margin: 0;
-  background: #111827;
-  font-family: Arial;
-  color: #e5e7eb;
+body{
+    margin:0;
+    background:#111827;
+    font-family:Arial;
+    color:#e5e7eb;
 }
 
-.container {
-  padding: 20px;
+.container{
+    padding:20px;
 }
 
 /* ================= NAV ================= */
 
 .top-nav {
   background: #0f172a;
-  padding: 12px;
+  padding: 12px 14px;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   border-bottom: 1px solid #374151;
   position: sticky;
   top: 0;
   z-index: 1000;
+  flex-wrap: nowrap;
 }
 
+/* BRAND */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 10px;
+}
+
+.brand img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* LINKS */
 .top-nav a {
   color: #cbd5e1;
   text-decoration: none;
-  padding: 7px 10px;
+  padding: 6px 10px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .top-nav a:hover {
@@ -48,169 +70,428 @@ body {
   color: white;
 }
 
-/* ================= TITLE ================= */
-
-h1 {
-  margin: 15px 0 5px;
-  color: white;
+/* RIGHT SIDE */
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
-.sub {
-  color: #9ca3af;
+/* USER */
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(37,99,235,0.10);
+  border: 1px solid rgba(59,130,246,0.25);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.user-name {
   font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+/* BUTTONS */
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+  border: 1px solid rgba(59,130,246,0.4);
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+}
+
+/* ================= HEADER ================= */
+
+
+h1{
+    margin:15px 0 5px;
+    color:white;
+}
+
+.sub{
+    color:#9ca3af;
+    font-size:13px;
 }
 
 /* ================= DESCRIPTION ================= */
 
-.desc {
-  background: #fef3c7;
-  color: #78350f;
-  padding: 12px 14px;
-  border-radius: 10px;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.6;
+.desc{
+    background:#fef3c7;
+    color:#78350f;
+    padding:12px 14px;
+    border-radius:10px;
+    margin:14px 0;
+    font-size:12px;
+    line-height:1.6;
+}
+
+/* ================= CHART CARD ================= */
+
+.chart-card{
+    background:#0f172a;
+    border:1px solid #1f2937;
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+/* ================= SEARCH ================= */
+
+.search-row{
+    display:flex;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.search-input{
+    flex:1;
+    padding:12px;
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:10px;
+    color:white;
+    font-size:14px;
+}
+
+.search-input:focus{
+    outline:none;
+    border-color:#2563eb;
+}
+
+.search-btn{
+    padding:12px 18px;
+    background:#2563eb;
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.search-btn:hover{
+    background:#1d4ed8;
+}
+
+/* ================= CURRENT TICKER ================= */
+
+.current-ticker{
+    margin-bottom:15px;
+    font-size:20px;
+    font-weight:bold;
+    color:#60a5fa;
 }
 
 /* ================= TABLE ================= */
 
-.table-wrap {
-  overflow-x: auto;
-  background: #1f2937;
-  padding: 10px;
-  border-radius: 10px;
+.table-wrap{
+    overflow-x:auto;
+    background:#1f2937;
+    padding:10px;
+    border-radius:10px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  min-width: 1400px;
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    min-width:1400px;
 }
 
-th {
-  background: #111827;
-  padding: 10px;
-  text-transform: uppercase;
-  font-size: 11px;
+th{
+    background:#111827;
+    padding:10px;
+    text-transform:uppercase;
+    font-size:11px;
+    position:sticky;
+    top:0;
+    z-index:100;
 }
 
-td {
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid #374151;
+td{
+    padding:8px;
+    text-align:center;
+    border-bottom:1px solid #374151;
 }
 
-/* ================= COLORS (SYMMETRY BASED) ================= */
-
-.green {
-  background: rgba(34,197,94,0.18);
+tr:hover{
+    background:rgba(59,130,246,0.08);
 }
 
-.yellow {
-  background: rgba(234,179,8,0.18);
+/* ================= ROW COLORS ================= */
+
+.green{
+    background:rgba(34,197,94,0.15);
 }
 
-.red {
-  background: rgba(239,68,68,0.18);
+.yellow{
+    background:rgba(234,179,8,0.12);
+}
+
+.red{
+    background:rgba(239,68,68,0.12);
 }
 
 /* ================= TICKER ================= */
 
-.ticker {
-  color: #60a5fa;
-  font-weight: bold;
-  text-decoration: none;
+.ticker{
+    color:#60a5fa;
+    font-weight:bold;
+    text-decoration:none;
 }
 
-.ticker:hover {
-  text-decoration: underline;
+.ticker:hover{
+    text-decoration:underline;
+}
+
+/* ================= CHART ================= */
+
+canvas{
+    max-height:600px;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- NAV -->
+{% load static %}
+
+<!-- ================= MASTER TOP NAV ================= -->
+
 <div class="top-nav">
 
-  <a href="{% url 'home'%}"> Home</a>
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
   <a href="{% url 'fundamentals' %}">Fundamentals</a>
   <a href="{% url 'futures' %}">Futures</a>
   <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'sector' %}">Daily Sector </a>
-  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
-  <a href="{% url 'equity_ranking' %}">Equity Overall Rank</a>
-  <a href="{% url 'metrics' %}">Technical Metrics</a>
-  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
-  <a href="{% url 'rs_alignment' %}">Corelation</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </div>
+
+<!-- ================= MAIN ================= -->
 
 <div class="container">
 
 <h1>📉 Double Bottom Scanner</h1>
 
 <div class="sub">
-Reversal pattern detection using symmetry + neckline structure + swing lows
+Reversal structure scanner using neckline resistance + swing low symmetry
 </div>
 
-<!-- DESCRIPTION -->
+<!-- ================= DESCRIPTION ================= -->
 
 <div class="desc">
 
 <strong>Logic Overview</strong><br><br>
 
-✔ Detects L1 and L2 swing lows<br>
-✔ Measures neckline resistance breakout zone<br>
-✔ Calculates structural symmetry (quality score)<br>
-✔ Tracks breakout readiness after accumulation phase<br><br>
+✔ Detects first swing low (L1)<br>
+✔ Detects second swing low (L2)<br>
+✔ Measures neckline resistance zone<br>
+✔ Calculates symmetry between left/right structure<br><br>
 
-<strong>Interpretation</strong><br>
+<strong>Chart Features</strong><br>
 
-Higher symmetry = cleaner base formation<br>
-Lower symmetry = unstable / weak reversal structure<br>
+• White price line = closing price<br>
+• Green dot = L1 low<br>
+• Yellow dot = L2 low<br>
+• Red horizontal line = neckline resistance<br>
 
 </div>
 
-<!-- TABLE -->
+<!-- ================= CHART ================= -->
+
+<div class="chart-card">
+
+    <form method="get">
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                name="ticker"
+                class="search-input"
+                placeholder="Search ticker"
+                value="{{ selected_ticker }}"
+            >
+
+            <button type="submit"
+                    class="search-btn">
+
+                Load Chart
+
+            </button>
+
+        </div>
+
+    </form>
+
+    <div class="current-ticker">
+        {{ selected_ticker }}
+    </div>
+
+    <canvas id="priceChart"></canvas>
+
+</div>
+
+<!-- ================= TABLE ================= -->
 
 <div class="table-wrap">
 
 <table>
 
 <thead>
+
 <tr>
+
 {% for col in columns %}
+
 <th>{{ col }}</th>
+
 {% endfor %}
+
 </tr>
+
 </thead>
 
 <tbody>
 
 {% for row in rows %}
 
-<tr>
+<tr class="
+{% if row.Symmetry >= 80 %}
+green
+{% elif row.Symmetry >= 60 %}
+yellow
+{% else %}
+red
+{% endif %}
+">
 
     {% for col, cell in row.items %}
 
         {% if col == "TICKER" %}
 
-            <td>
-                <a class="ticker"
-                   href="{% url 'equity_chart' cell %}"
-                   target="_blank">
-                    {{ cell }}
-                </a>
-            </td>
+        <td>
+
+            <a class="ticker"
+               href="?ticker={{ cell }}">
+
+                {{ cell }}
+
+            </a>
+
+        </td>
 
         {% else %}
 
-            <td>{{ cell }}</td>
+        <td>{{ cell }}</td>
 
         {% endif %}
 
@@ -221,7 +502,13 @@ Lower symmetry = unstable / weak reversal structure<br>
 {% empty %}
 
 <tr>
-<td colspan="12">No signals found</td>
+
+<td colspan="12">
+
+No signals found
+
+</td>
+
 </tr>
 
 {% endfor %}
@@ -233,6 +520,147 @@ Lower symmetry = unstable / weak reversal structure<br>
 </div>
 
 </div>
+
+<!-- ================= CHART JS ================= -->
+
+<script>
+
+const chartData = JSON.parse('{{ chart_data|escapejs }}');
+
+const labels = chartData.candles.map(
+    x => x.x
+);
+
+const closePrices = chartData.candles.map(
+    x => x.c
+);
+
+const neckline = chartData.neckline.map(
+    x => x.y
+);
+
+const l1Map = {};
+const l2Map = {};
+
+chartData.l1.forEach(p => {
+    l1Map[p.x] = p.y;
+});
+
+chartData.l2.forEach(p => {
+    l2Map[p.x] = p.y;
+});
+
+const l1Series = labels.map(
+    d => l1Map[d] ?? null
+);
+
+const l2Series = labels.map(
+    d => l2Map[d] ?? null
+);
+
+const ctx = document.getElementById(
+    'priceChart'
+);
+
+new Chart(ctx, {
+
+    type:'line',
+
+    data:{
+
+        labels:labels,
+
+        datasets:[
+
+            {
+                label:'Price',
+                data:closePrices,
+                borderColor:'#ffffff',
+                backgroundColor:'transparent',
+                borderWidth:2,
+                pointRadius:0,
+                tension:0.1
+            },
+
+            {
+                label:'Neckline',
+                data:neckline,
+                borderColor:'#ef4444',
+                borderWidth:2,
+                pointRadius:0,
+                borderDash:[6,6],
+                tension:0
+            },
+
+            {
+                label:'L1 Low',
+                data:l1Series,
+                borderColor:'#22c55e',
+                backgroundColor:'#22c55e',
+                pointRadius:6,
+                pointHoverRadius:8,
+                showLine:false
+            },
+
+            {
+                label:'L2 Low',
+                data:l2Series,
+                borderColor:'#fde047',
+                backgroundColor:'#fde047',
+                pointRadius:6,
+                pointHoverRadius:8,
+                showLine:false
+            }
+
+        ]
+    },
+
+    options:{
+
+        responsive:true,
+
+        maintainAspectRatio:false,
+
+        interaction:{
+            mode:'index',
+            intersect:false
+        },
+
+        plugins:{
+
+            legend:{
+                labels:{
+                    color:'#ffffff'
+                }
+            }
+        },
+
+        scales:{
+
+            x:{
+                ticks:{
+                    color:'#94a3b8'
+                },
+
+                grid:{
+                    color:'rgba(255,255,255,0.05)'
+                }
+            },
+
+            y:{
+                ticks:{
+                    color:'#94a3b8'
+                },
+
+                grid:{
+                    color:'rgba(255,255,255,0.05)'
+                }
+            }
+        }
+    }
+});
+
+</script>
 
 </body>
 </html>
