@@ -889,52 +889,102 @@ def run_scanner():
         results["weekly_history"] = weekly_history_df
 
 
+    # =====================================
+    # MASTER HISTORY BUILD
+    # =====================================
+
     if full_history:
 
-        history_df = pd.concat(full_history, ignore_index=True).round(2)
-
-        # =====================================
-        # PRECOMPUTE KELTNER DATA
-        # =====================================
-
-        history_df = history_df.sort_values(["TICKER", "Date"])
-
-        keltner_df = build_keltner_data(history_df)
-
-        # full history with KC columns
-        keltner_df.to_parquet(DATA_DIR / "keltner_history.parquet",index=False)
-
-        # latest snapshot only
-        latest_keltner = (keltner_df.groupby("TICKER").tail(1).reset_index(drop=True))
-
-        latest_keltner.to_parquet(DATA_DIR / "keltner_latest.parquet",index=False)
-        print("Keltner finsished")
-
-
-        # =========================
-        # TURTLE SOUP
-        # =========================
-        ts_df, ts_signals = build_turtle_soup_signals(history_df)
-
-        ts_df.to_parquet(DATA_DIR / "turtle_soup_history.parquet", index=False)
-        ts_signals.to_parquet(DATA_DIR / "turtle_soup_signals.parquet", index=False)
-
-        # =========================
-        # STOCH SHORT
-        # =========================
-        ss_df, ss_signals = build_stochastic_short_signals(history_df)
-
-        ss_df.to_parquet(DATA_DIR / "stochastic_short_history.parquet", index=False)
-        ss_signals.to_parquet(DATA_DIR / "stochastic_short_signals.parquet", index=False)
-        print("stoch_short finished")
-
-        # =====================================
-        # 21 DAY BREAKOUT
-        # =====================================
-
-        breakout_21_df = build_breakout_21_signals(
-            history_df
+        history_df = (
+            pd.concat(full_history, ignore_index=True)
+            .round(2)
+            .sort_values(["TICKER", "Date"])
+            .reset_index(drop=True)
         )
+
+        # =========================================================
+        # KELTNER CHANNELS
+        # =========================================================
+
+        history_df = build_keltner_data(history_df)
+
+        latest_keltner = (
+            history_df.groupby("TICKER").tail(1).reset_index(drop=True)
+        )
+
+        latest_keltner.to_parquet(
+            DATA_DIR / "keltner_latest.parquet",
+            index=False
+        )
+
+        print("Keltner finished")
+
+        # =========================================================
+        # TURTLE SOUP
+        # =========================================================
+
+        history_df, ts_signals = build_turtle_soup_signals(history_df)
+
+        ts_signals.to_parquet(
+            DATA_DIR / "turtle_soup_signals.parquet",
+            index=False
+        )
+
+        print("Turtle Soup finished")
+
+        # =========================================================
+        # STOCHASTIC SHORT
+        # =========================================================
+
+        history_df, ss_signals = build_stochastic_short_signals(history_df)
+
+        ss_signals.to_parquet(
+            DATA_DIR / "stochastic_short_signals.parquet",
+            index=False
+        )
+
+        print("Stochastic Short finished")
+
+        # =========================================================
+        # FIB RETRACEMENT
+        # =========================================================
+
+        history_df, fib_latest = build_fib_retracement_data(history_df)
+
+        fib_latest.to_parquet(
+            DATA_DIR / "fib_retracement_latest.parquet",
+            index=False
+        )
+
+        print("Fib finished")
+
+        # =========================================================
+        # EQUITY RANKING
+        # =========================================================
+
+        ranking_history, ranking_latest = build_equity_ranking(history_df)
+
+        ranking_latest.to_parquet(
+            DATA_DIR / "equity_ranking_latest.parquet",
+            index=False
+        )
+
+        # =========================================================
+        # MA STRUCTURE
+        # =========================================================
+
+        history_df, ma_latest = build_ma_structure(history_df)
+
+        ma_latest.to_parquet(
+            DATA_DIR / "ma_structure_latest.parquet",
+            index=False
+        )
+
+        # =========================================================
+        # BREAKOUT 21 (no history dependency change)
+        # =========================================================
+
+        breakout_21_df = build_breakout_21_signals(history_df)
 
         breakout_21_df.to_parquet(
             DATA_DIR / "breakout_21.parquet",
@@ -943,51 +993,24 @@ def run_scanner():
 
         print("21 Day Breakout finished")
 
+        # =========================================================
+        # RS SYSTEM
+        # =========================================================
 
-
-
-        # =====================================
-        # FIB RETRACEMENT
-        # =====================================
-
-        fib_history, fib_latest = build_fib_retracement_data(history_df)
-        fib_history.to_parquet(DATA_DIR / "fib_retracement_history.parquet",index=False)
-        fib_latest.to_parquet(DATA_DIR / "fib_retracement_latest.parquet",index=False)
-        print("Fib finished")
-
-
-        # =====================================
-        # EQUITY RANKING
-        # =====================================
-
-        ranking_history, ranking_latest = build_equity_ranking(history_df)
-        ranking_history.to_parquet(DATA_DIR / "equity_ranking_history.parquet",index=False)
-        ranking_latest.to_parquet(DATA_DIR / "equity_ranking_latest.parquet",index=False)
-
-        # =====================================
-        # MA 
-        # =====================================
-
-
-        ma_history, ma_latest = build_ma_structure(history_df)
-        ma_history.to_parquet(DATA_DIR / "ma_structure_history.parquet",index=False)
-        ma_latest.to_parquet(DATA_DIR / "ma_structure_latest.parquet",index=False)
-
-        # SPY data (^GSPC)
-        spy_df = history_df[history_df["TICKER"] == "^GSPC"][["Date", "Close"]].sort_values("Date")
+        spy_df = (
+            history_df[history_df["TICKER"] == "^GSPC"][["Date", "Close"]]
+            .sort_values("Date")
+        )
 
         stock_df = history_df[history_df["TICKER"] != "^GSPC"].copy()
 
         rs_df = compute_relative_strength(stock_df, spy_df)
 
-        # -----------------------------
-        # SAVE MAIN RS DATA
-        # -----------------------------
-        rs_df.to_parquet(DATA_DIR / "industry_ticker_rs.parquet", index=False)
+        rs_df.to_parquet(
+            DATA_DIR / "industry_ticker_rs.parquet",
+            index=False
+        )
 
-        # -----------------------------
-        # INDUSTRY RS
-        # -----------------------------
         industry_rs = (
             rs_df.groupby("Industry")["RS_SCORE"]
             .mean()
@@ -995,42 +1018,34 @@ def run_scanner():
             .sort_values("RS_SCORE", ascending=False)
         )
 
-        industry_rs.to_parquet(DATA_DIR / "industry_rs.parquet", index=False)
+        industry_rs.to_parquet(
+            DATA_DIR / "industry_rs.parquet",
+            index=False
+        )
 
-        # -----------------------------
-        # RS ALIGNMENT PARQUET
-        # -----------------------------
-        alignment_cols = [
-            "TICKER", "Industry", "Sector",
-            "RS_7", "RS_21", "RS_50", "RS_100", "RS_200",
-            "ALIGN_7", "ALIGN_21", "ALIGN_50", "ALIGN_100", "ALIGN_200",
-            "RS_SCORE", "ALIGN_SCORE"
-        ]
-
-        alignment_cols = [c for c in alignment_cols if c in rs_df.columns]
-
-        rs_alignment_df = rs_df[alignment_cols].copy()
+        rs_alignment_df = rs_df[[
+            c for c in [
+                "TICKER", "Industry", "Sector",
+                "RS_7", "RS_21", "RS_50", "RS_100", "RS_200",
+                "ALIGN_7", "ALIGN_21", "ALIGN_50", "ALIGN_100", "ALIGN_200",
+                "RS_SCORE", "ALIGN_SCORE"
+            ] if c in rs_df.columns
+        ]]
 
         rs_alignment_df.to_parquet(
             DATA_DIR / "rs_alignment.parquet",
             index=False
         )
 
-        
+        # =========================================================
+        # FINAL MASTER SAVE (ONLY ONE HISTORY FILE)
+        # =========================================================
 
-        
+        history_df.to_parquet(
+            DATA_DIR / "full_history.parquet",
+            index=False
+        )
 
-        
-
-    # -----------------------------
-    # SUMMARY
-    # -----------------------------
-
-    print("\nScanner completed:")
-    print(f"Daily latest: {len(all_data)}")
-    print(f"Daily history: {len(full_history)}")
-    print(f"Weekly latest: {len(weekly_latest)}")
-    print(f"Weekly history: {len(weekly_history)}")
+        print("MASTER full_history.parquet saved with all indicators")
 
     return results
-
