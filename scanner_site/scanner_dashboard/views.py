@@ -1307,7 +1307,7 @@ def turtle_soup_view(request):
     BASE_DIR = Path(__file__).resolve().parents[2]
 
     data_path = BASE_DIR / "scanner_site" / "data" / "turtle_soup_signals.parquet"
-    history_path = BASE_DIR / "scanner_site" / "data" / "turtle_soup_history.parquet"
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
     df = pd.read_parquet(history_path)
     scanner_df = pd.read_parquet(data_path)
@@ -1435,7 +1435,7 @@ def stochastic_short_view(request):
     BASE_DIR = Path(__file__).resolve().parents[2]
 
     data_path = BASE_DIR / "scanner_site" / "data" / "stochastic_short_signals.parquet"
-    history_path = BASE_DIR / "scanner_site" / "data" / "stochastic_short_history.parquet"
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
     df = pd.read_parquet(history_path)
     scanner_df = pd.read_parquet(data_path)
@@ -3160,7 +3160,7 @@ def ma_structure_view(request):
         BASE_DIR
         / "scanner_site"
         / "data"
-        / "ma_structure_history.parquet"
+        / "full_history.parquet"
     )
 
     latest_df = pd.read_parquet(data_path)
@@ -3339,7 +3339,7 @@ def keltner_scan(request):
     BASE_DIR = Path(__file__).resolve().parents[2]
 
     latest_path = BASE_DIR / "scanner_site" / "data" / "keltner_latest.parquet"
-    history_path = BASE_DIR / "scanner_site" / "data" / "keltner_history.parquet"
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
 
     latest_df = pd.read_parquet(latest_path)
     history_df = pd.read_parquet(history_path)
@@ -3475,7 +3475,7 @@ def fib_retracement_scan(request):
         BASE_DIR
         / "scanner_site"
         / "data"
-        / "fib_retracement_history.parquet"
+        / "full_history.parquet"
     )
 
     latest_df = pd.read_parquet(
