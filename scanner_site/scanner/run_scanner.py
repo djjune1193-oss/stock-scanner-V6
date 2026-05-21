@@ -897,18 +897,6 @@ def run_scanner():
         # PRECOMPUTE KELTNER DATA
         # =====================================
 
-        history_df = history_df.sort_values(["TICKER", "Date"])
-
-        keltner_df = build_keltner_data(history_df)
-
-        # full history with KC columns
-        keltner_df.to_parquet(DATA_DIR / "keltner_history.parquet",index=False)
-
-        # latest snapshot only
-        latest_keltner = (keltner_df.groupby("TICKER").tail(1).reset_index(drop=True))
-
-        latest_keltner.to_parquet(DATA_DIR / "keltner_latest.parquet",index=False)
-        print("Keltner finsished")
 
 
         # =========================
