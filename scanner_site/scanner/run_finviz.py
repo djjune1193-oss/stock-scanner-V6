@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 import yfinance as yf
 import pandas as pd
@@ -232,6 +233,7 @@ def run_finviz():
     for ticker_symbol in TICKERS:
 
         print(f"Processing {ticker_symbol}...")
+        time.sleep(1)
 
         try:
 
