@@ -596,6 +596,7 @@ tr:hover {
 <thead>
 <tr>
   <th>Date</th>
+  <th>Updated</th>
   <th>Ticker</th>
   <th>%</th>
   <th>Sector</th>
@@ -615,6 +616,7 @@ tr:hover {
 <tr class="{{ row.row_class }}">
 
   <td>{{ row.Date }}</td>
+  <td>{{ row.download_timestamp }}</td>
 
   <td>
     <a class="ticker" href="{% url 'equity_chart' row.TICKER %}">
