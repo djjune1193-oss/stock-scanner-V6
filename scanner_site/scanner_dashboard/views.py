@@ -1,14 +1,5 @@
 import pandas as pd
 import numpy as np
-from django.shortcuts import render
-from pathlib import Path
-from django.conf import settings
-from .models import UserProfile 
-
-
-from django.shortcuts import render, redirect
-import pandas as pd
-import numpy as np
 from pathlib import Path
 from django.conf import settings
 
@@ -252,10 +243,8 @@ def new_password(request):
 
 
 
-
 from .services.market_health import build_market_health_indicator
 from .services.scan_status import get_scan_status
-
 
 def home(request):
 
@@ -268,6 +257,8 @@ def home(request):
     df = df[df["TICKER"] != ""]
 
     df["Date"] = pd.to_datetime(df["Date"]).dt.normalize()
+    df["download_timestamp"] = pd.to_datetime(df["download_timestamp"])
+    df["perc_change"] = df["perc_change"].round(2)
 
     # =========================================================
     # GET LATEST ROW FOR EACH TICKER
@@ -321,6 +312,7 @@ def home(request):
 
     selected_columns = [
         "Date",
+        "download_timestamp",
         "TICKER",
         "perc_change",
         "Sector",
@@ -380,15 +372,16 @@ def home(request):
 
         rows.append({
             "Date": r["Date"],
+            "download_timestamp": (r["download_timestamp"].strftime("%I:%M %p") if pd.notnull(r["download_timestamp"])else ""),
             "TICKER": r["TICKER"],
             "perc_change": r["perc_change"],
             "Sector": r["Sector"],
             "Industry": r["Industry"],
-            "Close": r["Close"],
-            "Open": r["Open"],
-            "High": r["High"],
-            "Low": r["Low"],
-            "Volume": r["Volume"],
+            "Close": round(r["Close"], 2),
+            "Open": round(r["Open"], 2),
+            "High": round(r["High"], 2),
+            "Low": round(r["Low"], 2),
+            "Volume": int(r["Volume"]),
             "row_class": get_row_class(r["perc_change"])
         })
 
@@ -406,7 +399,6 @@ def home(request):
             "flat_count": int(flat_count),
         }
     )
-
 
 
 import json
@@ -842,6 +834,10 @@ def sector_view(request):
         "Low",
         "Volume"
     ]
+
+    round_cols = ["Close","Open","High","Low"]
+    sector_df[round_cols] = sector_df[round_cols].round(2)
+    
 
     sector_df = sector_df[selected_columns]
 
@@ -1939,12 +1935,7 @@ def get_equity_ranking(request):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
 
-    data_path = (
-        BASE_DIR
-        / "scanner_site"
-        / "data"
-        / "equity_ranking_latest.parquet"
-    )
+    data_path = (BASE_DIR/ "scanner_site"/ "data"/ "equity_ranking_latest.parquet")
 
     latest_df = pd.read_parquet(data_path)
 
@@ -2013,7 +2004,6 @@ def get_equity_ranking(request):
         "scanner_dashboard/equity_ranking.html",
         {
             "ranking_list": ranking_list,
-            "date": latest_df["Date"].max(),
             "sort_by": sort_by,
             "sort_dir": sort_dir
         }

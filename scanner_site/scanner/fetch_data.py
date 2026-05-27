@@ -5,7 +5,7 @@ from datetime import timedelta
 
 def get_historical_stock_data(ticker_symbol, start_date=None, end_date=None, interval="1d"):
     today = pd.Timestamp.today().date()
-    lookback_days = 365
+    lookback_days = 3
 
     if start_date is None:
         start_date = today - timedelta(days=lookback_days)

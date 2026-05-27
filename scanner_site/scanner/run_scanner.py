@@ -3,6 +3,7 @@ from pathlib import Path
 from django.conf import settings
 from .fetch_data import get_historical_stock_data
 from .features import build_features
+from datetime import datetime
 
 # -----------------------------
 # PATHS
@@ -94,10 +95,10 @@ def build_equity_ranking(df):
     # =====================================
 
     latest_df = (
-    df.sort_values(["TICKER", "Date"])
-    .groupby("TICKER")
-    .tail(1)
-    .copy()
+        df.sort_values(["TICKER", "Date"])
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
     )
 
     # =====================================
@@ -781,16 +782,46 @@ def compute_relative_strength(df, spy_df, periods=[7, 21, 50, 100, 200]):
 
 
 def resample_to_weekly(df):
-    df = df.copy()
-    df = df.sort_index()
 
-    weekly = df.resample("W-FRI").agg({
+    df = df.copy()
+
+    # =====================================================
+    # ENSURE DATETIME
+    # =====================================================
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    # =====================================================
+    # SET DATETIME INDEX
+    # =====================================================
+
+    df = df.sort_values("Date")
+
+    df = df.set_index("Date")
+
+    # =====================================================
+    # WEEKLY OHLCV
+    # =====================================================
+
+    weekly = df.resample("W").agg({
         "Open": "first",
         "High": "max",
         "Low": "min",
         "Close": "last",
         "Volume": "sum"
-    }).dropna()
+    })
+
+    # =====================================================
+    # REMOVE EMPTY WEEKS
+    # =====================================================
+
+    weekly = weekly.dropna()
+
+    # =====================================================
+    # RESET INDEX BACK
+    # =====================================================
+
+    weekly = weekly.reset_index()
 
     return weekly
 
@@ -800,442 +831,826 @@ def resample_to_weekly(df):
 
 def run_scanner():
 
+    import gc
+    import numpy as np
+    import pandas as pd
+
+    # =====================================================
+    # LOAD SYMBOLS
+    # =====================================================
+
     df_symbols = pd.read_csv(csv_path)
 
-    symbol_meta = df_symbols.set_index("Ticker")[["Sector", "Industry"]].to_dict("index")
-    stock_list = df_symbols["Ticker"].to_list()
+    symbol_meta = (
+        df_symbols
+        .set_index("Ticker")[["Sector", "Industry"]]
+        .to_dict("index")
+    )
 
-    # DAILY
-    all_data = []
-    full_history = []
+    stock_list = (
+        df_symbols["Ticker"]
+        .dropna()
+        .unique()
+        .tolist()
+    )
 
-    # WEEKLY
-    weekly_latest = []
-    weekly_history = []
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    DATA_DIR = (
+        BASE_DIR /
+        "scanner_site" /
+        "data"
+    )
+
+    # =====================================================
+    # PATHS
+    # =====================================================
+
+    history_path = DATA_DIR / "full_history.parquet"
+    latest_path = DATA_DIR / "all_data.parquet"
+
+    weekly_history_path = (
+        DATA_DIR /
+        "weekly_history.parquet"
+    )
+
+    weekly_latest_path = (
+        DATA_DIR /
+        "weekly_latest.parquet"
+    )
+
+    # =====================================================
+    # LOAD EXISTING DATABASE
+    # =====================================================
+
+    full_history_df = (
+        pd.read_parquet(history_path)
+        if history_path.exists()
+        else pd.DataFrame()
+    )
+
+    weekly_history_df = (
+        pd.read_parquet(weekly_history_path)
+        if weekly_history_path.exists()
+        else pd.DataFrame()
+    )
+
+    # =====================================================
+    # REMOVE DUPLICATE COLUMNS
+    # =====================================================
+
+    if not full_history_df.empty:
+
+        full_history_df = full_history_df.loc[
+            :,
+            ~full_history_df.columns.duplicated()
+        ]
+
+    if not weekly_history_df.empty:
+
+        weekly_history_df = weekly_history_df.loc[
+            :,
+            ~weekly_history_df.columns.duplicated()
+        ]
+
+    # =====================================================
+    # NORMALIZE DATES
+    # =====================================================
+
+    if (
+        not full_history_df.empty
+        and
+        "Date" in full_history_df.columns
+    ):
+
+        full_history_df["Date"] = (
+            pd.to_datetime(
+                full_history_df["Date"],
+                errors="coerce"
+            )
+            .dt.tz_localize(None)
+            .dt.normalize()
+        )
+
+    if (
+        not weekly_history_df.empty
+        and
+        "Date" in weekly_history_df.columns
+    ):
+
+        weekly_history_df["Date"] = (
+            pd.to_datetime(
+                weekly_history_df["Date"],
+                errors="coerce"
+            )
+            .dt.tz_localize(None)
+            .dt.normalize()
+        )
+
+    # =====================================================
+    # STORAGE
+    # =====================================================
+
+    keltner_latest_chunks = []
+    fib_latest_chunks = []
+    ma_latest_chunks = []
+
+    turtle_signals = []
+    stochastic_signals = []
+
+    # =====================================================
+    # NUMERIC OPTIMIZATION
+    # =====================================================
+
+    numeric_cols = [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "Adj Close",
+        "Volume"
+    ]
+
+    print("\nStarting scanner...\n")
+
+    # =====================================================
+    # MAIN LOOP
+    # =====================================================
 
     for i, tic in enumerate(stock_list, 1):
 
-        data = get_historical_stock_data(tic, interval="1d")
-
-        if data is None or len(data) < 150:
-            continue
-
-        if tic not in symbol_meta:
-            continue
-
         try:
-            # -----------------------------
-            # DAILY FEATURES
-            # -----------------------------
 
-            daily_df = build_features(data, tic, symbol_meta[tic])
+            # =================================================
+            # FETCH RAW DATA
+            # =================================================
 
-            if daily_df is None or daily_df.empty:
+            raw = get_historical_stock_data(
+                tic,
+                interval="1d"
+            )
+
+            if raw is None or raw.empty:
                 continue
 
-            full_history.append(daily_df)
-            all_data.append(daily_df.tail(1))
-
-            # -----------------------------
-            # WEEKLY DATA (6 MONTHS)
-            # -----------------------------
-
-            weekly_raw = resample_to_weekly(data)
-
-            # Keep last ~6 months (~26 weeks)
-            weekly_raw = weekly_raw.tail(26)
-
-            if len(weekly_raw) < 10:
+            if tic not in symbol_meta:
                 continue
 
-            weekly_df = build_features(weekly_raw, tic, symbol_meta[tic])
+            # =================================================
+            # ENSURE DATE COLUMN
+            # =================================================
 
-            if weekly_df is not None and not weekly_df.empty:
-                weekly_history.append(weekly_df)
-                weekly_latest.append(weekly_df.tail(1))
+            if "Date" not in raw.columns:
 
-            print(f"{i}/{len(stock_list)} ✔ {tic}")
+                raw = raw.reset_index()
+
+            if "Date" not in raw.columns:
+
+                possible_date_cols = [
+                    c for c in raw.columns
+                    if "date" in str(c).lower()
+                ]
+
+                if possible_date_cols:
+
+                    raw = raw.rename(
+                        columns={
+                            possible_date_cols[0]: "Date"
+                        }
+                    )
+
+            if "Date" not in raw.columns:
+
+                print(f"{tic} ❌ Missing Date")
+
+                continue
+
+            # =================================================
+            # REMOVE DUPLICATE COLS
+            # =================================================
+
+            raw = raw.loc[
+                :,
+                ~raw.columns.duplicated()
+            ]
+
+            # =================================================
+            # CLEAN DATE
+            # =================================================
+
+            raw["Date"] = (
+                pd.to_datetime(
+                    raw["Date"],
+                    errors="coerce"
+                )
+                .dt.tz_localize(None)
+                .dt.normalize()
+            )
+
+            raw = raw.dropna(
+                subset=["Date"]
+            )
+
+            raw = (
+                raw
+                .sort_values("Date")
+                .tail(365)
+                .reset_index(drop=True)
+            )
+
+            if raw.empty:
+                continue
+
+            latest_date = raw["Date"].iloc[-1]
+
+            download_timestamp = (
+                pd.Timestamp.now()
+            )
+
+            # =================================================
+            # REMOVE SAME-DATE ROW IMMEDIATELY
+            # =================================================
+
+            if not full_history_df.empty:
+
+                full_history_df = full_history_df.loc[
+                    ~(
+                        (
+                            full_history_df["TICKER"]
+                            == tic
+                        )
+                        &
+                        (
+                            full_history_df["Date"]
+                            == latest_date
+                        )
+                    )
+                ]
+
+            # =================================================
+            # GET EXISTING HISTORY
+            # =================================================
+
+            ticker_history = (
+                full_history_df[
+                    full_history_df["TICKER"]
+                    == tic
+                ]
+                .sort_values("Date")
+                .tail(364)
+                .copy()
+            )
+
+            ticker_history = ticker_history.loc[
+                :,
+                ~ticker_history.columns.duplicated()
+            ]
+
+            raw = raw.loc[
+                :,
+                ~raw.columns.duplicated()
+            ]
+
+            # =================================================
+            # MERGE OLD + NEWEST ROW
+            # =================================================
+
+            ticker_history = pd.concat(
+                [
+                    ticker_history,
+                    raw.tail(1)
+                ],
+                ignore_index=True
+            )
+
+            ticker_history = (
+                ticker_history
+                .sort_values("Date")
+                .tail(365)
+                .reset_index(drop=True)
+            )
+
+            # =================================================
+            # BUILD FEATURES
+            # =================================================
+
+            g = build_features(
+                ticker_history,
+                tic,
+                symbol_meta[tic]
+            )
+
+            round_cols = [
+                "perc_change",
+                "Close",
+                "Open",
+                "High",
+                "Low",
+            ]
+
+            g[round_cols] = g[round_cols].round(2) 
+
+            
+
+            if g is None or g.empty:
+                continue
+
+            # =================================================
+            # REMOVE DUPLICATE COLS
+            # =================================================
+
+            g = g.loc[
+                :,
+                ~g.columns.duplicated()
+            ]
+
+            g["download_timestamp"] = (
+                download_timestamp
+            )
+
+            # =================================================
+            # NUMERIC DOWNCAST
+            # =================================================
+
+            for col in numeric_cols:
+
+                if col in g.columns:
+
+                    g[col] = pd.to_numeric(
+                        g[col],
+                        downcast="float"
+                    )
+
+            # =================================================
+            # KELTNER
+            # =================================================
+
+            g = build_keltner_data(g)
+
+            keltner_latest_chunks.append(
+                g.tail(1).copy()
+            )
+
+            # =================================================
+            # TURTLE SOUP
+            # =================================================
+
+            g, ts_signals = (
+                build_turtle_soup_signals(g)
+            )
+
+            if not ts_signals.empty:
+
+                turtle_signals.append(
+                    ts_signals.copy()
+                )
+
+            # =================================================
+            # STOCHASTIC SHORT
+            # =================================================
+
+            g, ss_signals = (
+                build_stochastic_short_signals(g)
+            )
+
+            if not ss_signals.empty:
+
+                stochastic_signals.append(
+                    ss_signals.copy()
+                )
+
+            # =================================================
+            # FIB
+            # =================================================
+
+            g, fib_latest = (
+                build_fib_retracement_data(g)
+            )
+
+            fib_latest_chunks.append(
+                fib_latest.copy()
+            )
+
+            # =================================================
+            # MA STRUCTURE
+            # =================================================
+
+            g, ma_latest = (
+                build_ma_structure(g)
+            )
+
+            ma_latest_chunks.append(
+                ma_latest.copy()
+            )
+
+            # =================================================
+            # FINAL LATEST ROW
+            # =================================================
+
+            
+
+            latest_row = (
+                g.tail(1)
+                .copy()
+            )
+
+            latest_row = latest_row.loc[
+                :,
+                ~latest_row.columns.duplicated()
+            ]
+
+            # =================================================
+            # APPEND TO MASTER HISTORY
+            # =================================================
+
+            full_history_df = pd.concat(
+                [
+                    full_history_df,
+                    latest_row
+                ],
+                ignore_index=True
+            )
+
+            full_history_df = (
+                full_history_df
+                .sort_values(
+                    ["TICKER", "Date"]
+                )
+                .groupby(
+                    "TICKER",
+                    group_keys=False
+                )
+                .tail(365)
+                .reset_index(drop=True)
+            )
+
+            # =================================================
+            # WEEKLY BUILD
+            # =================================================
+
+            weekly_raw = (
+                resample_to_weekly(g)
+                .tail(26)
+            )
+
+            if len(weekly_raw) >= 10:
+
+                weekly_df = build_features(
+                    weekly_raw,
+                    tic,
+                    symbol_meta[tic]
+                )
+
+                if (
+                    weekly_df is not None
+                    and
+                    not weekly_df.empty
+                ):
+
+                    weekly_df = weekly_df.loc[
+                        :,
+                        ~weekly_df.columns.duplicated()
+                    ]
+
+                    weekly_df["Date"] = (
+                        pd.to_datetime(
+                            weekly_df["Date"],
+                            errors="coerce"
+                        )
+                        .dt.tz_localize(None)
+                        .dt.normalize()
+                    )
+
+                    latest_week = (
+                        weekly_df["Date"]
+                        .iloc[-1]
+                    )
+
+                    if not weekly_history_df.empty:
+
+                        weekly_history_df = (
+                            weekly_history_df.loc[
+                                ~(
+                                    (
+                                        weekly_history_df[
+                                            "TICKER"
+                                        ] == tic
+                                    )
+                                    &
+                                    (
+                                        weekly_history_df[
+                                            "Date"
+                                        ] == latest_week
+                                    )
+                                )
+                            ]
+                        )
+
+                    weekly_history_df = pd.concat(
+                        [
+                            weekly_history_df,
+                            weekly_df.tail(1)
+                        ],
+                        ignore_index=True
+                    )
+
+                    weekly_history_df = (
+                        weekly_history_df
+                        .sort_values(
+                            ["TICKER", "Date"]
+                        )
+                        .groupby(
+                            "TICKER",
+                            group_keys=False
+                        )
+                        .tail(26)
+                        .reset_index(drop=True)
+                    )
+
+            print(
+                f"{i}/{len(stock_list)} ✔ {tic}"
+            )
+
+            # =================================================
+            # CLEAN MEMORY
+            # =================================================
+
+            del raw
+            del g
+            del ticker_history
+            del latest_row
+
+            gc.collect()
 
         except Exception as e:
+
             print(f"{tic} ❌ {e}")
 
-    results = {}
+    # =====================================================
+    # FINAL SORT
+    # =====================================================
 
-    # -----------------------------
-    # SAVE DAILY
-    # -----------------------------
-
-    if all_data:
-        latest_df = pd.concat(all_data, ignore_index=True).round(2)
-        latest_df.to_parquet(DATA_DIR / "all_data.parquet", index=False)
-        results["latest"] = latest_df
-
-    if full_history:
-        history_df = pd.concat(full_history, ignore_index=True).round(2)
-        history_df.to_parquet(DATA_DIR / "full_history.parquet", index=False)
-        results["history"] = history_df
-
-    # -----------------------------
-    # SAVE WEEKLY
-    # -----------------------------
-
-    if weekly_latest:
-        weekly_latest_df = pd.concat(weekly_latest, ignore_index=True).round(2)
-        weekly_latest_df.to_parquet(DATA_DIR / "weekly_latest.parquet", index=False)
-        results["weekly_latest"] = weekly_latest_df
-
-    if weekly_history:
-        weekly_history_df = pd.concat(weekly_history, ignore_index=True).round(2)
-        weekly_history_df.to_parquet(DATA_DIR / "weekly_history.parquet", index=False)
-        results["weekly_history"] = weekly_history_df
-
-
-    # =====================================
-    # MASTER HISTORY BUILD
-    # =====================================
-
-    import gc
-
-    # =========================================================
-    # MASTER HISTORY BUILD (LOW RAM VERSION)
-    # =========================================================
-
-    if full_history:
-
-        history_df = (
-            pd.concat(full_history, ignore_index=True)
-            .round(2)
-            .sort_values(["TICKER", "Date"])
-            .reset_index(drop=True)
+    full_history_df = (
+        full_history_df
+        .drop_duplicates(
+            subset=["TICKER", "Date"],
+            keep="last"
         )
+        .sort_values(["TICKER", "Date"])
+        .reset_index(drop=True)
+    )
 
-        # =====================================================
-        # MEMORY OPTIMIZATION
-        # =====================================================
+    weekly_history_df = (
+        weekly_history_df
+        .drop_duplicates(
+            subset=["TICKER", "Date"],
+            keep="last"
+        )
+        .sort_values(["TICKER", "Date"])
+        .reset_index(drop=True)
+    )
 
-        del full_history
-        gc.collect()
+    # =====================================================
+    # SNAPSHOTS
+    # =====================================================
 
-        numeric_cols = [
-            "Open",
-            "High",
-            "Low",
-            "Close",
-            "Adj Close",
-            "Volume"
-        ]
+    all_data_df = (
+        full_history_df
+        .sort_values(["TICKER", "Date"])
+        .groupby("TICKER")
+        .tail(1)
+        .reset_index(drop=True)
+    )
 
-        for col in numeric_cols:
+    weekly_latest_df = (
+        weekly_history_df
+        .sort_values(["TICKER", "Date"])
+        .groupby("TICKER")
+        .tail(1)
+        .reset_index(drop=True)
+    )
 
-            if col in history_df.columns:
+    # =====================================================
+    # SAVE DATABASE
+    # =====================================================
 
-                history_df[col] = pd.to_numeric(
-                    history_df[col],
-                    downcast="float"
-                )
+    full_history_df.to_parquet(
+        history_path,
+        index=False
+    )
 
-        # =====================================================
-        # STREAM PROCESSING PER TICKER
-        # =====================================================
+    all_data_df.to_parquet(
+        latest_path,
+        index=False
+    )
 
-        chunks = []
+    weekly_history_df.to_parquet(
+        weekly_history_path,
+        index=False
+    )
 
-        turtle_signals = []
-        stochastic_signals = []
+    weekly_latest_df.to_parquet(
+        weekly_latest_path,
+        index=False
+    )
 
-        ma_latest_chunks = []
-        fib_latest_chunks = []
-        keltner_latest_chunks = []
+    # =====================================================
+    # SAVE KELTNER
+    # =====================================================
 
-        print("\nStarting low-RAM processing...\n")
+    if keltner_latest_chunks:
 
-        for i, (ticker, g) in enumerate(
-            history_df.groupby("TICKER"),
-            1
-        ):
-
-            try:
-
-                g = g.sort_values("Date").copy()
-
-                # =============================================
-                # KELTNER
-                # =============================================
-
-                g = build_keltner_data(g)
-
-                keltner_latest_chunks.append(
-                    g.tail(1)
-                )
-
-                # =============================================
-                # TURTLE SOUP
-                # =============================================
-
-                g, ts_signals = build_turtle_soup_signals(g)
-
-                if not ts_signals.empty:
-                    turtle_signals.append(ts_signals)
-
-                # =============================================
-                # STOCHASTIC SHORT
-                # =============================================
-
-                g, ss_signals = build_stochastic_short_signals(g)
-
-                if not ss_signals.empty:
-                    stochastic_signals.append(ss_signals)
-
-                # =============================================
-                # FIB RETRACEMENT
-                # =============================================
-
-                g, fib_latest = build_fib_retracement_data(g)
-
-                fib_latest_chunks.append(
-                    fib_latest
-                )
-
-                # =============================================
-                # MA STRUCTURE
-                # =============================================
-
-                g, ma_latest = build_ma_structure(g)
-
-                ma_latest_chunks.append(
-                    ma_latest
-                )
-
-                # =============================================
-                # SAVE FINAL TICKER CHUNK
-                # =============================================
-
-                chunks.append(g)
-
-                print(f"{i} ✔ {ticker}")
-
-                del g
-                gc.collect()
-
-            except Exception as e:
-
-                print(f"{ticker} ❌ {e}")
-
-        # =====================================================
-        # REBUILD MASTER DF
-        # =====================================================
-
-        history_df = pd.concat(
-            chunks,
+        pd.concat(
+            keltner_latest_chunks,
             ignore_index=True
-        )
-
-        del chunks
-        gc.collect()
-
-        # =====================================================
-        # SAVE MASTER HISTORY
-        # =====================================================
-
-        history_df.to_parquet(
-            DATA_DIR / "full_history.parquet",
+        ).to_parquet(
+            DATA_DIR /
+            "keltner_latest.parquet",
             index=False
         )
 
-        print("MASTER full_history.parquet saved")
+    # =====================================================
+    # SAVE FIB
+    # =====================================================
 
-        # =====================================================
-        # SAVE KELTNER LATEST
-        # =====================================================
+    if fib_latest_chunks:
 
-        if keltner_latest_chunks:
-
-            latest_keltner = pd.concat(
-                keltner_latest_chunks,
-                ignore_index=True
-            )
-
-            latest_keltner.to_parquet(
-                DATA_DIR / "keltner_latest.parquet",
-                index=False
-            )
-
-        # =====================================================
-        # SAVE TURTLE SOUP SIGNALS
-        # =====================================================
-
-        if turtle_signals:
-
-            turtle_df = pd.concat(
-                turtle_signals,
-                ignore_index=True
-            )
-
-            turtle_df.to_parquet(
-                DATA_DIR / "turtle_soup_signals.parquet",
-                index=False
-            )
-
-        # =====================================================
-        # SAVE STOCHASTIC SHORT SIGNALS
-        # =====================================================
-
-        if stochastic_signals:
-
-            stochastic_df = pd.concat(
-                stochastic_signals,
-                ignore_index=True
-            )
-
-            stochastic_df.to_parquet(
-                DATA_DIR / "stochastic_short_signals.parquet",
-                index=False
-            )
-
-        # =====================================================
-        # SAVE FIB LATEST
-        # =====================================================
-
-        if fib_latest_chunks:
-
-            fib_latest_df = pd.concat(
-                fib_latest_chunks,
-                ignore_index=True
-            )
-
-            fib_latest_df.to_parquet(
-                DATA_DIR / "fib_retracement_latest.parquet",
-                index=False
-            )
-
-        # =====================================================
-        # SAVE MA LATEST
-        # =====================================================
-
-        if ma_latest_chunks:
-
-            ma_latest_df = pd.concat(
-                ma_latest_chunks,
-                ignore_index=True
-            )
-
-            ma_latest_df.to_parquet(
-                DATA_DIR / "ma_structure_latest.parquet",
-                index=False
-            )
-
-        # =====================================================
-        # BREAKOUT 21
-        # =====================================================
-
-        breakout_21_df = build_breakout_21_signals(
-            history_df
-        )
-
-        breakout_21_df.to_parquet(
-            DATA_DIR / "breakout_21.parquet",
+        pd.concat(
+            fib_latest_chunks,
+            ignore_index=True
+        ).to_parquet(
+            DATA_DIR /
+            "fib_retracement_latest.parquet",
             index=False
         )
 
-        print("21 Day Breakout finished")
+    # =====================================================
+    # SAVE MA
+    # =====================================================
 
-        # =====================================================
-        # EQUITY RANKING
-        # =====================================================
+    if ma_latest_chunks:
 
-        ranking_history, ranking_latest = build_equity_ranking(
-            history_df
-        )
-
-        ranking_latest.to_parquet(
-            DATA_DIR / "equity_ranking_latest.parquet",
+        pd.concat(
+            ma_latest_chunks,
+            ignore_index=True
+        ).to_parquet(
+            DATA_DIR /
+            "ma_structure_latest.parquet",
             index=False
         )
 
-        print("Equity ranking finished")
+    # =====================================================
+    # SAVE TURTLE SOUP
+    # =====================================================
 
-        # =====================================================
-        # RS SYSTEM
-        # =====================================================
+    if turtle_signals:
 
-        spy_df = (
-            history_df[
-                history_df["TICKER"] == "^GSPC"
-            ][["Date", "Close"]]
-            .sort_values("Date")
-        )
-
-        stock_df = history_df[
-            history_df["TICKER"] != "^GSPC"
-        ].copy()
-
-        rs_df = compute_relative_strength(
-            stock_df,
-            spy_df
-        )
-
-        del stock_df
-        gc.collect()
-
-        rs_df.to_parquet(
-            DATA_DIR / "industry_ticker_rs.parquet",
+        pd.concat(
+            turtle_signals,
+            ignore_index=True
+        ).to_parquet(
+            DATA_DIR /
+            "turtle_soup_signals.parquet",
             index=False
         )
 
-        # =====================================================
-        # INDUSTRY RS
-        # =====================================================
+    # =====================================================
+    # SAVE STOCHASTIC SHORT
+    # =====================================================
 
-        industry_rs = (
-            rs_df.groupby("Industry")["RS_SCORE"]
-            .mean()
-            .reset_index()
-            .sort_values(
-                "RS_SCORE",
-                ascending=False
-            )
-        )
+    if stochastic_signals:
 
-        industry_rs.to_parquet(
-            DATA_DIR / "industry_rs.parquet",
+        pd.concat(
+            stochastic_signals,
+            ignore_index=True
+        ).to_parquet(
+            DATA_DIR /
+            "stochastic_short_signals.parquet",
             index=False
         )
 
-        # =====================================================
-        # RS ALIGNMENT
-        # =====================================================
+    # =====================================================
+    # BREAKOUT 21
+    # =====================================================
 
-        alignment_cols = [
-            "TICKER",
-            "Industry",
-            "Sector",
-            "RS_7",
-            "RS_21",
-            "RS_50",
-            "RS_100",
-            "RS_200",
-            "ALIGN_7",
-            "ALIGN_21",
-            "ALIGN_50",
-            "ALIGN_100",
-            "ALIGN_200",
+    breakout_21_df = (
+        build_breakout_21_signals(
+            full_history_df
+        )
+    )
+
+    breakout_21_df.to_parquet(
+        DATA_DIR /
+        "breakout_21.parquet",
+        index=False
+    )
+
+    # =====================================================
+    # EQUITY RANKING
+    # =====================================================
+
+    _, ranking_latest = (
+        build_equity_ranking(
+            full_history_df
+        )
+    )
+
+    ranking_latest.to_parquet(
+        DATA_DIR /
+        "equity_ranking_latest.parquet",
+        index=False
+    )
+
+    # =====================================================
+    # RS SYSTEM
+    # =====================================================
+
+    spy_df = (
+        full_history_df[
+            full_history_df["TICKER"]
+            == "^GSPC"
+        ][["Date", "Close"]]
+        .sort_values("Date")
+    )
+
+    stock_df = (
+        full_history_df[
+            full_history_df["TICKER"]
+            != "^GSPC"
+        ]
+        .copy()
+    )
+
+    rs_df = compute_relative_strength(
+        stock_df,
+        spy_df
+    )
+
+    rs_df.to_parquet(
+        DATA_DIR /
+        "industry_ticker_rs.parquet",
+        index=False
+    )
+
+    # =====================================================
+    # INDUSTRY RS
+    # =====================================================
+
+    industry_rs = (
+        rs_df
+        .groupby("Industry")["RS_SCORE"]
+        .mean()
+        .reset_index()
+        .sort_values(
             "RS_SCORE",
-            "ALIGN_SCORE"
-        ]
-
-        alignment_cols = [
-            c for c in alignment_cols
-            if c in rs_df.columns
-        ]
-
-        rs_alignment_df = rs_df[
-            alignment_cols
-        ].copy()
-
-        rs_alignment_df.to_parquet(
-            DATA_DIR / "rs_alignment.parquet",
-            index=False
+            ascending=False
         )
+    )
 
-        print("\nLOW RAM SCANNER COMPLETED\n")
-    return results
+    industry_rs.to_parquet(
+        DATA_DIR /
+        "industry_rs.parquet",
+        index=False
+    )
+
+    # =====================================================
+    # RS ALIGNMENT
+    # =====================================================
+
+    alignment_cols = [
+        "TICKER",
+        "Industry",
+        "Sector",
+        "RS_7",
+        "RS_21",
+        "RS_50",
+        "RS_100",
+        "RS_200",
+        "ALIGN_7",
+        "ALIGN_21",
+        "ALIGN_50",
+        "ALIGN_100",
+        "ALIGN_200",
+        "RS_SCORE",
+        "ALIGN_SCORE"
+    ]
+
+    alignment_cols = [
+        c for c in alignment_cols
+        if c in rs_df.columns
+    ]
+
+    rs_alignment_df = (
+        rs_df[alignment_cols]
+        .copy()
+    )
+
+    rs_alignment_df.to_parquet(
+        DATA_DIR /
+        "rs_alignment.parquet",
+        index=False
+    )
+
+    print("\nLOW RAM SCANNER COMPLETED\n")
+
+    return all_data_df
