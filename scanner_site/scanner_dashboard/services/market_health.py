@@ -33,9 +33,21 @@ def build_market_health_indicator():
     if df.empty:
         return {"score": 0, "error": "No macro ticker data"}
 
-    # Latest date snapshot
-    latest_date = df["Date"].max()
-    df_latest = df[df["Date"] == latest_date]
+    # =========================================================
+    # GET LAST ROW OF EACH TICKER
+    # =========================================================
+
+    df_latest = (
+        df.sort_values(["TICKER", "Date"])
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
+
+    latest_date = df_latest["Date"].max()
+
+    # continue rest of your logic...
+
 
     # --- Helper functions ---
     def above_ma(row, ma):

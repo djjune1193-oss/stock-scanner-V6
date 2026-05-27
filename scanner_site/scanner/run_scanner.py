@@ -93,11 +93,12 @@ def build_equity_ranking(df):
     # LATEST SNAPSHOT
     # =====================================
 
-    latest_date = df["Date"].max()
-
-    latest_df = df[
-        df["Date"] == latest_date
-    ].copy()
+    latest_df = (
+    df.sort_values(["TICKER", "Date"])
+    .groupby("TICKER")
+    .tail(1)
+    .copy()
+    )
 
     # =====================================
     # FINAL RS SCORE

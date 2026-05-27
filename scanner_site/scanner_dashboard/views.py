@@ -7,20 +7,43 @@ from .models import UserProfile
 
 
 from django.shortcuts import render, redirect
+import pandas as pd
+import numpy as np
+from pathlib import Path
 from django.conf import settings
-from django.core.mail import send_mail
-import random
 
-from django.contrib.auth.models import User
 from .models import UserProfile
 from .forms import SignupForm
 
+
+from django.shortcuts import render, redirect
+from django.conf import settings
+from django.core.mail import send_mail
+
+import random
+import resend
+
+from django.contrib.auth.models import User
+from django.contrib.auth import logout
+from django.contrib.auth.hashers import make_password
+from django.contrib import messages
+
+
+
+
+# ================= RESEND CONFIG =================
+
+resend.api_key = settings.RESEND_API_KEY
+
+
+# ================= GENERATE CODE =================
 
 def generate_code():
     return str(random.randint(100000, 999999))
 
 
 # ================= SIGNUP =================
+
 def signup_view(request):
 
     form = SignupForm(request.POST or None)
@@ -39,14 +62,13 @@ def signup_view(request):
                 "code": code
             }
 
-            # SEND EMAIL
-            send_mail(
-                subject="Verify Your Account",
-                message=f"Your verification code is: {code}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[form.cleaned_data["email"]],
-                fail_silently=False
-            )
+            # SEND EMAIL USING RESEND
+            resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": form.cleaned_data["email"],
+                "subject": "Verify Your Account",
+                "text": f"Your verification code is: {code}",
+            })
 
             return redirect("verify_email")
 
@@ -54,6 +76,7 @@ def signup_view(request):
 
 
 # ================= VERIFY EMAIL =================
+
 def verify_email(request):
 
     signup_data = request.session.get("signup_data")
@@ -93,14 +116,7 @@ def verify_email(request):
     return render(request, "auth/verify.html")
 
 
-
-
-from django.contrib import messages
-from django.contrib.auth.models import User
-from django.shortcuts import redirect
-from django.core.mail import send_mail
-from django.conf import settings
-import random
+# ================= RESEND CODE =================
 
 def resend_code(request):
 
@@ -115,27 +131,24 @@ def resend_code(request):
 
     request.session["signup_data"] = signup_data
 
-    send_mail(
-        subject="New Verification Code",
-        message=f"Your new verification code is: {code}",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[signup_data["email"]],
-        fail_silently=False
-    )
+    resend.Emails.send({
+        "from": settings.DEFAULT_FROM_EMAIL,
+        "to": signup_data["email"],
+        "subject": "New Verification Code",
+        "text": f"Your new verification code is: {code}",
+    })
 
     return redirect("verify_email")
 
 
-from django.contrib.auth import logout
-from django.shortcuts import redirect
+# ================= LOGOUT =================
 
 def logout_view(request):
+
     logout(request)
+
     return redirect("login")
 
-
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
 
 # ================= FORGOT PASSWORD =================
 
@@ -156,13 +169,12 @@ def forgot_password(request):
                 "code": code
             }
 
-            send_mail(
-                subject="Password Reset Code",
-                message=f"Your password reset code is: {code}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                fail_silently=False
-            )
+            resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": email,
+                "subject": "Password Reset Code",
+                "text": f"Your password reset code is: {code}",
+            })
 
             return redirect("reset_password_verify")
 
@@ -225,6 +237,7 @@ def new_password(request):
         user = User.objects.get(id=reset_data["user_id"])
 
         user.password = make_password(password1)
+
         user.save()
 
         del request.session["reset_data"]
@@ -239,8 +252,10 @@ def new_password(request):
 
 
 
+
 from .services.market_health import build_market_health_indicator
 from .services.scan_status import get_scan_status
+
 
 def home(request):
 
@@ -253,9 +268,17 @@ def home(request):
     df = df[df["TICKER"] != ""]
 
     df["Date"] = pd.to_datetime(df["Date"]).dt.normalize()
-    today = df["Date"].max()
 
-    today_df = df[df["Date"] == today].copy()
+    # =========================================================
+    # GET LATEST ROW FOR EACH TICKER
+    # =========================================================
+
+    today_df = (
+        df.sort_values(["TICKER", "Date"])
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
 
     mhi = build_market_health_indicator()
     scanner_status = get_scan_status()
@@ -264,13 +287,20 @@ def home(request):
     down_count = (today_df["perc_change"] < 0).sum()
     flat_count = (today_df["perc_change"] == 0).sum()
 
-    # Index
+    # =========================================================
+    # INDEX DATA
+    # =========================================================
+
     index_tickers = ["^IXIC", "^GSPC", "^RUT", "^VIX"]
-    index_df = today_df[today_df["TICKER"].isin(index_tickers)]
+
+    index_df = today_df[
+        today_df["TICKER"].isin(index_tickers)
+    ]
 
     index_values = {}
 
     for _, row in index_df.iterrows():
+
         key_map = {
             "^IXIC": "IXIC",
             "^GSPC": "GSPC",
@@ -285,32 +315,69 @@ def home(request):
             "pct": round(row["perc_change"], 2)
         }
 
+    # =========================================================
+    # TABLE
+    # =========================================================
+
     selected_columns = [
-        "Date","TICKER","perc_change","Sector","Industry",
-        "Close","Open","High","Low","Volume"
+        "Date",
+        "TICKER",
+        "perc_change",
+        "Sector",
+        "Industry",
+        "Close",
+        "Open",
+        "High",
+        "Low",
+        "Volume"
     ]
 
-    table_df = today_df[selected_columns].sort_values("Volume", ascending=False)
+    table_df = today_df[selected_columns].sort_values(
+        "Volume",
+        ascending=False
+    )
 
-    remove = ["^GSPC","^DJI","^NYA","^RUT","^VIX","^TNX","^TYX","^IXIC"]
-    table_df = table_df[~table_df["TICKER"].isin(remove)]
+    remove = [
+        "^GSPC",
+        "^DJI",
+        "^NYA",
+        "^RUT",
+        "^VIX",
+        "^TNX",
+        "^TYX",
+        "^IXIC"
+    ]
+
+    table_df = table_df[
+        ~table_df["TICKER"].isin(remove)
+    ]
 
     table_df["Date"] = table_df["Date"].dt.date
 
-    # 🔥 ADD COLOR LOGIC
+    # =========================================================
+    # ROW COLORS
+    # =========================================================
+
     def get_row_class(pct):
+
         if pct >= 4:
             return "dark-green"
+
         elif pct > 0:
             return "light-green"
+
         elif pct <= -4:
             return "dark-red"
+
         elif pct < 0:
             return "light-red"
+
         return ""
 
     rows = []
+
     for _, r in table_df.iterrows():
+
         rows.append({
             "Date": r["Date"],
             "TICKER": r["TICKER"],
@@ -325,16 +392,20 @@ def home(request):
             "row_class": get_row_class(r["perc_change"])
         })
 
-    return render(request, "scanner_dashboard/home.html", {
-        "scanner_status": scanner_status,
-        "columns": selected_columns,
-        "rows": rows,
-        "mhi": mhi,
-        "index_values": index_values,
-        "up_count": int(up_count),
-        "down_count": int(down_count),
-        "flat_count": int(flat_count),
-    })
+    return render(
+        request,
+        "scanner_dashboard/home.html",
+        {
+            "scanner_status": scanner_status,
+            "columns": selected_columns,
+            "rows": rows,
+            "mhi": mhi,
+            "index_values": index_values,
+            "up_count": int(up_count),
+            "down_count": int(down_count),
+            "flat_count": int(flat_count),
+        }
+    )
 
 
 

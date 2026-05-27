@@ -24,10 +24,17 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)  # ensure it exists
 SECRET_KEY = 'django-insecure-7@0#!8i_10(*@2bm9fbsf(vsn-!z74%*ypo0vaf!iz1yd=1vif'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["146.190.147.47", "www.swingtradesingh.com","swingtradesingh.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://swingtradesingh.com",
+    "https://www.swingtradesingh.com"
+]
 
+SECURE_PROXY_SSL_HEADER = (
+    ('HTTP_X_FORWARDED_PROTO', 'https')
+)
 
 # Application definition
 
@@ -53,15 +60,17 @@ MIDDLEWARE = [
 ]
 
 
-#CRONJOBS = [
-    # Every 30 minutes from 9:15 AM to 4:30 PM (Mon–Fri)
-#    ('15,45 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),
-#   ('15,45 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
-#    ('15,30 16 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+CRONJOBS = [
 
+    # 9:35 AM Monday-Friday
+    ('35 9 * * 1-5', 'scanner.tasks.run_scanner_logic'),
+
+    # Every hour from 10:05 AM to 3:05 PM Monday-Friday
+    ('5 10-15 * * 1-5', 'scanner.tasks.run_scanner_logic'),
     # Finviz run once daily at 9 PM (Mon–Fri)
-#    ('0 21 * * 1-5', 'scanner.tasks.run_finviz_cron'),
-#]
+    ('0 21 * * 1-5', 'scanner.tasks.run_finviz_cron'),
+
+]
 
 
 FULL_HISTORY_FILE = DATA_DIR / "full_history.parquet"
@@ -135,13 +144,8 @@ LOGIN_URL = "login"
 
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "goprofessionaltrader@gmail.com"
-EMAIL_HOST_PASSWORD = "rcms mdvp xcwh vhkf"
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+RESEND_API_KEY = "re_iBzPQwfq_7kBpTP4VdBUffAsogUCvtuMU"
+DEFAULT_FROM_EMAIL = "noreply@mail.swingtradesingh.com"
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -158,7 +162,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 from pathlib import Path
 
@@ -169,3 +172,5 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
