@@ -1063,9 +1063,8 @@ def run_scanner():
 
             latest_date = raw["Date"].iloc[-1]
 
-            download_timestamp = (
-                pd.Timestamp.now()
-            )
+            download_timestamp = pd.Timestamp.utcnow()
+            print(download_timestamp)
 
             # =================================================
             # REMOVE SAME-DATE ROW IMMEDIATELY

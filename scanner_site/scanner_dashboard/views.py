@@ -257,7 +257,7 @@ def home(request):
     df = df[df["TICKER"] != ""]
 
     df["Date"] = pd.to_datetime(df["Date"]).dt.normalize()
-    df["download_timestamp"] = pd.to_datetime(df["download_timestamp"])
+    df["download_timestamp"] = pd.to_datetime(df["download_timestamp"],utc=True).dt.tz_convert("America/New_York")
     df["perc_change"] = df["perc_change"].round(2)
 
     # =========================================================
