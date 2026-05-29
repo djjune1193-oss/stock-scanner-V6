@@ -8,6 +8,17 @@
 
 <style>
 
+.error-message{
+    background:#3b0d0d;
+    color:#ffb4b4;
+    border:1px solid #7f1d1d;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:20px;
+    text-align:center;
+    font-weight:600;
+}
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -539,6 +550,7 @@ tr:hover {
 
 <!-- ================= SEARCH BAR ================= -->
 
+
 <!-- ================= FULL WIDTH SEARCH ================= -->
 
 
@@ -599,6 +611,14 @@ tr:hover {
 
   </form>
 
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="error-message">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 </div>
 
 <div class="container">

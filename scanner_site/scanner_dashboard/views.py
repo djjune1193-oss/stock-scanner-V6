@@ -1654,18 +1654,6 @@ def refresh_scanner(request):
 
 
 
-from pathlib import Path
-import pandas as pd
-import numpy as np
-
-from django.shortcuts import render
-
-
-from pathlib import Path
-import pandas as pd
-import numpy as np
-
-from django.shortcuts import render
 
 
 def equity_chart(request, ticker):
@@ -1697,6 +1685,25 @@ def equity_chart(request, ticker):
     history_df = pd.read_parquet(
         HISTORY_PATH
     )
+
+    # =========================================
+    # INVALID TICKER
+    # =========================================
+
+    if ticker not in history_df["TICKER"].unique():
+
+        messages.error(
+            request,
+            f"{ticker} not in database"
+        )
+
+        return redirect("home")
+
+    # =========================================
+    # FILTER
+    # =========================================
+
+    
 
     history_df = history_df[
         history_df["TICKER"] == ticker
