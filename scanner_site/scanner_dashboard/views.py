@@ -1771,9 +1771,9 @@ def equity_chart(request, ticker):
     last_7["pct_change"] = (
         (
             last_7["Close"] -
-            last_7["Open"]
+            last_7["Close"].shift(-1)
         )
-        / last_7["Open"]
+        / last_7["Close"].shift(-1)
         * 100
     )
 
