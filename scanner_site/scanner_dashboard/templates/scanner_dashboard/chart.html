@@ -1,31 +1,1264 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
+
   <title>{{ ticker }} Chart</title>
+
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <style>
+
+
+
+
+<style>
+
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container{
+  padding:10px 16px;
+  max-width:1600px;
+  margin:auto;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  align-items: center;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+
+    /* =========================================
+       GLOBAL
+    ========================================= */
+
     body {
       margin: 0;
       font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
+      background: #0b1220;
+      color: #e2e8f0;
     }
-    #chart {
-      width: 100vw;
-      height: 100vh;
+
+    .container{
+      padding:20px;
+      max-width:1600px;
+      margin:auto;
     }
+
+    /* =========================================
+       TOP BANNER
+    ========================================= */
+
+.top-banner{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  padding:12px 16px;
+  margin-bottom:12px;
+}
+
+.banner-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+    .banner-left{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .back-btn{
+      background:#172554;
+      color:#bfdbfe;
+      border:none;
+      padding:10px 16px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:600;
+      transition:.2s;
+    }
+
+    .back-btn:hover{
+      background:#1e3a8a;
+    }
+
+    .ticker-title{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+.ticker-symbol{
+  font-size:22px;
+  font-weight:700;
+  color:#f8fafc;
+  line-height:1;
+}
+
+.ticker-company{
+  font-size:11px;
+  color:#94a3b8;
+}
+    .banner-price{
+      text-align:right;
+    }
+
+.banner-close{
+  font-size:24px;
+  font-weight:700;
+  color:#f8fafc;
+  line-height:1;
+}
+
+.banner-change{
+  margin-top:4px;
+  font-size:12px;
+  font-weight:600;
+}
+    /* =========================================
+       MINI STATS
+    ========================================= */
+
+.mini-stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:8px;
+}
+
+.mini-card{
+  background:#0f172a;
+  border:1px solid #1e293b;
+  border-radius:10px;
+  padding:9px;
+}
+
+.mini-label{
+  font-size:9px;
+  color:#94a3b8;
+  margin-bottom:4px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.mini-value{
+  font-size:13px;
+  font-weight:700;
+  color:#f8fafc;
+}
+
+    /* =========================================
+       COLORS
+    ========================================= */
+
+    .green{
+      color:#22c55e;
+    }
+
+    .light-green{
+      color:#4ade80;
+    }
+
+    .red{
+      color:#ef4444;
+    }
+
+    .orange{
+      color:#f59e0b;
+    }
+
+    .blue{
+      color:#60a5fa;
+    }
+
+    /* =========================================
+       SECTION TITLE
+    ========================================= */
+
+.section-title{
+  font-size:15px;
+  font-weight:700;
+  margin-top:14px;
+  margin-bottom:10px;
+  color:#f8fafc;
+}
+
+    /* =========================================
+       STATS GRID
+    ========================================= */
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.stat-card{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:14px;
+  padding:12px;
+}
+
+.stat-label{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  color:#94a3b8;
+  margin-bottom:6px;
+}
+
+.stat-value{
+  font-size:17px;
+  font-weight:700;
+  color:#f8fafc;
+}
+
+    /* =========================================
+       CHART
+    ========================================= */
+
+.chart-wrapper{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:18px;
+  padding:10px;
+  margin-bottom:18px;
+  margin-top:-6px;
+}
+
+#chart {
+  width: 100%;
+  height: 48vh;
+}
+    /* =========================================
+       TABLES
+    ========================================= */
+
+    .table-card{
+      background:#111827;
+      border:1px solid #1e293b;
+      border-radius:18px;
+      overflow:hidden;
+      margin-top:20px;
+    }
+
+.table-title{
+  padding:12px 14px;
+  font-size:14px;
+  font-weight:700;
+  border-bottom:1px solid #1e293b;
+  background:#0f172a;
+}
+
+    .table-scroll{
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    thead{
+      background:#111827;
+      position:sticky;
+      top:0;
+      z-index:5;
+    }
+
+th{
+  padding:10px;
+  text-align:left;
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+  border-bottom:1px solid #1e293b;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+
+td{
+  padding:10px;
+  border-bottom:1px solid #1e293b;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+    tbody tr:hover{
+      background:#0f172a;
+    }
+
+    /* =========================================
+       FUNDAMENTALS
+    ========================================= */
+
+    .fundamentals-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:18px;
+      margin-top:18px;
+      margin-bottom:40px;
+    }
+
+.fund-card{
+  background:#111827;
+  border:1px solid #1e293b;
+  border-radius:16px;
+  padding:14px;
+}
+
+    .fund-card-title{
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:16px;
+      color:#60a5fa;
+    }
+
+    .fund-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      padding:10px 0;
+      border-bottom:1px solid #1f2937;
+    }
+
+    .fund-row:last-child{
+      border-bottom:none;
+    }
+
+.fund-row span{
+  color:#94a3b8;
+  font-size:11px;
+}
+
+.fund-row strong{
+  color:#f8fafc;
+  text-align:right;
+  font-size:11px;
+}
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media(max-width:900px){
+
+      #chart{
+        height:500px;
+      }
+
+      .ticker-symbol{
+        font-size:24px;
+      }
+
+      .banner-close{
+        font-size:24px;
+      }
+
+      .stat-value{
+        font-size:18px;
+      }
+    }
+
   </style>
-
-
-
-
 
 </head>
 
 <body>
-  <div id="chart"></div>
+
+
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+
+  <!-- LEFT: BRAND -->
+  <div class="nav-left">
+    <div class="brand">
+      <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+      <div class="brand-text">
+        <div class="brand-title">ScannerX</div>
+        <div class="brand-sub">Market Intelligence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-center">
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  </div>
+
+  <!-- RIGHT: USER -->
+<div class="nav-right">
+
+  {% if request.user.is_authenticated %}
+
+    <div class="user-panel">
+
+      <div class="user-chip">
+        <div class="user-avatar">
+          {{ request.user.username|slice:":1"|upper }}
+        </div>
+
+        <div class="user-info">
+          <div class="user-label">Signed in</div>
+          <div class="user-name">{{ request.user.username }}</div>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="auth-btn logout-btn">
+                Logout
+        </button>
+      </form>
+
+    </div>
+
+  {% else %}
+
+    <a href="{% url 'login' %}" class="auth-btn">Login</a>
+
+  {% endif %}
+
+</div>
+
+</div>
+
+<div class="container">
+
+
+
+
+<div class="container">
+
+  <!-- =========================================
+       COMPLETE TOP BANNER
+  ========================================= -->
+
+  <div class="top-banner">
+
+    <div class="banner-top">
+
+      <div class="banner-left">
+
+        <button
+          class="back-btn"
+          onclick="window.history.back();"
+        >
+          ← Back
+        </button>
+
+        <div class="ticker-title">
+
+          <div class="ticker-symbol">
+            {{ ticker }}
+          </div>
+
+          <div class="ticker-company">
+            {{ fundamentals.company }}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="banner-price">
+
+        <div class="banner-close">
+          {{ price_stats.close }}
+        </div>
+
+        <div class="banner-change {% if price_stats.daily_change >= 0 %}green{% else %}red{% endif %}">
+          {% if price_stats.daily_change >= 0 %}
+            ▲
+          {% else %}
+            ▼
+          {% endif %}
+
+          {{ price_stats.daily_change }}%
+        </div>
+
+      </div>
+
+    </div>
+
+  <!-- =========================================
+       CHART
+  ========================================= -->
+
+  <div class="chart-wrapper">
+    <div id="chart"></div>
+  </div>
+
+    <!-- =========================================
+         MINI OVERVIEW TABLE
+    ========================================= -->
+
+    <div class="mini-stats">
+
+      <div class="mini-card">
+        <div class="mini-label">Sector</div>
+        <div class="mini-value blue">
+          {{ fundamentals.sector }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">Industry</div>
+        <div class="mini-value">
+          {{ fundamentals.industry }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">Market Cap</div>
+        <div class="mini-value">
+          {{ fundamentals.market_cap }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">Volume</div>
+        <div class="mini-value">
+          {{ price_stats.volume }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">P/E</div>
+        <div class="mini-value orange">
+          {{ fundamentals.pe }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">ROE</div>
+
+        <div class="mini-value green">
+          {{ fundamentals.roe }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">52W High</div>
+        <div class="mini-value">
+          {{ technical_stats.52w_high }}
+        </div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-label">52W Low</div>
+        <div class="mini-value">
+          {{ technical_stats.52w_low }}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       PRICE OVERVIEW
+  ========================================= -->
+
+  <div class="section-title">
+    Price Overview
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-label">Open</div>
+      <div class="stat-value">
+        {{ price_stats.open }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">High</div>
+      <div class="stat-value green">
+        {{ price_stats.high }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Low</div>
+      <div class="stat-value red">
+        {{ price_stats.low }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Intraday Range</div>
+      <div class="stat-value orange">
+        {{ price_stats.range_pct }}%
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">20D Avg Volume</div>
+      <div class="stat-value">
+        {{ technical_stats.vol_avg20 }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Distance From 52W High</div>
+
+      <div class="stat-value {% if technical_stats.distance_52h > -10 %}green{% else %}orange{% endif %}">
+        {{ technical_stats.distance_52h }}%
+      </div>
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       TECHNICALS
+  ========================================= -->
+
+  <div class="section-title">
+    Technical Levels
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <div class="stat-label">20 SMA</div>
+      <div class="stat-value">
+        {{ technical_stats.sma20 }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">50 SMA</div>
+      <div class="stat-value">
+        {{ technical_stats.sma50 }}
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">200 SMA</div>
+      <div class="stat-value">
+        {{ technical_stats.sma200 }}
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       7 DAY HISTORY
+  ========================================= -->
+
+  <div class="table-card">
+
+    <div class="table-title">
+      Last 7 Trading Days
+    </div>
+
+    <div class="table-scroll">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Open</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Close</th>
+            <th>Volume</th>
+            <th>% Change</th>
+            <th>Gap %</th>
+            <th>Range %</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+        {% for row in history_rows %}
+
+          <tr>
+
+            <td>{{ row.Date }}</td>
+
+            <td>{{ row.Open }}</td>
+
+            <td class="green">
+              {{ row.High }}
+            </td>
+
+            <td class="red">
+              {{ row.Low }}
+            </td>
+
+            <td>
+              {{ row.Close }}
+            </td>
+
+            <td>
+              {{ row.Volume_fmt }}
+            </td>
+
+            <td>
+
+              <span class="{% if row.pct_change >= 0 %}green{% else %}red{% endif %}">
+
+                {% if row.pct_change >= 0 %}
+                  ▲
+                {% else %}
+                  ▼
+                {% endif %}
+
+                {{ row.pct_change }}%
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <span class="{% if row.gap_pct >= 0 %}green{% else %}red{% endif %}">
+                {{ row.gap_pct }}%
+              </span>
+
+            </td>
+
+            <td class="orange">
+              {{ row.range_pct }}%
+            </td>
+
+          </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+<!-- =========================================
+     FUNDAMENTALS
+========================================= -->
+
+<div class="section-title">
+  Fundamentals
+</div>
+
+<div class="fundamentals-grid">
+
+  <!-- =====================================
+       BUSINESS
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Business
+    </div>
+
+    <div class="fund-row">
+      <span>Sector</span>
+      <strong>{{ fundamentals.sector }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Industry</span>
+      <strong>{{ fundamentals.industry }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Market Cap</span>
+      <strong>
+        {{ fundamentals.market_cap }}B
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Float Adj MCap</span>
+      <strong>
+        {{ fundamentals.float_market_cap }}B
+      </strong>
+    </div>
+
+  </div>
+
+  <!-- =====================================
+       VALUATION
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Valuation
+    </div>
+
+    <div class="fund-row">
+      <span>P/E</span>
+      <strong>{{ fundamentals.pe }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Forward P/E</span>
+      <strong>{{ fundamentals.forward_pe }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>P/S</span>
+      <strong>{{ fundamentals.ps }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>P/B</span>
+      <strong>{{ fundamentals.pb }}</strong>
+    </div>
+
+    <div class="fund-row">
+      <span>PEG</span>
+      <strong>{{ fundamentals.peg }}</strong>
+    </div>
+
+  </div>
+
+  <!-- =====================================
+       QUALITY
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Quality Metrics
+    </div>
+
+    <div class="fund-row">
+      <span>ROE</span>
+      <strong class="green">
+        {{ fundamentals.roe }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>ROA</span>
+      <strong>
+        {{ fundamentals.roa }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Gross Margin</span>
+      <strong>
+        {{ fundamentals.gross_margin }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Operating Margin</span>
+      <strong>
+        {{ fundamentals.oper_margin }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Profit Margin</span>
+      <strong>
+        {{ fundamentals.profit_margin }}%
+      </strong>
+    </div>
+
+  </div>
+
+  <!-- =====================================
+       TRADING
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Trading Metrics
+    </div>
+
+    <div class="fund-row">
+      <span>Relative Volume</span>
+      <strong>
+        {{ fundamentals.relative_volume }}
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Average Volume</span>
+      <strong>
+        {{ fundamentals.avg_volume }}M
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Beta</span>
+      <strong>
+        {{ fundamentals.beta }}
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Short Float</span>
+      <strong class="orange">
+        {{ fundamentals.short_float }}%
+      </strong>
+    </div>
+
+  </div>
+
+  <!-- =====================================
+       QUARTERLY GROWTH
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Latest Q/Q Growth
+    </div>
+
+    <div class="fund-row">
+      <span>Revenue</span>
+      <strong class="green">
+        {{ fundamentals.revenue_qoq }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Profit</span>
+      <strong class="green">
+        {{ fundamentals.profit_qoq }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Operating Income</span>
+      <strong class="green">
+        {{ fundamentals.op_qoq }}%
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>EPS</span>
+      <strong class="green">
+        {{ fundamentals.eps_qoq }}%
+      </strong>
+    </div>
+
+  </div>
+
+  <!-- =====================================
+       QUARTERLY HISTORY
+  ====================================== -->
+
+  <div class="fund-card">
+
+    <div class="fund-card-title">
+      Quarterly History
+    </div>
+
+    <div class="fund-row">
+      <span>Revenue Qtrs</span>
+      <strong>
+        {{ fundamentals.revenue_quarters }}
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Profit Qtrs</span>
+      <strong>
+        {{ fundamentals.profit_quarters }}
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>Operating Qtrs</span>
+      <strong>
+        {{ fundamentals.op_income_quarters }}
+      </strong>
+    </div>
+
+    <div class="fund-row">
+      <span>EPS Qtrs</span>
+      <strong>
+        {{ fundamentals.eps_quarters }}
+      </strong>
+    </div>
+
+  </div>
+
+</div>
+
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.getElementById("tickerSearchForm");
+
+  if (!form) return;
+
+  form.addEventListener("submit", function (e) {
+
+    e.preventDefault();
+
+    const ticker = document
+      .getElementById("tickerInput")
+      .value
+      .trim()
+      .toUpperCase();
+
+    if (!ticker) return;
+
+    window.location.href = `/chart/${ticker}/`;
+
+  });
+
+});
+</script>
+
+<script>
+
   const dates = {{ dates|safe }};
   const open = {{ open|safe }};
   const high = {{ high|safe }};
@@ -33,56 +1266,100 @@
   const close = {{ close|safe }};
   const volume = {{ volume|safe }};
 
+  const candleColors = close.map((c, i) => {
+    return c >= open[i]
+      ? "#22c55e"
+      : "#ef4444";
+  });
+
   const price = {
+
     x: dates,
     open: open,
     high: high,
     low: low,
     close: close,
+
     type: "candlestick",
+
     name: "{{ ticker }}",
-    increasing: { line: { color: "#22c55e" } },
-    decreasing: { line: { color: "#ef4444" } },
+
+    increasing: {
+      line: { color: "#22c55e" }
+    },
+
+    decreasing: {
+      line: { color: "#ef4444" }
+    },
+
     yaxis: "y"
   };
 
   const vol = {
+
     x: dates,
     y: volume,
+
     type: "bar",
+
     name: "Volume",
-    yaxis: "y2",
+
     marker: {
-      color: "#64748b",
+      color: candleColors,
       opacity: 0.45
-    }
+    },
+
+    yaxis: "y2"
   };
 
   const layout = {
-    title: "{{ ticker }} — Price & Volume",
-    paper_bgcolor: "#0f172a",
-    plot_bgcolor: "#0f172a",
-    font: { color: "#e5e7eb" },
+
+    paper_bgcolor: "#111827",
+    plot_bgcolor: "#111827",
+
+    font: {
+      color: "#cbd5e1",
+      size: 12
+    },
+
     showlegend: false,
 
+    margin: {
+      l: 55,
+      r: 20,
+      t: 20,
+      b: 40
+    },
+
     xaxis: {
-      rangeslider: { visible: false }
+      rangeslider: { visible: false },
+      gridcolor: "#1e293b",
+      zeroline: false
     },
 
     yaxis: {
       title: "Price",
-      domain: [0.28, 1],   // 🔥 PRICE gets 72% height
-      showgrid: true
+      domain: [0.28, 1],
+      gridcolor: "#1e293b",
+      zeroline: false
     },
 
     yaxis2: {
       title: "Volume",
-      domain: [0, 0.22],   // 🔥 VOLUME only 22% height
-      showgrid: false
+      domain: [0, 0.20],
+      gridcolor: "#1e293b",
+      zeroline: false
     }
   };
 
-  Plotly.newPlot("chart", [price, vol], layout, { responsive: true });
+  Plotly.newPlot(
+    "chart",
+    [price, vol],
+    layout,
+    { responsive: true }
+  );
+
 </script>
+
 </body>
 </html>

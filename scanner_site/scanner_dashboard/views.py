@@ -1653,34 +1653,575 @@ def refresh_scanner(request):
 
 
 
+
+from pathlib import Path
+import pandas as pd
+import numpy as np
+
+from django.shortcuts import render
+
+
+from pathlib import Path
+import pandas as pd
+import numpy as np
+
+from django.shortcuts import render
+
+
 def equity_chart(request, ticker):
 
+    # =====================================================
+    # PATHS
+    # =====================================================
+
     BASE_DIR = Path(__file__).resolve().parents[2]
-    DATA_PATH = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
-    if not DATA_PATH.exists():
-        return render(request, "scanner_dashboard/chart_error.html")
 
-    df = pd.read_parquet(DATA_PATH)
-    df = df[df["TICKER"] == ticker].sort_values("Date")
+    HISTORY_PATH = (
+        BASE_DIR /
+        "scanner_site" /
+        "data" /
+        "full_history.parquet"
+    )
 
-    if df.empty:
-        return render(request, "scanner_dashboard/chart_error.html", {"ticker": ticker})
+    FUNDAMENTALS_PATH = (
+        BASE_DIR /
+        "scanner_site" /
+        "data" /
+        "finviz_fundamentals.parquet"
+    )
 
-    # Convert for JS
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-    df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
+    # =====================================================
+    # LOAD HISTORY
+    # =====================================================
 
-    context = {
-        "ticker": ticker,
-        "dates": df["Date"].tolist(),
-        "open": df["Open"].tolist(),
-        "high": df["High"].tolist(),
-        "low": df["Low"].tolist(),
-        "close": df["Close"].tolist(),
-        "volume": df["Volume"].tolist(),
+    history_df = pd.read_parquet(
+        HISTORY_PATH
+    )
+
+    history_df = history_df[
+        history_df["TICKER"] == ticker
+    ].copy()
+
+    if history_df.empty:
+
+        return render(
+            request,
+            "scanner_dashboard/chart_error.html",
+            {"ticker": ticker}
+        )
+
+    # =====================================================
+    # CLEAN
+    # =====================================================
+
+    history_df["Date"] = pd.to_datetime(
+        history_df["Date"]
+    )
+
+    history_df = history_df.sort_values(
+        "Date"
+    )
+
+    latest_row = history_df.iloc[-1]
+
+    # =====================================================
+    # SECTOR / INDUSTRY
+    # =====================================================
+
+    sector = (
+        latest_row["Sector"]
+        if "Sector" in history_df.columns
+        else "-"
+    )
+
+    industry = (
+        latest_row["Industry"]
+        if "Industry" in history_df.columns
+        else "-"
+    )
+
+    # =====================================================
+    # CHART DATA
+    # =====================================================
+
+    chart_df = history_df.copy()
+
+    chart_df["Date"] = (
+        chart_df["Date"]
+        .dt.strftime("%Y-%m-%d")
+    )
+
+    # =====================================================
+    # 7 DAY TABLE
+    # =====================================================
+
+    last_7 = (
+        history_df.tail(7)
+        .sort_values("Date", ascending=False)
+        .copy()
+    )
+
+    last_7["pct_change"] = (
+        (
+            last_7["Close"] -
+            last_7["Open"]
+        )
+        / last_7["Open"]
+        * 100
+    )
+
+    last_7["range_pct"] = (
+        (
+            last_7["High"] -
+            last_7["Low"]
+        )
+        / last_7["Low"]
+        * 100
+    )
+
+    last_7["gap_pct"] = (
+        (
+            last_7["Open"] -
+            last_7["Close"].shift(-1)
+        )
+        / last_7["Close"].shift(-1)
+        * 100
+    )
+
+    last_7["Volume_fmt"] = (
+        last_7["Volume"]
+        .fillna(0)
+        .astype(float)
+        .apply(
+            lambda x: f"{x:,.0f}"
+        )
+    )
+
+    numeric_cols = [
+        "Open",
+        "High",
+        "Low",
+        "Close",
+        "pct_change",
+        "range_pct",
+        "gap_pct"
+    ]
+
+    last_7[numeric_cols] = (
+        last_7[numeric_cols]
+        .round(2)
+    )
+
+    last_7["Date"] = (
+        last_7["Date"]
+        .dt.strftime("%Y-%m-%d")
+    )
+
+    history_rows = (
+        last_7.to_dict("records")
+    )
+
+    # =====================================================
+    # TECHNICALS
+    # =====================================================
+
+    tech_df = history_df.copy()
+
+    tech_df["SMA20"] = (
+        tech_df["Close"]
+        .rolling(20)
+        .mean()
+    )
+
+    tech_df["SMA50"] = (
+        tech_df["Close"]
+        .rolling(50)
+        .mean()
+    )
+
+    tech_df["SMA200"] = (
+        tech_df["Close"]
+        .rolling(200)
+        .mean()
+    )
+
+    tech_df["AVG20_VOL"] = (
+        tech_df["Volume"]
+        .rolling(20)
+        .mean()
+    )
+
+    latest = tech_df.iloc[-1]
+
+    prev_close = (
+        tech_df.iloc[-2]["Close"]
+        if len(tech_df) > 1
+        else latest["Close"]
+    )
+
+    daily_change = (
+        (
+            latest["Close"] -
+            prev_close
+        )
+        / prev_close
+        * 100
+    )
+
+    # =====================================================
+    # PRICE STATS
+    # =====================================================
+
+    price_stats = {
+
+        "close":
+            round(latest["Close"], 2),
+
+        "open":
+            round(latest["Open"], 2),
+
+        "high":
+            round(latest["High"], 2),
+
+        "low":
+            round(latest["Low"], 2),
+
+        "volume":
+            f"{latest['Volume']:,.0f}",
+
+        "daily_change":
+            round(daily_change, 2),
+
+        "range_pct":
+            round(
+                (
+                    (
+                        latest["High"] -
+                        latest["Low"]
+                    )
+                    / latest["Low"]
+                ) * 100,
+                2
+            )
     }
 
-    return render(request, "scanner_dashboard/chart.html", context)
+    # =====================================================
+    # TECHNICAL STATS
+    # =====================================================
+
+    technical_stats = {
+
+        "sma20":
+            round(latest["SMA20"], 2)
+            if not pd.isna(latest["SMA20"])
+            else "-",
+
+        "sma50":
+            round(latest["SMA50"], 2)
+            if not pd.isna(latest["SMA50"])
+            else "-",
+
+        "sma200":
+            round(latest["SMA200"], 2)
+            if not pd.isna(latest["SMA200"])
+            else "-",
+
+        "vol_avg20":
+            f"{latest['AVG20_VOL']:,.0f}"
+            if not pd.isna(latest["AVG20_VOL"])
+            else "-",
+
+        "52w_high":
+            round(
+                tech_df["High"]
+                .tail(252)
+                .max(),
+                2
+            ),
+
+        "52w_low":
+            round(
+                tech_df["Low"]
+                .tail(252)
+                .min(),
+                2
+            ),
+
+        "distance_52h":
+            round(
+                (
+                    (
+                        latest["Close"] -
+                        tech_df["High"]
+                        .tail(252)
+                        .max()
+                    )
+                    /
+                    tech_df["High"]
+                    .tail(252)
+                    .max()
+                ) * 100,
+                2
+            )
+    }
+
+    # =====================================================
+    # FUNDAMENTALS
+    # =====================================================
+
+    fundamentals = {}
+
+    if FUNDAMENTALS_PATH.exists():
+
+        fund_df = pd.read_parquet(
+            FUNDAMENTALS_PATH
+        )
+
+        fund_df = fund_df[
+            fund_df["Ticker"] == ticker
+        ]
+
+        if not fund_df.empty:
+
+            f = fund_df.iloc[-1]
+
+            fundamentals = {
+
+                # =================================================
+                # BASIC
+                # =================================================
+
+                "sector":
+                    sector,
+
+                "industry":
+                    industry,
+
+                # =================================================
+                # VALUATION
+                # =================================================
+
+                "market_cap":
+                    f.get(
+                        "Market Cap (B)",
+                        "-"
+                    ),
+
+                "float_market_cap":
+                    f.get(
+                        "Float Adj Market Cap (B)",
+                        "-"
+                    ),
+
+                "pe":
+                    f.get("P/E", "-"),
+
+                "forward_pe":
+                    f.get(
+                        "Forward P/E",
+                        "-"
+                    ),
+
+                "ps":
+                    f.get("P/S", "-"),
+
+                "pb":
+                    f.get("P/B", "-"),
+
+                "peg":
+                    f.get("PEG", "-"),
+
+                # =================================================
+                # QUALITY
+                # =================================================
+
+                "roe":
+                    f.get("ROE %", "-"),
+
+                "roa":
+                    f.get("ROA %", "-"),
+
+                "gross_margin":
+                    f.get(
+                        "Gross Margin %",
+                        "-"
+                    ),
+
+                "oper_margin":
+                    f.get(
+                        "Operating Margin %",
+                        "-"
+                    ),
+
+                "profit_margin":
+                    f.get(
+                        "Profit Margin %",
+                        "-"
+                    ),
+
+                # =================================================
+                # TRADING
+                # =================================================
+
+                "relative_volume":
+                    f.get(
+                        "Relative Volume",
+                        "-"
+                    ),
+
+                "beta":
+                    f.get(
+                        "Beta",
+                        "-"
+                    ),
+
+                "short_float":
+                    f.get(
+                        "Short Float %",
+                        "-"
+                    ),
+
+                "avg_volume":
+                    f.get(
+                        "Avg Volume (M)",
+                        "-"
+                    ),
+
+                # =================================================
+                # QUARTERLY
+                # =================================================
+
+                "revenue_quarters":
+                    f.get(
+                        "Revenue Quarters (B)",
+                        "-"
+                    ),
+
+                "profit_quarters":
+                    f.get(
+                        "Profit Quarters (B)",
+                        "-"
+                    ),
+
+                "op_income_quarters":
+                    f.get(
+                        "Operating Income Quarters (B)",
+                        "-"
+                    ),
+
+                "eps_quarters":
+                    f.get(
+                        "EPS Quarters",
+                        "-"
+                    ),
+
+                # =================================================
+                # LATEST Q/Q
+                # =================================================
+
+                "revenue_qoq":
+                    f.get(
+                        "Revenue Latest Q/Q %",
+                        "-"
+                    ),
+
+                "profit_qoq":
+                    f.get(
+                        "Profit Latest Q/Q %",
+                        "-"
+                    ),
+
+                "op_qoq":
+                    f.get(
+                        "Operating Income Latest Q/Q %",
+                        "-"
+                    ),
+
+                "eps_qoq":
+                    f.get(
+                        "EPS Latest Q/Q %",
+                        "-"
+                    ),
+
+                # =================================================
+                # HISTORICAL
+                # =================================================
+
+                "rev_hist":
+                    f.get(
+                        "Revenue Historical Q/Q %",
+                        "-"
+                    ),
+
+                "profit_hist":
+                    f.get(
+                        "Profit Historical Q/Q %",
+                        "-"
+                    ),
+
+                "op_hist":
+                    f.get(
+                        "Operating Income Historical Q/Q %",
+                        "-"
+                    ),
+
+                "eps_hist":
+                    f.get(
+                        "EPS Historical Q/Q %",
+                        "-"
+                    )
+            }
+
+    # =====================================================
+    # CONTEXT
+    # =====================================================
+
+    context = {
+
+        "ticker": ticker,
+
+        # Chart
+        "dates":
+            chart_df["Date"].tolist(),
+
+        "open":
+            chart_df["Open"].tolist(),
+
+        "high":
+            chart_df["High"].tolist(),
+
+        "low":
+            chart_df["Low"].tolist(),
+
+        "close":
+            chart_df["Close"].tolist(),
+
+        "volume":
+            chart_df["Volume"].tolist(),
+
+        # Tables
+        "history_rows":
+            history_rows,
+
+        # Stats
+        "price_stats":
+            price_stats,
+
+        "technical_stats":
+            technical_stats,
+
+        # Fundamentals
+        "fundamentals":
+            fundamentals
+    }
+
+    return render(
+        request,
+        "scanner_dashboard/chart.html",
+        context
+    )
+
+
 
 
 
