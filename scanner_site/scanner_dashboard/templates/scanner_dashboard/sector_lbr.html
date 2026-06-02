@@ -7,6 +7,25 @@
 
 <style>
 
+
+.lock-banner {
+
+    background: #0f172a;
+    border: 1px solid #2563eb;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin: 15px 0;
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.locked-content {
+
+    filter: blur(6px);
+    opacity: 0.6;
+    user-select: none;
+}
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +134,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,24 +148,14 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
 /* ================= USER SECTION ================= */
@@ -457,11 +465,32 @@ Zero line = trend equilibrium zone<br>
 
 <!-- ================= CHART ================= -->
 
-<div class="card">
+
     {% if chart %}
         {{ chart|safe }}
     {% endif %}
+
+
+{% if not request.user.is_authenticated %}
+
+<div class="lock-banner">
+
+    🔒 Preview Mode:
+    Showing only the first 5 signals.
+
+    <a href="{% url 'login' %}"
+       style="color:#60a5fa;font-weight:600;margin-left:10px;">
+
+        Login
+
+    </a>
+
+    to unlock all LBR signals.
+
 </div>
+
+{% endif %}
+
 
 <!-- ================= TABLE ================= -->
 
@@ -481,30 +510,61 @@ Zero line = trend equilibrium zone<br>
 
 <tbody>
 
-{% for row in data %}
+{% if request.user.is_authenticated %}
 
-<tr>
+    {% for row in data %}
 
-<td>
-    <a class="ticker-link" href="?ticker={{ row.ticker }}">
-        {{ row.ticker }}
-    </a>
-</td>
+    <tr>
 
-<td>{{ row.industry }}</td>
-<td>{{ row.volume }}</td>
+        <td>
+            <a class="ticker-link" href="?ticker={{ row.ticker }}">
+                {{ row.ticker }}
+            </a>
+        </td>
 
-<td class="buy">
-    {% if row.buy_day %}✔{% endif %}
-</td>
+        <td>{{ row.industry }}</td>
+        <td>{{ row.volume }}</td>
 
-<td class="sell">
-    {% if row.sell_day %}✔{% endif %}
-</td>
+        <td class="buy">
+            {% if row.buy_day %}✔{% endif %}
+        </td>
 
-</tr>
+        <td class="sell">
+            {% if row.sell_day %}✔{% endif %}
+        </td>
 
-{% endfor %}
+    </tr>
+
+    {% endfor %}
+
+{% else %}
+
+    {% for row in data|slice:":5" %}
+
+    <tr>
+
+        <td>
+            <a class="ticker-link" href="?ticker={{ row.ticker }}">
+                {{ row.ticker }}
+            </a>
+        </td>
+
+        <td>{{ row.industry }}</td>
+        <td>{{ row.volume }}</td>
+
+        <td class="buy">
+            {% if row.buy_day %}✔{% endif %}
+        </td>
+
+        <td class="sell">
+            {% if row.sell_day %}✔{% endif %}
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+{% endif %}
 
 </tbody>
 

@@ -7,6 +7,28 @@
 
 <style>
 
+/* ================= LOGIN PREVIEW ================= */
+
+.locked-row{
+    filter: blur(6px);
+    opacity: 0.35;
+    pointer-events:none;
+    user-select:none;
+}
+
+.login-overlay{
+    padding:20px;
+    text-align:center;
+    background:rgba(15,23,42,0.95);
+    border-top:1px solid #1e293b;
+}
+
+.login-overlay p{
+    margin:0 0 14px;
+    color:#cbd5e1;
+    font-size:13px;
+}
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +137,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,24 +151,14 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
 /* ================= USER SECTION ================= */
@@ -552,6 +563,23 @@ Color System
 
     </div>
 
+{% if not request.user.is_authenticated %}
+
+<div class="login-overlay">
+
+    <p>
+        🔒 Preview mode showing first 2 stocks only.
+        Login to unlock the full MA Structure Dashboard.
+    </p>
+
+    <a href="{% url 'login' %}" class="auth-btn">
+        Login to Unlock
+    </a>
+
+</div>
+
+{% endif %}
+
     <!-- ================= TABLES ================= -->
 
     {% for group_name, rows in groups.items %}
@@ -576,93 +604,94 @@ Color System
 
                         <th>Ticker</th>
                         <th>Close</th>
-                        <th>Distance %</th>
+                        <th>% From Base</th>
                         <th>Move</th>
                         <th>Base</th>
+                        <th>%10MA</th>
+                        <th>%21MA</th>
+                        <th>%34MA</th>
+                        <th>%50MA</th>
+                        <th>%100MA</th>
+                        <th>%200MA</th>
                         <th>Industry</th>
+
 
                     </tr>
 
                 </thead>
+<tbody>
 
-                <tbody>
+{% for r in rows %}
 
-                    {% for r in rows %}
+<tr class="
+    {% if 'strong' in r.group %}
+        purple
+    {% elif 'weak' in r.group %}
+        light-blue
+    {% elif '21-34' in r.group or '34-50' in r.group %}
+        light-yellow
+    {% elif '50-100' in r.group %}
+        orange
+    {% else %}
+        red
+    {% endif %}
 
-                    <tr class="
-                        {% if 'strong' in r.group %}
-                            purple
+    {% if not request.user.is_authenticated and forloop.counter > 2 %}
+        locked-row
+    {% endif %}
+">
 
-                        {% elif 'weak' in r.group %}
-                            light-blue
+    <td>
+        <a class="ticker"
+           href="?ticker={{ r.TICKER }}">
+           {{ r.TICKER }}
+        </a>
+    </td>
 
-                        {% elif '21-34' in r.group or '34-50' in r.group %}
-                            light-yellow
+    <td>{{ r.Close|floatformat:2 }}</td>
 
-                        {% elif '50-100' in r.group %}
-                            orange
+    <td>
+        {{ r.pct_distance|floatformat:2 }}%
+    </td>
 
-                        {% else %}
-                            red
-                        {% endif %}
-                    ">
+    <td>
 
-                        <td>
+        {% if r.move == '⬆' %}
 
-                            <a class="ticker"
-                               href="?ticker={{ r.TICKER }}">
+            <span class="badge move-up">
+                ⬆ Improving
+            </span>
 
-                               {{ r.TICKER }}
+        {% elif r.move == '⬇' %}
 
-                            </a>
+            <span class="badge move-down">
+                ⬇ Weakening
+            </span>
 
-                        </td>
+        {% else %}
 
-                        <td>
-                            {{ r.Close|floatformat:2 }}
-                        </td>
+            <span class="badge move-flat">
+                Stable
+            </span>
 
-                        <td>
-                            {{ r.pct_distance|floatformat:2 }}%
-                        </td>
+        {% endif %}
 
-                        <td>
+    </td>
 
-                            {% if r.move == '⬆' %}
+    <td>{{ r.base_label }}</td>
+    <td>{{ r.pct_from_ma10 }}</td>
+    <td>{{ r.pct_from_ma21 }}</td>
+    <td>{{ r.pct_from_ma34 }}</td>
+    <td>{{ r.pct_from_ma50 }}</td>
+    <td>{{ r.pct_from_ma100 }}</td>
+    <td>{{ r.pct_from_ma200 }}</td>
+    <td>{{ r.Industry }}</td>
 
-                                <span class="badge move-up">
-                                    ⬆ Improving
-                                </span>
+</tr>
 
-                            {% elif r.move == '⬇' %}
+{% endfor %}
 
-                                <span class="badge move-down">
-                                    ⬇ Weakening
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge move-flat">
-                                    Stable
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-                            {{ r.base_label }}
-                        </td>
-
-                        <td>
-                            {{ r.Industry }}
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
+</tbody>
 
             </table>
 

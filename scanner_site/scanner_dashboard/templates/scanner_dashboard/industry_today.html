@@ -7,6 +7,25 @@
 
 <style>
 
+/* ================= LOCK PREVIEW (TILES) ================= */
+
+.tile.locked {
+    filter: blur(6px);
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* optional overlay */
+.tile-lock-overlay {
+    margin-top: 20px;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(37, 99, 235, 0.4);
+    border-radius: 12px;
+    color: #cbd5e1;
+    text-align: center;
+}
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +134,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,24 +148,14 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
 /* ================= USER SECTION ================= */
@@ -426,7 +434,22 @@ Median Gain used for ranking<br><br>
 🔴 Red → Weak (< 0.40)
 
 </div>
+{% if not request.user.is_authenticated %}
 
+<div class="tile-lock-overlay">
+
+    🔒 Showing preview (1 industry only).  
+    Login to unlock full industry breakdown.
+
+    <br><br>
+
+    <a href="{% url 'login' %}" class="auth-btn">
+        Login to Unlock
+    </a>
+
+</div>
+
+{% endif %}
 <!-- ================= TILES ================= -->
 
 <div class="tile-grid">
@@ -434,7 +457,6 @@ Median Gain used for ranking<br><br>
 {% for row in data %}
 
 <a href="{% url 'industry_today_detail' row.Industry %}"
-
    class="tile
    {% if row.RATIO >= 0.60 %}
        green
@@ -442,6 +464,10 @@ Median Gain used for ranking<br><br>
        yellow
    {% else %}
        red
+   {% endif %}
+
+   {% if not request.user.is_authenticated and forloop.counter > 3 %}
+       locked
    {% endif %}">
 
     <h3>{{ row.Industry }}</h3>

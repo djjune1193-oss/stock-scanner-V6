@@ -7,6 +7,27 @@
 
 <style>
 
+.preview-row {
+    filter: blur(6px);
+    opacity: 0.45;
+    pointer-events: none;
+    user-select: none;
+}
+
+.login-overlay {
+    margin: 20px;
+    padding: 18px;
+    text-align: center;
+
+    background: rgba(15,23,42,0.95);
+    border: 1px solid rgba(37,99,235,0.35);
+
+    border-radius: 12px;
+
+    color: #cbd5e1;
+}
+
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +136,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,25 +150,16 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
+
 
 /* ================= USER SECTION ================= */
 
@@ -450,149 +461,166 @@ tbody tr:hover{
     </div>
 
     <div class="page-subtitle">
-      Equity Relative Strength vs S&P500
+      Multi-timeframe cumulative performance ranking
     </div>
 
   </div>
 
   <!-- ================= DESCRIPTION ================= -->
 
-  <div class="desc">
+<div class="desc">
 
-    <strong>Ranking Logic</strong><br><br>
+  Stocks are ranked by cumulative percentage gain over multiple
+  trend windows.<br><br>
 
-    RS_SCORE compares stock performance against S&P500 over
-    7, 21, 50, 100 and 200 day periods.<br><br>
+  Available ranking periods(sort by column):
 
-    RS_SCORE = 1 → Equal to market performance<br>
-    RS_SCORE > 1 → Outperforming market<br>
-    RS_SCORE < 1 → Underperforming market<br><br>
+  <br><br>
 
-    RS SCORE:<br>
-    0.30 × RS_7 +
-    0.25 × RS_21 +
-    0.20 × RS_50 +
-    0.15 × RS_100 +
-    0.10 × RS_200<br><br>
+  • 7 Day Momentum<br>
+  • 30 Day Momentum<br>
+  • 90 Day Trend<br>
+  • 200 Day Leadership Trend
 
-    Cumulative Return represents long-term trend strength over ~1 year.<br><br>
+  <br><br>
 
-    <strong>Color Logic</strong><br>
 
-    🟢 Strong Leadership (>50%)<br>
-    🟡 Positive Trend (25–50%)<br>
-    🟠 Weak Positive (0–25%)<br>
-    🔴 Negative Trend (<0%)
+  Default view uses <strong>200 Day Cumulative Gain</strong>.
 
-  </div>
+  <br><br>
+
+  <strong>Color Logic</strong><br>
+
+  🟢 Strong Leadership (>50%)<br>
+  🟡 Positive Trend (25–50%)<br>
+  🟠 Weak Positive (0–25%)<br>
+  🔴 Negative Trend (<0%)
+
+</div>
 
   <!-- ================= TABLE ================= -->
 
-  <div class="table-wrap">
+<div class="table-wrap">
 
-    <table>
+<table>
 
-      <thead>
+<thead>
 
-        <tr>
+<tr>
 
-          <th>
-            <a href="?sort=TICKER&dir={% if sort_by == 'TICKER' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
-              Ticker
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=RANKING&dir={% if sort_by == 'RANKING' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+    Rank
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=RS_SCORE&dir={% if sort_by == 'RS_SCORE' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS Score
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=TICKER&dir={% if sort_by == 'TICKER' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}">
+    Ticker
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=Cumulative_Return&dir={% if sort_by == 'Cumulative_Return' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              Cumulative % Gain
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=GAIN_7&dir={% if sort_by == 'GAIN_7' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+    7 Day %
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=RS_7&dir={% if sort_by == 'RS_7' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS 7
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=GAIN_30&dir={% if sort_by == 'GAIN_30' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+    30 Day %
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=RS_21&dir={% if sort_by == 'RS_21' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS 21
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=GAIN_90&dir={% if sort_by == 'GAIN_90' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+    90 Day %
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=RS_50&dir={% if sort_by == 'RS_50' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS 50
-            </a>
-          </th>
+<th>
+  <a href="?tf={{ timeframe }}&sort=GAIN_200&dir={% if sort_by == 'GAIN_200' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+    200 Day %
+  </a>
+</th>
 
-          <th>
-            <a href="?sort=RS_100&dir={% if sort_by == 'RS_100' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS 100
-            </a>
-          </th>
+</tr>
 
-          <th>
-            <a href="?sort=RS_200&dir={% if sort_by == 'RS_200' and sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
-              RS 200
-            </a>
-          </th>
+</thead>
 
-        </tr>
 
-      </thead>
+{% if not request.user.is_authenticated %}
 
-      <tbody>
+<div class="login-overlay">
 
-        {% for r in ranking_list %}
+    🔒 Preview Mode
 
-        <tr
+    <br><br>
 
-        {% if r.Cumulative_Return > 50 %}
-          class="strong"
+    Showing only the first 5 ranked stocks.
 
-        {% elif r.Cumulative_Return > 25 %}
-          class="mid"
+    <br><br>
 
-        {% elif r.Cumulative_Return > 0 %}
-          class="low"
+    Login to unlock the full equity ranking dashboard,
+    stock charts and all rankings.
 
-        {% else %}
-          class="negative"
+    <br><br>
 
-        {% endif %}
-        >
+    <a href="{% url 'login' %}" class="auth-btn">
+        Login to Unlock
+    </a>
 
-          <td>
-            <a class="ticker"
-               href="{% url 'equity_chart' r.Ticker %}">
-               {{ r.Ticker }}
-            </a>
-          </td>
+</div>
 
-          <td>{{ r.RS_SCORE|floatformat:2 }}</td>
-          <td>{{ r.Cumulative_Return|floatformat:2 }}</td>
-          <td>{{ r.RS_7|floatformat:2 }}</td>
-          <td>{{ r.RS_21|floatformat:2 }}</td>
-          <td>{{ r.RS_50|floatformat:2 }}</td>
-          <td>{{ r.RS_100|floatformat:2 }}</td>
-          <td>{{ r.RS_200|floatformat:2 }}</td>
+{% endif %}
 
-        </tr>
+<tbody>
 
-        {% endfor %}
+{% for r in ranking_list %}
 
-      </tbody>
+<tr
 
-    </table>
+{% if not request.user.is_authenticated and forloop.counter > 5 %}
+    class="preview-row"
+{% elif r.CUMULATIVE_GAIN > 50 %}
+    class="strong"
+{% elif r.CUMULATIVE_GAIN > 25 %}
+    class="mid"
+{% elif r.CUMULATIVE_GAIN > 0 %}
+    class="low"
+{% else %}
+    class="negative"
+{% endif %}
+>
 
-  </div>
+<td>{{ r.RANKING }}</td>
+
+<td>
+    {% if request.user.is_authenticated or forloop.counter <= 5 %}
+    <a class="ticker"
+       href="{% url 'equity_chart' r.Ticker %}">
+       {{ r.Ticker }}
+    </a>
+    {% else %}
+       {{ r.Ticker }}
+    {% endif %}
+</td>
+
+<td>{{ r.GAIN_7|floatformat:2 }}</td>
+<td>{{ r.GAIN_30|floatformat:2 }}</td>
+<td>{{ r.GAIN_90|floatformat:2 }}</td>
+<td>{{ r.GAIN_200|floatformat:2 }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+
+</div>
 
 </div>
 

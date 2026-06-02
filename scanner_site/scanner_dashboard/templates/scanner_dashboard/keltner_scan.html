@@ -7,6 +7,33 @@
 
 <style>
 
+/* ================= LOGIN PREVIEW ================= */
+
+.locked-preview {
+    filter: blur(6px);
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+}
+
+.login-overlay {
+    margin-top: 15px;
+    padding: 20px;
+    text-align: center;
+
+    background: rgba(15,23,42,0.95);
+
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 10px;
+
+    color: #cbd5e1;
+}
+
+.login-overlay p {
+    margin-bottom: 14px;
+    font-size: 13px;
+}
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +142,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,24 +156,14 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
 /* ================= USER SECTION ================= */
@@ -507,29 +523,94 @@ Auto-loads <b>S&P500</b> Keltner structure
 </tr>
 </thead>
 
+{% if not request.user.is_authenticated %}
+
+<div class="login-overlay">
+
+    <p>
+        🔒 Preview mode showing only the first 2 Keltner setups.
+        Login to unlock the complete scanner.
+    </p>
+
+    <a href="{% url 'login' %}" class="auth-btn">
+        Login to Unlock
+    </a>
+
+</div>
+
+{% endif %}
+
 <tbody>
 
 {% for row in data %}
 
-<tr>
+    {% if request.user.is_authenticated or forloop.counter <= 2 %}
 
-<td>
-    <a class="ticker-link" href="?ticker={{ row.TICKER }}">
-        {{ row.TICKER }}
-    </a>
-</td>
+    <tr>
 
-<td>{{ row.Close }}</td>
-<td>{{ row.ema20 }}</td>
-<td>{{ row.kc_upper }}</td>
-<td>{{ row.kc_lower }}</td>
-<td>{{ row.pct_above_ema }}</td>
-<td>{{ row.atr_pct }}</td>
-<td>{{ row.days_above_ema }}</td>
+        <td>
+            <a class="ticker-link"
+               href="?ticker={{ row.TICKER }}">
+                {{ row.TICKER }}
+            </a>
+        </td>
+
+        <td>{{ row.Close }}</td>
+        <td>{{ row.ema20 }}</td>
+        <td>{{ row.kc_upper }}</td>
+        <td>{{ row.kc_lower }}</td>
+        <td>{{ row.pct_above_ema }}</td>
+        <td>{{ row.atr_pct }}</td>
+        <td>{{ row.days_above_ema }}</td>
+
+    </tr>
+
+    {% endif %}
+
+{% endfor %}
+
+{% if not request.user.is_authenticated %}
+
+<tr class="locked-preview">
+
+    <td>NVDA</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
 
 </tr>
 
-{% endfor %}
+<tr class="locked-preview">
+
+    <td>AAPL</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+
+</tr>
+
+<tr class="locked-preview">
+
+    <td>MSFT</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+
+</tr>
+
+{% endif %}
 
 </tbody>
 

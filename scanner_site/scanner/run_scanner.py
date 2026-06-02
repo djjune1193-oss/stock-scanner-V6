@@ -29,111 +29,76 @@ def build_equity_ranking(df):
     )
 
     # =====================================
-    # RETURNS
+    # MULTI-TIMEFRAME RETURNS
     # =====================================
 
-    df["Return"] = (
-        df.groupby("TICKER")["Close"]
-        .pct_change()
-    )
+    periods = [7, 30, 90, 200]
 
-    spy = (
-        df[df["TICKER"] == "^GSPC"][["Date", "Return"]]
-        .rename(columns={
-            "Return": "SPY_Return"
-        })
-    )
+    for period in periods:
 
-    df = df.merge(
-        spy,
-        on="Date",
-        how="left"
-    )
-
-    # =====================================
-    # DAILY RELATIVE STRENGTH
-    # =====================================
-
-    df["RS_Daily"] = (
-        df["Return"] -
-        df["SPY_Return"]
-    )
-
-    rmse = np.sqrt(
-        np.mean(df["RS_Daily"] ** 2)
-    )
-
-    df["RS_Normalized"] = (
-        df["RS_Daily"] / rmse
-    )
-
-    # =====================================
-    # MULTI-TIMEFRAME RS
-    # =====================================
-
-    for period in [7, 21, 50, 100, 200]:
-
-        df[f"RS_{period}"] = (
-            df.groupby("TICKER")["RS_Normalized"]
+        df[f"GAIN_{period}"] = (
+            df.groupby("TICKER")["Close"]
             .transform(
                 lambda x:
-                x.rolling(period).mean()
+                (
+                    x /
+                    x.shift(period)
+                    - 1
+                ) * 100
             )
         )
-
-    # =====================================
-    # CUMULATIVE SCORE
-    # =====================================
-
-    df["Cumulative_Return"] = (
-        df.groupby("TICKER")["RS_Normalized"]
-        .cumsum()
-    )
 
     # =====================================
     # LATEST SNAPSHOT
     # =====================================
 
     latest_df = (
-        df.sort_values(["TICKER", "Date"])
-        .groupby("TICKER")
+        df.groupby("TICKER")
         .tail(1)
         .copy()
     )
 
     # =====================================
-    # FINAL RS SCORE
+    # RANKINGS
     # =====================================
 
-    latest_df["RS_SCORE"] = (
-        0.30 * latest_df["RS_7"] +
-        0.25 * latest_df["RS_21"] +
-        0.20 * latest_df["RS_50"] +
-        0.15 * latest_df["RS_100"] +
-        0.10 * latest_df["RS_200"]
+    for period in periods:
+
+        latest_df[f"RANK_{period}"] = (
+            latest_df[f"GAIN_{period}"]
+            .rank(
+                ascending=False,
+                method="min"
+            )
+            .astype("Int64")
+        )
+
+    # =====================================
+    # DEFAULT VIEW
+    # =====================================
+
+    latest_df["RANKING"] = (
+        latest_df["RANK_200"]
+    )
+
+    latest_df["CUMULATIVE_GAIN"] = (
+        latest_df["GAIN_200"]
     )
 
     latest_df = latest_df.dropna(
         subset=[
-            "RS_SCORE",
-            "RS_7",
-            "RS_21",
-            "RS_50",
-            "RS_100",
-            "RS_200"
+            "GAIN_7",
+            "GAIN_30",
+            "GAIN_90",
+            "GAIN_200"
         ]
     )
 
-    # =====================================
-    # FINAL SORT DEFAULT
-    # =====================================
-
     latest_df = latest_df.sort_values(
-        "Cumulative_Return",
-        ascending=False
+        "RANKING"
     )
 
-    return df, latest_df
+    return latest_df
 
 
 
@@ -520,6 +485,26 @@ def build_ma_structure(df):
     ) * 100
 
     # =========================
+    # DISTANCE FROM EACH MA
+    # =========================
+
+    for ma in [10, 21, 34, 50, 100, 200]:
+
+        latest_df[f"pct_from_ma{ma}"] = (
+            (
+                latest_df["Close"]
+                - latest_df[f"MA_{ma}"]
+            )
+            / latest_df[f"MA_{ma}"]
+        ) * 100
+
+        latest_df[f"pct_from_ma{ma}"] = (
+            latest_df[f"pct_from_ma{ma}"]
+            .round(2)
+        )
+
+
+    # =========================
     # SORTING
     # =========================
     group_order = {
@@ -869,15 +854,8 @@ def run_scanner():
     history_path = DATA_DIR / "full_history.parquet"
     latest_path = DATA_DIR / "all_data.parquet"
 
-    weekly_history_path = (
-        DATA_DIR /
-        "weekly_history.parquet"
-    )
-
-    weekly_latest_path = (
-        DATA_DIR /
-        "weekly_latest.parquet"
-    )
+    weekly_history_path = DATA_DIR /"weekly_history.parquet"
+    weekly_latest_path = DATA_DIR /"weekly_latest.parquet"
 
     # =====================================================
     # LOAD EXISTING DATABASE
@@ -1548,15 +1526,12 @@ def run_scanner():
     # EQUITY RANKING
     # =====================================================
 
-    _, ranking_latest = (
-        build_equity_ranking(
-            full_history_df
-        )
+    ranking_latest = build_equity_ranking(
+        full_history_df
     )
 
     ranking_latest.to_parquet(
-        DATA_DIR /
-        "equity_ranking_latest.parquet",
+        DATA_DIR / "equity_ranking_latest.parquet",
         index=False
     )
 

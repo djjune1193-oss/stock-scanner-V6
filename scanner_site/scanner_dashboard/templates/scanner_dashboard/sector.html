@@ -7,6 +7,98 @@
 
 <style>
 
+
+/* ================= LOCK PREVIEW ================= */
+
+.locked-row {
+    filter: blur(6px);
+    opacity: 0.45;
+    user-select: none;
+    pointer-events: none;
+}
+
+.table-wrapper-lock {
+    position: relative;
+}
+
+.lock-overlay {
+
+    position: absolute;
+
+    top: 250px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 100;
+}
+
+.lock-card {
+
+    background: rgba(15,23,42,0.96);
+
+    border: 1px solid rgba(37,99,235,0.45);
+
+    backdrop-filter: blur(12px);
+
+    border-radius: 16px;
+
+    padding: 22px;
+
+    width: 420px;
+
+    text-align: center;
+
+    box-shadow:
+        0 0 40px rgba(37,99,235,0.20);
+}
+
+.lock-title {
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    color: white;
+
+    margin-bottom: 10px;
+}
+
+.lock-text {
+
+    color: #cbd5e1;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    margin-bottom: 18px;
+}
+
+.lock-btn {
+
+    display: inline-block;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 12px 18px;
+
+    border-radius: 12px;
+
+    font-weight: 700;
+
+    font-size: 13px;
+}
+
 /* ================= BRAND ================= */
 
 .brand {
@@ -115,10 +207,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -130,24 +221,14 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
 /* ================= USER SECTION ================= */
@@ -497,18 +578,21 @@ Volume leadership ranking<br>
 
         {% with pct=row.2 %}
 
-        <tr class="
-            {% if pct > 4 %}
-                dark-green
-            {% elif pct > 0 %}
-                light-green
-            {% elif pct >= -4 %}
-                light-red
-            {% else %}
-                dark-red
-            {% endif %}
-        ">
+<tr class="
+    {% if pct > 4 %}
+        dark-green
+    {% elif pct > 0 %}
+        light-green
+    {% elif pct >= -4 %}
+        light-red
+    {% else %}
+        dark-red
+    {% endif %}
 
+    {% if not request.user.is_authenticated and forloop.counter > 3 %}
+        locked-row
+    {% endif %}
+">
             {% for cell in row %}
 
                 {% if forloop.counter == 2 %}
@@ -548,6 +632,38 @@ Volume leadership ranking<br>
 </tbody>
 
 </table>
+
+{% if not request.user.is_authenticated %}
+
+<div class="lock-overlay">
+
+    <div class="lock-card">
+
+        <div class="lock-title">
+            Unlock Full Sector Dashboard
+        </div>
+
+        <div class="lock-text">
+
+            View all sector rankings, ETF rotation,
+            momentum leadership, and institutional
+            money flow data.
+
+        </div>
+
+        <a href="{% url 'login' %}"
+           class="lock-btn">
+
+            Login to Unlock
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
 
 </div>
 

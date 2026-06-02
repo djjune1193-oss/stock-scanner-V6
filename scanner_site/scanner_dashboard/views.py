@@ -257,7 +257,12 @@ def home(request):
     df = df[df["TICKER"] != ""]
 
     df["Date"] = pd.to_datetime(df["Date"]).dt.normalize()
-    df["download_timestamp"] = pd.to_datetime(df["download_timestamp"],utc=True).dt.tz_convert("America/New_York")
+
+    df["download_timestamp"] = (
+        pd.to_datetime(df["download_timestamp"], utc=True)
+        .dt.tz_convert("America/New_York")
+    )
+
     df["perc_change"] = df["perc_change"].round(2)
 
     # =========================================================
@@ -344,7 +349,7 @@ def home(request):
         ~table_df["TICKER"].isin(remove)
     ]
 
-    table_df["Date"] = table_df["Date"].dt.date
+    table_df["Date"] = table_df["Date"].dt.strftime("%b %d, %Y")
 
     # =========================================================
     # ROW COLORS
@@ -370,11 +375,33 @@ def home(request):
 
     for _, r in table_df.iterrows():
 
+        # ==========================================
+        # MARKET HOURS DISPLAY
+        # ==========================================
+
+        if pd.notnull(r["download_timestamp"]):
+
+            ts = r["download_timestamp"]
+
+            market_closed = (
+                ts.hour >= 16 or
+                ts.hour < 9 or
+                (ts.hour == 9 and ts.minute < 30)
+            )
+
+            if market_closed:
+                updated_display = "CLOSE"
+            else:
+                updated_display = ts.strftime("%I:%M %p")
+
+        else:
+            updated_display = ""
+
         rows.append({
             "Date": r["Date"],
-            "download_timestamp": (r["download_timestamp"].strftime("%I:%M %p") if pd.notnull(r["download_timestamp"])else ""),
+            "download_timestamp": updated_display,
             "TICKER": r["TICKER"],
-            "perc_change": r["perc_change"],
+            "perc_change": round(r["perc_change"], 2),
             "Sector": r["Sector"],
             "Industry": r["Industry"],
             "Close": round(r["Close"], 2),
@@ -464,7 +491,6 @@ def scanner_view(request):
 
         (df["lower_count"] > 0)
     )
-
     scanner_df = df[row_condition].copy()
 
     selected_columns = [
@@ -480,11 +506,16 @@ def scanner_view(request):
         "Low",
         "Volume",
         "Candle_Type",
-        "slope_50",
         "lower_count"
     ]
 
+
+    round_columns = ["Close","Open","High","Low"]
+    
+    scanner_df[round_columns] = scanner_df[round_columns].round(2)
     scanner_df = scanner_df[selected_columns]
+    scanner_df["Date"] = scanner_df["Date"].dt.strftime("%b %d, %Y")
+    
 
     scanner_df = scanner_df.sort_values(
         by="Volume",
@@ -559,14 +590,11 @@ def scanner_view(request):
     context = {
 
         "columns": scanner_df.columns.tolist(),
-
         "rows": scanner_df.values.tolist(),
-
         "locked": not request.user.is_authenticated,
-
         "chart_data": json.dumps(chart_data),
-
         "selected_ticker": ticker,
+
     }
 
     return render(
@@ -647,7 +675,6 @@ def hot_ten_day_view(request):
         (df["21ma"] > df["50ma"]) &
         (df["50ma"] > df["100ma"]) &
 
-        (df["slope_50"] > 0) &
 
         (
 
@@ -686,12 +713,15 @@ def hot_ten_day_view(request):
         "Low",
         "Volume",
         "Candle_Type",
-        "slope_Lower",
-        "delta_upper",
         "lower_count"
     ]
 
+    
+    round_columns = ["Close","Open","High","Low"]
+    
+    hot_ten_day[round_columns] = hot_ten_day[round_columns].round(2)
     hot_ten_day = hot_ten_day[selected_columns]
+    hot_ten_day["Date"] = hot_ten_day["Date"].dt.strftime("%b %d, %Y")
 
     hot_ten_day = hot_ten_day.sort_values(
         by="Volume",
@@ -1007,7 +1037,7 @@ def futures_view(request):
     # =============================
 
     groups = {
-        "Equities": ["ES=F","NQ=F","YM=F","RTY=F"],
+        "Equities": ["ES=F","NQ=F","YM=F","RTY=F","BTC-USD"],
         "Bonds": ["ZB=F","ZN=F","ZF=F","ZT=F"],
         "Metals": ["GC=F","SI=F","HG=F","PL=F","PA=F"],
         "Energy": ["CL=F","NG=F","RB=F","HO=F","BZ=F"],
@@ -1235,7 +1265,7 @@ def double_bottom_view(request):
         "Date"
     )
 
-    chart_df = chart_df.tail(20)
+    chart_df = chart_df.tail(180)
 
     # =========================================
     # SIGNAL ROW
@@ -2479,13 +2509,48 @@ def get_industry_ranking(request):
 
 
 
+from pathlib import Path
+import pandas as pd
+from django.shortcuts import render
+
+
 def get_equity_ranking(request):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
 
-    data_path = (BASE_DIR/ "scanner_site"/ "data"/ "equity_ranking_latest.parquet")
+    data_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "equity_ranking_latest.parquet"
+    )
 
-    latest_df = pd.read_parquet(data_path)
+    df = pd.read_parquet(data_path)
+
+    # =====================================
+    # TIMEFRAME
+    # =====================================
+
+    timeframe = request.GET.get(
+        "tf",
+        "200"
+    )
+
+    valid_timeframes = [
+        "7",
+        "30",
+        "90",
+        "200"
+    ]
+
+    if timeframe not in valid_timeframes:
+        timeframe = "200"
+
+    rank_col = f"RANK_{timeframe}"
+    gain_col = f"GAIN_{timeframe}"
+
+    df["RANKING"] = df[rank_col]
+    df["CUMULATIVE_GAIN"] = df[gain_col]
 
     # =====================================
     # SORT CONTROL
@@ -2493,35 +2558,37 @@ def get_equity_ranking(request):
 
     sort_by = request.GET.get(
         "sort",
-        "Cumulative_Return"
+        "RANKING"
     )
 
     sort_dir = request.GET.get(
         "dir",
-        "desc"
+        "asc"
     )
 
-    ascending = (
-        sort_dir == "asc"
-    )
+    ascending = sort_dir == "asc"
 
-    valid_columns = [
+    valid_sort_columns = [
         "TICKER",
-        "RS_SCORE",
-        "Cumulative_Return",
-        "RS_7",
-        "RS_21",
-        "RS_50",
-        "RS_100",
-        "RS_200"
+        "GAIN_7",
+        "GAIN_30",
+        "GAIN_90",
+        "GAIN_200",
+        "RANK_7",
+        "RANK_30",
+        "RANK_90",
+        "RANK_200",
+        "RANKING",
+        "CUMULATIVE_GAIN",
     ]
 
-    if sort_by not in valid_columns:
-        sort_by = "Cumulative_Return"
+    if sort_by not in valid_sort_columns:
+        sort_by = "RANKING"
 
-    latest_df = latest_df.sort_values(
+    df = df.sort_values(
         sort_by,
-        ascending=ascending
+        ascending=ascending,
+        na_position="last"
     )
 
     # =====================================
@@ -2529,16 +2596,19 @@ def get_equity_ranking(request):
     # =====================================
 
     ranking_list = (
-        latest_df[
+        df[
             [
                 "TICKER",
-                "RS_SCORE",
-                "Cumulative_Return",
-                "RS_7",
-                "RS_21",
-                "RS_50",
-                "RS_100",
-                "RS_200"
+                "GAIN_7",
+                "GAIN_30",
+                "GAIN_90",
+                "GAIN_200",
+                "RANK_7",
+                "RANK_30",
+                "RANK_90",
+                "RANK_200",
+                "RANKING",
+                "CUMULATIVE_GAIN",
             ]
         ]
         .rename(columns={
@@ -2552,9 +2622,10 @@ def get_equity_ranking(request):
         "scanner_dashboard/equity_ranking.html",
         {
             "ranking_list": ranking_list,
+            "timeframe": timeframe,
             "sort_by": sort_by,
-            "sort_dir": sort_dir
-        }
+            "sort_dir": sort_dir,
+        },
     )
 
 def metrics_view(request):
@@ -2611,13 +2682,13 @@ def metrics_view(request):
         "ADX",
         "PLUS_DI",
         "MINUS_DI",
-
         "Candle_Type"
 
     ]
 
     selected_columns = [
-        c for c in selected_columns if c in df.columns
+        c for c in selected_columns
+        if c in df.columns
     ]
 
     df = df[selected_columns]
@@ -2661,6 +2732,31 @@ def metrics_view(request):
         if not matches.empty:
 
             highlight_index = matches.index[0]
+
+    # -----------------------------
+    # DATE FORMAT
+    # -----------------------------
+
+    if "Date" in df.columns:
+
+        df["Date"] = pd.to_datetime(
+            df["Date"],
+            errors="coerce"
+        ).dt.strftime("%Y-%m-%d")
+
+    # -----------------------------
+    # ROUND ALL NUMERIC COLUMNS
+    # -----------------------------
+
+    numeric_cols = df.select_dtypes(
+        include=["number"]
+    ).columns
+
+    df[numeric_cols] = (
+        df[numeric_cols]
+        .astype(float)
+        .round(2)
+    )
 
     # -----------------------------
     # FINAL
@@ -2729,24 +2825,48 @@ def calculate_momentum_strength(request):
         subset=["Momentum_3D", "Intraday_Strength", "Avg_Volume"]
     )
 
-    # liquidity filter (historical only)
-    df_latest = df_latest[df_latest["Avg_Volume"] > 50_000_000]
-
     # ----------------------------
     # SORT
     # ----------------------------
     df_latest = df_latest.sort_values(
-        [ "Intraday_Strength","Momentum_3D"],
-        ascending=[False, False]
+        [ "Momentum_3D"],
+        ascending=[False]
+    )
+
+    # ----------------------------
+    # FORMAT DISPLAY COLUMNS
+    # ----------------------------
+    df_latest["Date"] = df_latest["Date"].dt.strftime("%b %d, %Y")
+
+    df_latest["Close"] = df_latest["Close"].round(2)
+
+    df_latest["Volume"] = (
+        df_latest["Volume"]
+        .fillna(0)
+        .astype(int)
+    )
+
+    df_latest["Avg_Volume"] = (
+        df_latest["Avg_Volume"]
+        .fillna(0)
+        .astype(int)
     )
 
     # ----------------------------
     # FINAL TABLE
     # ----------------------------
     df_latest = df_latest[
-        ["Date", "TICKER", "Sector", "Industry",
-         "Momentum_3D", "Intraday_Strength",
-         "Close", "Volume", "Avg_Volume"]
+        [
+            "Date",
+            "TICKER",
+            "Sector",
+            "Industry",
+            "Momentum_3D",
+            "Intraday_Strength",
+            "Close",
+            "Volume",
+            "Avg_Volume",
+        ]
     ]
 
     return render(
@@ -3211,6 +3331,11 @@ def fundamentals_view(request):
     # SORTING
     # -----------------------------
     sort_col = request.GET.get("sort")
+
+    if not sort_col:
+
+        if "Market Cap (B)" in df.columns:
+            sort_col = "Market Cap (B)"
 
     if sort_col and sort_col in df.columns:
         df = df.sort_values(by=sort_col, ascending=False)
@@ -4118,10 +4243,10 @@ def fib_retracement_scan(request):
 
     if sort_col in valid_sort_fields:
 
-        ascending = (
-            True if sort_col == "TICKER"
-            else False
-        )
+        ascending = sort_col in [
+            "TICKER",
+            "retracement"
+        ]
 
         latest_df = latest_df.sort_values(
             sort_col,
@@ -4398,5 +4523,3 @@ def industry_dashboard(request):
             'ticker_data': ticker_data,
         }
     )
-
-

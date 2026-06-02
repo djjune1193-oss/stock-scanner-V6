@@ -10,6 +10,32 @@
 
 <style>
 
+
+.lock-banner {
+
+    background: #0f172a;
+
+    border: 1px solid #2563eb;
+
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    margin-bottom: 12px;
+
+    color: #cbd5e1;
+
+    font-size: 13px;
+}
+
+.locked-content {
+
+    filter: blur(6px);
+
+    opacity: 0.6;
+
+    user-select: none;
+}
 /* ================= BRAND ================= */
 
 .brand {
@@ -118,10 +144,9 @@ body {
 /* ================= AUTH BUTTON ================= */
 
 .auth-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white !important;
-
-  border: 1px solid rgba(59,130,246,0.4);
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
 
   padding: 7px 14px;
   border-radius: 10px;
@@ -133,25 +158,16 @@ body {
 
   transition: all 0.2s ease;
 
-  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+  box-shadow: none;
 }
 
 .auth-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(37,99,235,0.35);
-}
-
-/* Logout slightly different (more subtle) */
-.logout-btn {
-  background: #111827;
-  border: 1px solid #374151;
-  color: #e5e7eb !important;
-}
-
-.logout-btn:hover {
   background: #1f2937;
   border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
+
 
 /* ================= USER SECTION ================= */
 
@@ -570,8 +586,30 @@ Only bullish directional candles included (Close &gt; Open)
 
 </div>
 
+
+{% if not request.user.is_authenticated %}
+
+<div class="lock-banner">
+
+    🔒 Preview Mode:
+    Showing only the top breakout candidate.
+
+    <a href="{% url 'login' %}"
+       style="color:#60a5fa;font-weight:600;margin-left:10px;">
+
+        Login
+
+    </a>
+
+    to unlock all breakout signals.
+
+</div>
+
+{% endif %}
+
 <!-- ================= TABLE ================= -->
 
+<div class="{% if not request.user.is_authenticated %}locked-content{% endif %}">
 <div class="table-wrap">
 
 <table>
@@ -592,48 +630,82 @@ Only bullish directional candles included (Close &gt; Open)
 
 <tbody>
 
-{% for row in rows %}
+{% if request.user.is_authenticated %}
 
-<tr class="
-{% if row.6 > 5 %}
-dark-green
+    {% for row in rows %}
+
+    <tr class="
+    {% if row.6 > 5 %}
+    dark-green
+    {% else %}
+    light-green
+    {% endif %}
+    ">
+
+        <td>{{ row.0 }}</td>
+
+        <td>
+            <a class="ticker"
+               href="?ticker={{ row.1 }}">
+               {{ row.1 }}
+            </a>
+        </td>
+
+        <td>{{ row.2 }}</td>
+        <td>{{ row.3 }}</td>
+        <td>{{ row.4 }}</td>
+        <td>{{ row.5 }}</td>
+        <td>{{ row.6 }}%</td>
+        <td>{{ row.7 }}</td>
+        <td>{{ row.8 }}</td>
+        <td>{{ row.9 }}</td>
+
+    </tr>
+
+    {% endfor %}
+
 {% else %}
-light-green
+
+    {% for row in rows|slice:":1" %}
+
+    <tr class="
+    {% if row.6 > 5 %}
+    dark-green
+    {% else %}
+    light-green
+    {% endif %}
+    ">
+
+        <td>{{ row.0 }}</td>
+
+        <td>
+            <a class="ticker"
+               href="?ticker={{ row.1 }}">
+               {{ row.1 }}
+            </a>
+        </td>
+
+        <td>{{ row.2 }}</td>
+        <td>{{ row.3 }}</td>
+        <td>{{ row.4 }}</td>
+        <td>{{ row.5 }}</td>
+        <td>{{ row.6 }}%</td>
+        <td>{{ row.7 }}</td>
+        <td>{{ row.8 }}</td>
+        <td>{{ row.9 }}</td>
+
+    </tr>
+
+    {% endfor %}
+
 {% endif %}
-">
-
-<td>{{ row.0 }}</td>
-
-<td>
-
-<a class="ticker"
-   href="?ticker={{ row.1 }}">
-
-   {{ row.1 }}
-
-</a>
-
-</td>
-
-<td>{{ row.2 }}</td>
-<td>{{ row.3 }}</td>
-<td>{{ row.4 }}</td>
-<td>{{ row.5 }}</td>
-<td>{{ row.6 }}%</td>
-<td>{{ row.7 }}</td>
-<td>{{ row.8 }}</td>
-<td>{{ row.9 }}</td>
-
-</tr>
-
-{% endfor %}
 
 </tbody>
 
 </table>
 
 </div>
-
+</div>
 </div>
 
 <!-- ================= CHART JS ================= -->
