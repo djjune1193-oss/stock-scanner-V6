@@ -1,0 +1,815 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>ScannerX Tool Guide</title>
+
+<style>
+
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  align-items: center;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white !important;
+
+  border: 1px solid rgba(59,130,246,0.4);
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 0 10px rgba(37,99,235,0.15);
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(37,99,235,0.35);
+}
+
+/* Logout slightly different (more subtle) */
+.logout-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+}
+
+.logout-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+
+
+/* ================= ROOT ================= */
+
+:root {
+  --bg: #111827;
+  --panel: #0f172a;
+  --card: #1f2937;
+  --border: #374151;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --blue: #60a5fa;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #facc15;
+}
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: Arial, sans-serif;
+  color: var(--text);
+}
+
+/* watermark */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("{% static 'images/bull_bear_logo.png' %}") center center no-repeat;
+  background-size: 500px;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* ================= CONTAINER ================= */
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 28px;
+}
+
+
+/* ================= SECTIONS ================= */
+
+.section {
+  margin-top: 36px;
+}
+
+h1 {
+  margin-bottom: 6px;
+  color: white;
+}
+
+h2 {
+  margin-top: 36px;
+  color: var(--blue);
+}
+
+h3 {
+  margin-top: 22px;
+  color: #93c5fd;
+}
+
+p {
+  line-height: 1.75;
+  color: #d1d5db;
+}
+
+/* ================= CARDS ================= */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 14px;
+}
+
+/* ================= TABLE ================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+th {
+  background: #111827;
+  padding: 10px;
+  text-align: left;
+  color: #93c5fd;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  color: #e5e7eb;
+}
+
+/* ================= TAGS ================= */
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  margin-right: 6px;
+  color: #93c5fd;
+}
+
+/* ================= GRID ================= */
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tile {
+  flex: 1;
+  min-width: 220px;
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+/* ================= COLORS ================= */
+
+.green { color: var(--green); }
+.red { color: var(--red); }
+.yellow { color: var(--yellow); }
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAV ================= -->
+
+<div class="top-nav">
+
+  <!-- LEFT: BRAND -->
+  <div class="nav-left">
+    <div class="brand">
+      <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+      <div class="brand-text">
+        <div class="brand-title">ScannerX</div>
+        <div class="brand-sub">Market Intelligence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-center">
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  </div>
+
+  <!-- RIGHT: USER -->
+<div class="nav-right">
+
+  {% if request.user.is_authenticated %}
+
+    <div class="user-panel">
+
+      <div class="user-chip">
+        <div class="user-avatar">
+          {{ request.user.username|slice:":1"|upper }}
+        </div>
+
+        <div class="user-info">
+          <div class="user-label">Signed in</div>
+          <div class="user-name">{{ request.user.username }}</div>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="auth-btn logout-btn">
+                Logout
+        </button>
+      </form>
+
+    </div>
+
+  {% else %}
+
+    <a href="{% url 'login' %}" class="auth-btn">Login</a>
+
+  {% endif %}
+
+</div>
+
+</div>
+
+<div class="container">
+
+<!-- ================= HOME ================= -->
+
+<div class="section" id="home">
+<h1>ScannerX Tool Guide</h1>
+<p>
+<p>
+ScannerX is an institutional-style market intelligence platform designed
+to help investors identify high-quality stocks, monitor market conditions,
+track sector rotation, analyze fundamentals, and discover technical setups.
+The platform maintains a curated universe of liquid U.S. equities sourced
+from Yahoo Finance and updated on a synchronized schedule approximately
+one hour behind market time.
+</p>
+</p>
+
+
+<!-- ================= DATA PIPELINE ================= -->
+
+<div class="section" id="data">
+
+<h2>1. Data Collection & Refresh Process</h2>
+
+<div class="card">
+
+<p>
+ScannerX is built around a structured market database designed for
+mid-term and long-term investors. The goal is to provide reliable,
+consistent, and actionable market information rather than ultra-short-term
+trading signals.
+</p>
+
+<h3>Data Sources</h3>
+
+<p>
+All market, fundamental, and historical price data is collected from
+Yahoo Finance and processed into the ScannerX database.
+</p>
+
+<ul>
+<li>Daily OHLCV (Open, High, Low, Close, Volume)</li>
+<li>Market Capitalization</li>
+<li>Float Shares</li>
+<li>Shares Outstanding</li>
+<li>Valuation Metrics (P/E, Forward P/E, P/S, P/B, PEG)</li>
+<li>Profitability Metrics (ROE, ROA, Margins)</li>
+<li>Quarterly Revenue and Earnings History</li>
+<li>Industry and Sector Classifications</li>
+<li>Major Index and Futures Data</li>
+<li>Treasury Yield and Macro Market Data</li>
+</ul>
+
+<h3>Stock Requirements</h3>
+
+<p>
+To maintain a liquid and investable universe, ScannerX only includes
+stocks meeting minimum liquidity requirements.
+</p>
+
+<ul>
+<li>Share Price above <strong>$5</strong></li>
+<li>Average Daily Dollar Volume above <strong>$1 million</strong></li>
+<li>Valid and actively traded exchange-listed securities</li>
+</ul>
+
+<p>
+These filters remove most penny stocks, illiquid securities, and
+extremely thinly traded names that may produce unreliable technical signals.
+</p>
+
+<h3>Monthly Universe Refresh</h3>
+
+<p>
+The eligible stock universe is rebuilt and refreshed monthly.
+Newly qualified stocks are added while securities that no longer meet
+minimum requirements are removed.
+</p>
+
+<ul>
+<li>Monthly universe rebuild</li>
+<li>Ticker validation checks</li>
+<li>Corporate action adjustments</li>
+<li>Data quality verification</li>
+</ul>
+
+<h3>Daily Updates</h3>
+
+<p>
+ScannerX updates market data throughout the trading week and intentionally
+operates approximately <strong>one hour behind current market time</strong>.
+</p>
+
+<div class="tile">
+
+<strong>Why a 1-Hour Delay?</strong>
+
+<p>
+The platform is designed for market analysis, screening, trend discovery,
+and investment research rather than high-frequency execution.
+Operating one hour behind market time provides more stable calculations,
+reduces temporary data inconsistencies, and allows all scanners to run on
+a synchronized dataset.
+</p>
+
+</div>
+
+<ul>
+<li>OHLCV data updates approximately one hour behind market time</li>
+<li>Fundamental metrics are refreshed when new filings become available</li>
+<li>Futures, sectors, industries, and market health calculations are rebuilt automatically</li>
+<li>Scanner rankings and relative strength metrics are recalculated after each update cycle</li>
+</ul>
+
+<h3>Designed For</h3>
+
+<p>
+ScannerX is optimized for:
+</p>
+
+<ul>
+<li>Position Traders</li>
+<li>Swing Traders</li>
+<li>Growth Investors</li>
+<li>Trend Followers</li>
+<li>Market Researchers</li>
+<li>Long-Term Investors</li>
+</ul>
+
+<p>
+The platform is not intended for day trading, scalping, or
+sub-second execution strategies. Instead, it focuses on identifying
+high-quality stocks, strong industry groups, emerging trends, and
+institutional accumulation opportunities.
+</p>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+<h3>Home Page Overview (Quick Market View)</h3>
+
+<p>
+The Home page is designed as a <strong>liquidity-first market dashboard</strong>.
+Stocks are sorted by <strong>Volume by default</strong> to show where the highest participation and institutional flow exists.
+</p>
+
+<div class="grid">
+
+<div class="tile">
+<strong>Volume Sorting</strong>
+<p>Default sorting by highest traded volume to detect active capital flow.</p>
+</div>
+
+<div class="tile">
+<strong>Market Health</strong>
+<p>Quick 0–100 regime score showing bullish / neutral / bearish conditions.</p>
+</div>
+
+<div class="tile">
+<strong>Major Averages</strong>
+<p>S&P 500, Nasdaq, Dow, Russell trend snapshot.</p>
+</div>
+
+<div class="tile">
+<strong>Quick Scan</strong>
+<p>Fast view of strongest movers and liquidity leaders.</p>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ================= FUNDAMENTALS ================= -->
+
+<div class="section" id="fundamentals">
+<h2>2. Fundamentals Engine</h2>
+
+<div class="card">
+
+<p>
+The fundamentals section provides deep financial structure analysis using Yahoo Finance data.
+It blends valuation, profitability, growth, and momentum metrics.
+</p>
+
+
+</div>
+</div>
+
+<!-- ================= FUTURES ================= -->
+
+<div class="section" id="futures">
+<h2>3. Futures Dashboard (Macro Engine)</h2>
+
+<div class="card">
+
+<p>
+Futures provide macro market direction before equities react.
+They act as leading indicators for risk sentiment.
+</p>
+
+<div class="grid">
+
+<div class="tile">
+<strong>Equities</strong>
+<p>ES, NQ, YM, RTY</p>
+</div>
+
+<div class="tile">
+<strong>Bonds</strong>
+<p>ZN, ZB, ZT</p>
+</div>
+
+<div class="tile">
+<strong>Commodities</strong>
+<p>Gold, Oil, Silver, Copper</p>
+</div>
+
+<div class="tile">
+<strong>Crypto</strong>
+<p>BTC-USD risk proxy</p>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- ================= INDUSTRY ================= -->
+
+<div class="section" id="industry">
+<h2>4. Industry & Sector System</h2>
+
+<div class="card">
+
+<p>
+The system tracks:
+</p>
+
+<ul>
+<li>Weekly industry rotation</li>
+<li>Daily sector momentum</li>
+<li>ETF performance flows</li>
+</ul>
+
+<p>
+Each tile is clickable and opens:
+<strong>industry → company breakdown → relative strength ranking</strong>
+</p>
+
+</div>
+</div>
+
+<!-- ================= SEARCH ================= -->
+
+<div class="section" id="search">
+<h2>5. Smart Search System</h2>
+
+<div class="card">
+<p>
+Search bar returns:
+</p>
+
+<ul>
+<li>7-day price performance</li>
+<li>Candlestick chart</li>
+<li>Fundamentals snapshot</li>
+<li>Relative Strength score</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= EQUITY RANK ================= -->
+
+<div class="section" id="equity">
+<h2>6. Equity Ranking System</h2>
+
+<div class="card">
+<p>
+Stocks ranked across multiple timeframes:
+</p>
+
+<ul>
+<li>1D momentum</li>
+<li>7D trend</li>
+<li>30D swing strength</li>
+<li>Quarterly performance</li>
+</ul>
+
+</div>
+</div>
+
+<!-- ================= METRICS ================= -->
+
+<div class="section" id="metrics">
+<h2>7. Metrics Engine</h2>
+
+<div class="card">
+
+<p>
+Detects:
+</p>
+
+<ul>
+<li>Overbought / Oversold conditions</li>
+<li>ATR (volatility expansion)</li>
+<li>Relative volume spikes</li>
+</ul>
+
+</div>
+</div>
+
+<!-- ================= INDICATORS ================= -->
+
+<div class="section" id="indicators">
+<h2>8. Technical Indicator Suite</h2>
+
+<div class="card">
+
+<h3>Moving Averages</h3>
+<p>21–34 EMA structure identifies institutional trend alignment.</p>
+
+<h3>Keltner Channels</h3>
+<p>Volatility-based breakout zones using ATR bands.</p>
+
+<h3>Fibonacci Retracement</h3>
+<p>Key reversal zones for swing entries.</p>
+
+</div>
+</div>
+
+<!-- ================= STRATEGIES ================= -->
+
+<div class="section" id="strategies">
+<h2>9. Trading Strategies Engine</h2>
+
+<div class="card">
+
+<h3>Momentum Strategy</h3>
+<p>3-day momentum: <strong>100 × (Close / Close 3 days ago)</strong></p>
+
+<h3>21-Day Breakout</h3>
+<p>William O’Neil inspired breakout above 21-day high.</p>
+
+<h3>Anti Long / Anti Short</h3>
+<p>Linda Raschke stochastic signals.</p>
+
+<h3>3/10 Oscillator</h3>
+<p>Taylor-style cyclical swing detection model.</p>
+
+<h3>Double Bottoms</h3>
+<p>Structural reversal pattern confirmation system.</p>
+
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
