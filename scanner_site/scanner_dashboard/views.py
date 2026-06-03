@@ -4523,3 +4523,8 @@ def industry_dashboard(request):
             'ticker_data': ticker_data,
         }
     )
+
+
+
+def tool_guide(request):
+    return render(request, "scanner_dashboard/tool_guide.html")
