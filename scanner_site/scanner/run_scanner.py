@@ -761,44 +761,25 @@ def compute_relative_strength(df, spy_df, periods=[7, 21, 50, 100, 200]):
 
 def resample_to_weekly(df):
 
-
-    # =====================================================
-    # ENSURE DATETIME
-    # =====================================================
+    df = df.copy()
 
     df["Date"] = pd.to_datetime(df["Date"])
-
-    # =====================================================
-    # SET DATETIME INDEX
-    # =====================================================
-
     df = df.sort_values("Date")
 
-    df = df.set_index("Date")
+    # Create week bucket (NO index conversion)
+    df["week"] = df["Date"].dt.to_period("W")
 
-    # =====================================================
-    # WEEKLY OHLCV
-    # =====================================================
-
-    weekly = df.resample("W").agg({
+    weekly = df.groupby("week").agg({
         "Open": "first",
         "High": "max",
         "Low": "min",
         "Close": "last",
         "Volume": "sum"
-    })
+    }).reset_index()
 
-    # =====================================================
-    # REMOVE EMPTY WEEKS
-    # =====================================================
-
-    weekly = weekly.dropna()
-
-    # =====================================================
-    # RESET INDEX BACK
-    # =====================================================
-
-    weekly = weekly.reset_index()
+    # Convert period back to timestamp
+    weekly["Date"] = weekly["week"].dt.start_time
+    weekly = weekly.drop(columns=["week"])
 
     return weekly
 
