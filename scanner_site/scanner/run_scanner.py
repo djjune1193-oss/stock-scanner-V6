@@ -888,6 +888,14 @@ def run_scanner():
     )
 
     # =====================================================
+    # SAVE DAILY
+    # =====================================================
+    all_data_df = (full_history_df.sort_values(["TICKER", "Date"]).groupby("TICKER").tail(1).reset_index(drop=True))
+
+    all_data_df.to_parquet(DATA_DIR / "all_data.parquet",index=False)
+        
+
+    # =====================================================
     # SAVE WEEKLY
     # =====================================================
 
