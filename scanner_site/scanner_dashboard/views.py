@@ -823,30 +823,47 @@ def sector_view(request):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
 
-    latest_path = BASE_DIR / "scanner_site" / "data" / "all_data.parquet"
-    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
-
-    latest_df = pd.read_parquet(latest_path).reset_index()
-    history_df = pd.read_parquet(history_path)
-
-    # =========================================
-    # DATE CLEANING
-    # =========================================
-
-    latest_df["Date"] = pd.to_datetime(latest_df["Date"])
-    history_df["Date"] = pd.to_datetime(history_df["Date"])
-
-    history_df = history_df.sort_values(["TICKER", "Date"])
-
-    # =========================================
-    # ETF FILTER
-    # =========================================
-
-    row_condition = (
-        latest_df["Industry"].str.contains("ETF", na=False)
+    history_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "full_history.parquet"
     )
 
-    sector_df = latest_df[row_condition].copy()
+    history_df = pd.read_parquet(history_path)
+
+    history_df["Date"] = pd.to_datetime(
+        history_df["Date"]
+    )
+
+    history_df = history_df.sort_values(
+        ["TICKER", "Date"]
+    )
+
+    # =========================================
+    # ETF HISTORY ONLY
+    # =========================================
+
+    etf_history = history_df[
+        history_df["Industry"]
+        .astype(str)
+        .str.contains(
+            "ETF",
+            case=False,
+            na=False
+        )
+    ].copy()
+
+    # =========================================
+    # LATEST ETF ROWS
+    # =========================================
+
+    sector_df = (
+        etf_history
+        .groupby("TICKER")
+        .tail(1)
+        .reset_index(drop=True)
+    )
 
     # =========================================
     # TABLE DATA
@@ -865,64 +882,77 @@ def sector_view(request):
         "Volume"
     ]
 
-    round_cols = ["Close","Open","High","Low"]
-    sector_df[round_cols] = sector_df[round_cols].round(2)
-    
+    round_cols = [
+        "Close",
+        "Open",
+        "High",
+        "Low"
+    ]
 
-    sector_df = sector_df[selected_columns]
+    sector_df[round_cols] = (
+        sector_df[round_cols]
+        .round(2)
+    )
 
-    sector_df = sector_df.sort_values(
-        "Volume",
-        ascending=False
-    ).reset_index(drop=True)
+    sector_df = (
+        sector_df[selected_columns]
+        .sort_values(
+            "Volume",
+            ascending=False
+        )
+        .reset_index(drop=True)
+    )
 
-    sector_df["Date"] = sector_df["Date"].dt.date
+    sector_df["Date"] = (
+        sector_df["Date"]
+        .dt.date
+    )
 
     # =========================================
-    # HISTOGRAM DATA FROM FULL_HISTORY
+    # HISTOGRAM DATA
     # =========================================
 
-    etf_tickers = sector_df["TICKER"].unique()
-
-    hist_df = history_df[
-        history_df["TICKER"].isin(etf_tickers)
-    ].copy()
+    hist_df = etf_history.copy()
 
     hist_df["ret_5d"] = (
-        hist_df.groupby("TICKER")["Close"]
-        .pct_change(5) * 100
+        hist_df
+        .groupby("TICKER")["Close"]
+        .pct_change(5)
+        * 100
     )
 
     hist_df["ret_21d"] = (
-        hist_df.groupby("TICKER")["Close"]
-        .pct_change(21) * 100
+        hist_df
+        .groupby("TICKER")["Close"]
+        .pct_change(21)
+        * 100
     )
 
     latest_hist = (
-        hist_df.sort_values("Date")
+        hist_df
         .groupby("TICKER")
         .tail(1)
         .copy()
     )
 
-    latest_hist = latest_hist.sort_values(
-        "ret_5d",
-        ascending=False
-    )
+    import plotly.graph_objects as go
 
     # =========================================
     # 5 DAY HISTOGRAM
     # =========================================
 
-    import plotly.graph_objects as go
+    latest_5d = latest_hist.sort_values(
+        "ret_5d",
+        ascending=False
+    )
 
     fig_5d = go.Figure()
 
     fig_5d.add_trace(
         go.Bar(
-            x=latest_hist["TICKER"],
-            y=latest_hist["ret_5d"],
-            text=latest_hist["ret_5d"].round(1),
+            x=latest_5d["TICKER"],
+            y=latest_5d["ret_5d"],
+            text=latest_5d["ret_5d"].round(1),
             textposition="outside"
         )
     )
@@ -931,18 +961,25 @@ def sector_view(request):
         template="plotly_dark",
         height=500,
         title="Sector ETF 5-Day Return (%)",
-        margin=dict(l=20, r=20, t=60, b=40),
+        margin=dict(
+            l=20,
+            r=20,
+            t=60,
+            b=40
+        ),
         xaxis_title="ETF",
         yaxis_title="% Return"
     )
 
-    chart_5d = fig_5d.to_html(full_html=False)
+    chart_5d = fig_5d.to_html(
+        full_html=False
+    )
 
     # =========================================
     # 21 DAY HISTOGRAM
     # =========================================
 
-    latest_hist = latest_hist.sort_values(
+    latest_21d = latest_hist.sort_values(
         "ret_21d",
         ascending=False
     )
@@ -951,9 +988,9 @@ def sector_view(request):
 
     fig_21d.add_trace(
         go.Bar(
-            x=latest_hist["TICKER"],
-            y=latest_hist["ret_21d"],
-            text=latest_hist["ret_21d"].round(1),
+            x=latest_21d["TICKER"],
+            y=latest_21d["ret_21d"],
+            text=latest_21d["ret_21d"].round(1),
             textposition="outside"
         )
     )
@@ -962,12 +999,19 @@ def sector_view(request):
         template="plotly_dark",
         height=500,
         title="Sector ETF 21-Day Return (%)",
-        margin=dict(l=20, r=20, t=60, b=40),
+        margin=dict(
+            l=20,
+            r=20,
+            t=60,
+            b=40
+        ),
         xaxis_title="ETF",
         yaxis_title="% Return"
     )
 
-    chart_21d = fig_21d.to_html(full_html=False)
+    chart_21d = fig_21d.to_html(
+        full_html=False
+    )
 
     return render(
         request,
