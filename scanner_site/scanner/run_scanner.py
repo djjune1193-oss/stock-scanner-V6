@@ -999,27 +999,33 @@ def run_scanner():
 
         weekly = resample_to_weekly(g)
 
+        if len(weekly) < 2:
+            continue
+
         meta = {
-            "Sector": g["Sector"].iloc[-1],
-            "Industry": g["Industry"].iloc[-1]
+            "Sector": g["Sector"].iat[-1],
+            "Industry": g["Industry"].iat[-1]
         }
 
-        weekly_frames.append(
-            build_features(weekly, ticker, meta)
+        weekly = build_features(
+            weekly,
+            ticker,
+            meta
         )
 
-    weekly_history_df = pd.concat(weekly_frames, ignore_index=True)
+        weekly_frames.append(
+            weekly.tail(2)      # ONLY KEEP LAST 2 WEEKS
+        )
 
-    weekly_latest_df = (
-        weekly_history_df
-        .sort_values(["TICKER", "Date"])
-        .groupby("TICKER")
-        .tail(1)
-        .reset_index(drop=True)
+    weekly_2weeks_df = pd.concat(
+        weekly_frames,
+        ignore_index=True
     )
 
-    weekly_history_df.to_parquet(DATA_DIR / "weekly_history.parquet", index=False)
-    weekly_latest_df.to_parquet(DATA_DIR / "weekly_latest.parquet", index=False)
+    weekly_2weeks_df.to_parquet(
+        DATA_DIR / "weekly_2weeks.parquet",
+        index=False
+    )
     print("Weekly completed")
 
     print("\nSCANNER COMPLETED\n")

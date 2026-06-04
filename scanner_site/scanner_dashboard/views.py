@@ -3220,7 +3220,7 @@ from django.shortcuts import render
 def industry_detail_view_change(request, industry_name):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
-    data_path = BASE_DIR / "scanner_site" / "data" / "weekly_history.parquet"
+    data_path = (BASE_DIR /"scanner_site" /"data" /"weekly_2weeks.parquet")
 
     df = pd.read_parquet(data_path)
 
