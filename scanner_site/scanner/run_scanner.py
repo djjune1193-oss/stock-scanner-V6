@@ -806,7 +806,7 @@ def run_scanner():
     ma_latest_chunks = []
     turtle_signals = []
     stochastic_signals = []
-
+    weekly_frames = []
     master = []
 
     print("\nStarting scanner...\n")
@@ -857,6 +857,14 @@ def run_scanner():
             # ================= MA =================
             df, ma_latest = build_ma_structure(df)
             ma_latest_chunks.append(ma_latest.copy())
+            
+            # ================= WEEKLY ================= 
+            weekly = resample_to_weekly(df)
+           
+            if len(weekly) >= 2:
+                weekly = build_features(weekly, ticker, meta)
+                weekly_frames.append(weekly.tail(2))
+            
 
         except Exception as e:
             print(f"{ticker} ❌ {e}")
@@ -879,6 +887,14 @@ def run_scanner():
         index=False
     )
 
+    # =====================================================
+    # SAVE WEEKLY
+    # =====================================================
+
+    weekly_2weeks_df = pd.concat(weekly_frames, ignore_index=True)
+    weekly_2weeks_df.to_parquet(DATA_DIR / "weekly_2weeks.parquet",index=False)
+
+    
     # =====================================================
     # SAVE KELTNER
     # =====================================================
@@ -971,43 +987,6 @@ def run_scanner():
     )
     print("RS Alignemnt completed")
 
-    # =====================================================
-    # WEEKLY
-    # =====================================================
-    weekly_frames = []
-
-    for ticker, g in full_history_df.groupby("TICKER"):
-
-        weekly = resample_to_weekly(g)
-
-        if len(weekly) < 2:
-            continue
-
-        meta = {
-            "Sector": g["Sector"].iat[-1],
-            "Industry": g["Industry"].iat[-1]
-        }
-
-        weekly = build_features(
-            weekly,
-            ticker,
-            meta
-        )
-
-        weekly_frames.append(
-            weekly.tail(2)      # ONLY KEEP LAST 2 WEEKS
-        )
-
-    weekly_2weeks_df = pd.concat(
-        weekly_frames,
-        ignore_index=True
-    )
-
-    weekly_2weeks_df.to_parquet(
-        DATA_DIR / "weekly_2weeks.parquet",
-        index=False
-    )
-    print("Weekly completed")
 
     print("\nSCANNER COMPLETED\n")
 
