@@ -3168,40 +3168,42 @@ def breakout_21_view(request):
 def industry_weekly_view(request):
 
     BASE_DIR = Path(__file__).resolve().parents[2]
-    data_path = BASE_DIR / "scanner_site" / "data" / "weekly_latest.parquet"
+    data_path = BASE_DIR / "scanner_site" / "data" / "weekly_2weeks.parquet"
 
-    # ✅ Load latest weekly data (your saved output)
     df = pd.read_parquet(data_path)
 
+    # Keep only needed columns
     df = df[["Date", "TICKER", "perc_change", "Industry"]]
 
-    df = df[~df["Industry"].str.contains("ETF", na=False)].copy()
-
-    # Ensure clean datetime
+    # Clean datetime
     df["Date"] = pd.to_datetime(df["Date"])
 
-    # ✅ Direction logic
-    df["direction"] = df["perc_change"].apply(lambda x: "UP" if x > 0 else "DOWN")
+    # 🚀 get ONLY latest available week in dataset
+    latest_date = df["Date"].max()
+    df = df[df["Date"] == latest_date].copy()
 
-    # ✅ Industry aggregation
+    # Remove ETFs
+    df = df[~df["Industry"].str.contains("ETF", na=False)].copy()
+
+    # Direction
+    df["direction"] = np.where(df["perc_change"] > 0, "UP", "DOWN")
+
+    # Industry aggregation
     grouped = (
         df.groupby(["Industry", "direction"])
         .size()
         .unstack(fill_value=0)
     )
 
-    # Ensure columns exist
     grouped["UP"] = grouped.get("UP", 0)
     grouped["DOWN"] = grouped.get("DOWN", 0)
 
-    # Metrics
     grouped["TOTAL"] = grouped["UP"] + grouped["DOWN"]
     grouped["RATIO"] = grouped["UP"] / grouped["TOTAL"]
+
     median_gain = df.groupby("Industry")["perc_change"].median()
     grouped["MEDIAN_GAIN"] = median_gain
 
-
-    # Sort strongest → weakest industries
     grouped = grouped.sort_values("MEDIAN_GAIN", ascending=False).reset_index()
 
     return render(
@@ -3211,7 +3213,6 @@ def industry_weekly_view(request):
             "data": grouped.to_dict(orient="records")
         }
     )
-
 
 import pandas as pd
 from pathlib import Path
