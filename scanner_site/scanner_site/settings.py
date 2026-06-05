@@ -26,10 +26,10 @@ SECRET_KEY = 'django-insecure-7@0#!8i_10(*@2bm9fbsf(vsn-!z74%*ypo0vaf!iz1yd=1vif
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["146.190.147.47", "www.swingtradesingh.com","swingtradesingh.com"]
+ALLOWED_HOSTS = ["146.190.147.47", "www.swingtradesingh.com","swingtradesingh.com","scannerxmi.com","www.scannerxmi.com"]
 CSRF_TRUSTED_ORIGINS = [
     "https://swingtradesingh.com",
-    "https://www.swingtradesingh.com"
+    "https://www.swingtradesingh.com","https://scannerxmi.com","https://www.scannerxmi.com/"
 ]
 
 SECURE_PROXY_SSL_HEADER = (
