@@ -1,0 +1,549 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Premarket Scanner</title>
+
+<style>
+
+/* ================= BRAND ================= */
+
+/* ================= PAYWALL BLUR ================= */
+
+.blur-row td {
+    filter: blur(5px);
+    user-select: none;
+}
+
+.blur-row {
+    position: relative;
+}
+
+.blur-overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    background: rgba(15,23,42,0.95);
+
+    border: 1px solid rgba(59,130,246,0.35);
+
+    padding: 12px 24px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    backdrop-filter: blur(10px);
+
+    z-index: 20;
+}
+
+.blur-overlay a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  align-items: center;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+
+.auth-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: none;
+}
+
+.auth-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+
+h1 {
+    margin: 15px 0 5px;
+    color: white;
+}
+
+.sub {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= TABLE ================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+thead {
+  background: #1f2937;
+  position: sticky;
+  top: 60px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #374151;
+  text-align: left;
+}
+
+tr:hover {
+  background: #1f2937;
+}
+
+/* ================= COLORS ================= */
+
+.high { color: #22c55e; font-weight: 700; }
+.mid { color: #facc15; }
+.low { color: #ef4444; }
+
+.ticker {
+  color: #60a5fa;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+</style>
+
+<br>
+<!-- ================= MASTER TOP NAV ================= -->
+
+<div class="top-nav">
+
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+<!-- ================= MAIN ================= -->
+
+
+
+<br>
+
+<div class="desc">
+
+Previous Close = Prior regular market closing price<br>
+PM Last = Latest premarket trade before the opening bell<br>
+PM High / PM Low = Highest and lowest prices reached during the premarket session<br><br>
+
+Premarket session includes:<br>
+• 4:00 AM – 9:29 AM ET<br><br>
+
+<strong>Gap Calculations</strong><br>
+
+Gap Now % = (PM Last − Previous Close) ÷ Previous Close × 100<br>
+Gap High % = (PM High − Previous Close) ÷ Previous Close × 100<br>
+Gap Low % = (PM Low − Previous Close) ÷ Previous Close × 100<br><br>
+
+<strong>Interpretation</strong><br>
+
+🟢 Positive gaps indicate premarket buying pressure.<br>
+🔴 Negative gaps indicate premarket selling pressure.<br>
+⚡ Large gap moves are often associated with earnings, analyst actions, news releases, economic reports, or sector-wide catalysts before the market opens
+
+</div>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Premarket Gap Scanner</h1>
+<div class="sub">
+Tracks premarket price action from 4:00 AM to 9:29 AM ET relative to the previous day's closing price.<br><br>
+</div>
+
+
+<table>
+
+<thead>
+<tr>
+  {% for col in columns %}
+    <th>{{ col }}</th>
+  {% endfor %}
+</tr>
+</thead>
+<tbody>
+
+{% for row in rows %}
+
+    {% if not request.user.is_authenticated and forloop.counter > 5 %}
+
+        <tr class="blur-row">
+
+  	    <td>
+            <a class="ticker" href="{% url 'equity_chart' row.TICKER %}">
+            {{ row.TICKER }}
+            </a>
+            </td>
+            <td>{{ row.Prev_Close }}</td>
+            <td>{{ row.PM_Last }}</td>
+            <td>{{ row.PM_High }}</td>
+            <td>{{ row.PM_Low }}</td>
+            <td>{{ row.Gap_Now }}</td>
+            <td>{{ row.Gap_High }}</td>
+            <td>{{ row.Gap_Low }}</td>
+
+        </tr>
+
+        {% if forloop.counter == 6 %}
+        <tr>
+            <td colspan="8" style="position:relative;padding:0;border:none;">
+                <div class="blur-overlay">
+                    🔒 Showing Top 5 Premarket Movers<br><br>
+                    <a href="{% url 'login' %}">
+                        Login to unlock the full scanner
+                    </a>
+                </div>
+            </td>
+        </tr>
+        {% endif %}
+
+    {% else %}
+
+        <tr class="{{ row.row_class }}">
+
+            <td>
+            <a class="ticker" href="{% url 'equity_chart' row.TICKER %}">
+            {{ row.TICKER }}
+            </a>
+            </td>
+            <td>{{ row.Prev_Close }}</td>
+            <td>{{ row.PM_Last }}</td>
+            <td>{{ row.PM_High }}</td>
+            <td>{{ row.PM_Low }}</td>
+
+            <td
+                {% if row.Gap_Now >= 3 %}
+                    class="high"
+                {% elif row.Gap_Now < 0 %}
+                    class="low"
+                {% else %}
+                    class="mid"
+                {% endif %}
+            >
+                {{ row.Gap_Now }}
+            </td>
+
+            <td>{{ row.Gap_High }}</td>
+            <td>{{ row.Gap_Low }}</td>
+
+        </tr>
+
+    {% endif %}
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

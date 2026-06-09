@@ -4264,7 +4264,6 @@ def fib_retracement_scan(request):
     history_df = pd.read_parquet(
         history_path
     )
-
     history_df["Date"] = pd.to_datetime(
         history_df["Date"]
     )
@@ -4569,7 +4568,586 @@ def industry_dashboard(request):
         }
     )
 
+from pathlib import Path
+import pandas as pd
+from django.shortcuts import render
 
+
+from pathlib import Path
+import pandas as pd
+from django.shortcuts import render
+
+
+def premarket_view(request):
+
+    # =========================================================
+    # PATH
+    # =========================================================
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    data_path = BASE_DIR / "scanner_site" / "data" / "premarket_scan.parquet"
+
+    df = pd.read_parquet(data_path)
+
+    if df.empty:
+        return render(request, "scanner/premarket.html", {
+            "columns": [],
+            "rows": []
+        })
+
+    # =========================================================
+    # CLEAN + SORT
+    # =========================================================
+    df = df[df["TICKER"].notna()]
+    df = df[df["TICKER"] != ""]
+
+    if "Gap_Now_%" in df.columns:
+        df["Gap_Now_%"] = df["Gap_Now_%"].round(2)
+        df["Abs_Gap"] = df["Gap_Now_%"].abs()
+
+    df = df.sort_values("Abs_Gap", ascending=False)
+
+    df = df.head(200)
+
+    # =========================================================
+    # COLUMNS (fixed order like home view)
+    # =========================================================
+    selected_columns = [
+        "TICKER",
+        "Prev_Close",
+        "PM_Last",
+        "PM_High",
+        "PM_Low",
+        "Gap_Now_%",
+        "Gap_High_%",
+        "Gap_Low_%"
+    ]
+
+    df = df[selected_columns]
+
+    # =========================================================
+    # ROWS BUILD (SAME PATTERN AS HOME VIEW)
+    # =========================================================
+    rows = []
+
+    for _, r in df.iterrows():
+
+        gap = r["Gap_Now_%"]
+
+        # row coloring logic (same style system as your scanner)
+        if gap >= 3:
+            row_class = "dark-green"
+        elif gap > 0:
+            row_class = "light-green"
+        elif gap <= -3:
+            row_class = "dark-red"
+        elif gap < 0:
+            row_class = "light-red"
+        else:
+            row_class = ""
+
+        rows.append({
+            "TICKER": r["TICKER"],
+            "Prev_Close": round(r["Prev_Close"], 2),
+            "PM_Last": round(r["PM_Last"], 2),
+            "PM_High": round(r["PM_High"], 2),
+            "PM_Low": round(r["PM_Low"], 2),
+            "Gap_Now": round(gap, 2),
+            "Gap_High": round(r["Gap_High_%"], 2),
+            "Gap_Low": round(r["Gap_Low_%"], 2),
+            "row_class": row_class
+        })
+
+    # =========================================================
+    # RENDER
+    # =========================================================
+    return render(
+        request,
+        "scanner_dashboard/premarket.html",
+        {
+            "columns": selected_columns,
+            "rows": rows
+        }
+    )
+
+from pathlib import Path
+
+import pandas as pd
+import plotly.graph_objects as go
+
+from django.shortcuts import render
+
+
+def rsi_scan(request):
+
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    df = pd.read_parquet(history_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    # =====================================
+    # LATEST ROW PER TICKER
+    # =====================================
+
+    latest_df = (
+        df.sort_values("Date")
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
+
+    # =====================================
+    # SORTING
+    # =====================================
+
+    sort_col = request.GET.get("sort", "Volume")
+    sort_dir = request.GET.get("dir", "desc")
+
+    valid_cols = [
+        "RSI14",
+        "RSI14_slope",
+        "Close",
+        "Volume"
+    ]
+
+    if sort_col not in valid_cols:
+        sort_col = "RSI14"
+
+    ascending = sort_dir == "asc"
+
+    latest_df = latest_df.sort_values(
+        sort_col,
+        ascending=ascending
+    )
+
+    # =====================================
+    # TABLE
+    # =====================================
+
+    results = latest_df[[
+        "TICKER",
+        "Close",
+        "RSI14",
+        "RSI14_slope",
+        "Volume"
+    ]].round(2).to_dict("records")
+
+    # =====================================
+    # CHART
+    # =====================================
+
+    selected_ticker = request.GET.get("ticker", "^GSPC")
+
+    if selected_ticker not in df["TICKER"].unique():
+        selected_ticker = "^GSPC"
+
+    chart_df = (
+        df[df["TICKER"] == selected_ticker]
+        .tail(100)
+        .copy()
+    )
+
+    chart_data = None
+
+    if not chart_df.empty:
+
+        fig = go.Figure()
+
+        # RSI
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["RSI14"],
+                name="RSI(14)",
+                line=dict(color="cyan", width=2)
+            )
+        )
+
+        # Overbought
+        fig.add_hline(
+            y=70,
+            line_dash="dash",
+            line_color="red"
+        )
+
+        # Oversold
+        fig.add_hline(
+            y=30,
+            line_dash="dash",
+            line_color="lime"
+        )
+
+        fig.update_layout(
+            template="plotly_dark",
+            height=450,
+            margin=dict(l=10, r=10, t=30, b=10),
+            title=f"{selected_ticker} - RSI(14)",
+            yaxis=dict(range=[0, 100])
+        )
+
+        chart_data = fig.to_html(full_html=False)
+
+    return render(
+        request,
+        "scanner_dashboard/rsi_scan.html",
+        {
+            "data": results,
+            "chart": chart_data,
+            "selected_ticker": selected_ticker,
+            "sort_col": sort_col,
+            "sort_dir": sort_dir,
+        }
+    )
+
+
+
+from pathlib import Path
+import pandas as pd
+import plotly.graph_objects as go
+from django.shortcuts import render
+
+
+def macd_scan(request):
+
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    df = pd.read_parquet(history_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    # =====================================
+    # LATEST ROW PER TICKER
+    # =====================================
+
+    latest_df = (
+        df.sort_values("Date")
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
+
+    # =====================================
+    # SORTING
+    # =====================================
+
+    sort_col = request.GET.get("sort", "Volume")
+    sort_dir = request.GET.get("dir", "desc")
+
+    valid_cols = [
+        "Close",
+        "MACD",
+        "Signal",
+        "Histogram",
+        "Volume"
+    ]
+
+    if sort_col not in valid_cols:
+        sort_col = "MACD"
+
+    ascending = sort_dir == "asc"
+
+    latest_df = latest_df.sort_values(
+        sort_col,
+        ascending=ascending
+    )
+
+    # =====================================
+    # TABLE OUTPUT
+    # =====================================
+
+    results = latest_df[[
+        "TICKER",
+        "Close",
+        "MACD",
+        "Signal",
+        "Histogram",
+        "Volume"
+    ]].round(3).to_dict("records")
+
+    # =====================================
+    # CHART (selected ticker)
+    # =====================================
+
+    selected_ticker = request.GET.get("ticker", "^GSPC")
+
+    if selected_ticker not in df["TICKER"].unique():
+        selected_ticker = "^GSPC"
+
+    chart_df = (
+        df[df["TICKER"] == selected_ticker]
+    )
+
+    chart_data = None
+
+    if not chart_df.empty:
+
+        fig = go.Figure()
+
+        # =========================
+        # PRICE (MAIN)
+        # =========================
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["Close"],
+                name="Price",
+                line=dict(width=2, color="white"),
+                yaxis="y"
+            )
+        )
+
+        # =========================
+        # MACD + SIGNAL
+        # =========================
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["MACD"],
+                name="MACD",
+                line=dict(width=2, color="cyan"),
+                yaxis="y2"
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["Signal"],
+                name="Signal",
+                line=dict(width=2, color="orange"),
+                yaxis="y2"
+            )
+        )
+
+        # =========================
+        # HISTOGRAM (GREEN/RED)
+        # =========================
+        colors = [
+            "green" if val >= 0 else "red"
+            for val in chart_df["Histogram"]
+        ]
+
+        fig.add_trace(
+            go.Bar(
+                x=chart_df["Date"],
+                y=chart_df["Histogram"],
+                name="Histogram",
+                marker_color=colors,
+                opacity=0.6,
+                yaxis="y2"
+            )
+        )
+
+        # =========================
+        # ZERO LINE (MACD PANEL)
+        # =========================
+        fig.add_hline(
+            y=0,
+            line_dash="dash",
+            line_color="gray",
+            opacity=0.5,
+            yref="y2"
+        )
+
+        # =========================
+        # LAYOUT (DUAL PANEL STYLE)
+        # =========================
+        fig.update_layout(
+            template="plotly_dark",
+            height=520,
+            margin=dict(l=10, r=10, t=30, b=10),
+            title=f"{selected_ticker} - Price + MACD",
+
+            xaxis=dict(domain=[0, 1]),
+
+            yaxis=dict(
+                title="Price",
+                domain=[0.45, 1]
+            ),
+
+            yaxis2=dict(
+                title="MACD",
+                domain=[0, 0.4],
+                anchor="x"
+            ),
+
+            legend=dict(orientation="h"),
+        )
+
+        chart_data = fig.to_html(full_html=False)
+
+    return render(
+        request,
+        "scanner_dashboard/macd_scan.html",
+        {
+            "data": results,
+            "chart": chart_data,
+            "selected_ticker": selected_ticker,
+            "sort_col": sort_col,
+            "sort_dir": sort_dir,
+        }
+    )
+
+
+
+def cmf_scan(request):
+
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    history_path = BASE_DIR / "scanner_site" / "data" / "full_history.parquet"
+
+    df = pd.read_parquet(history_path)
+
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    # =========================================================
+    # REMOVE NON-TRADEABLE INDICATORS
+    # =========================================================
+    df = df[~df["Industry"].isin(["FUTURES", "MARKET INDICATOR"])].copy()
+
+    # =========================================================
+    # LATEST ROW PER TICKER
+    # =========================================================
+    latest_df = (
+        df.sort_values("Date")
+        .groupby("TICKER")
+        .tail(1)
+        .copy()
+    )
+
+    # =========================================================
+    # SORTING
+    # =========================================================
+    sort_col = request.GET.get("sort", "Volume")
+    sort_dir = request.GET.get("dir", "desc")
+
+    valid_cols = ["Close", "Volume", "CMF20"]
+
+    if sort_col not in valid_cols:
+        sort_col = "Volume"
+
+    ascending = sort_dir == "asc"
+
+    latest_df = latest_df.sort_values(sort_col, ascending=ascending)
+
+    # =========================================================
+    # TABLE OUTPUT
+    # =========================================================
+    results = latest_df[[
+        "TICKER",
+        "Close",
+        "CMF20",
+        "Volume"
+    ]].round(2).to_dict("records")
+
+    # =========================================================
+    # CHART → FIRST TICKER
+    # =========================================================
+    selected_ticker = request.GET.get("ticker", "^GSPC")
+
+    if selected_ticker not in df["TICKER"].unique():
+        selected_ticker = "NVDA"
+
+    chart_df = (
+        df[df["TICKER"] == selected_ticker]
+    )
+
+    chart_data = None
+
+    if not chart_df.empty:
+
+        # =====================================================
+        # SUBPLOTS (PRICE / CMF / VOLUME)
+        # =====================================================
+        fig = make_subplots(
+            rows=3,
+            cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.03,
+            row_heights=[0.5, 0.25, 0.25]
+        )
+
+        # =====================================================
+        # PRICE (TOP PANEL)
+        # =====================================================
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["Close"],
+                name="Price",
+                line=dict(width=2, color="white")
+            ),
+            row=1, col=1
+        )
+
+        # =====================================================
+        # CMF (MIDDLE PANEL)
+        # =====================================================
+        fig.add_trace(
+            go.Scatter(
+                x=chart_df["Date"],
+                y=chart_df["CMF20"],
+                name="CMF(20)",
+                line=dict(width=2, color="cyan")
+            ),
+            row=2, col=1
+        )
+
+        fig.add_hline(
+            y=0,
+            line_dash="dash",
+            line_color="gray",
+            opacity=0.6,
+            row=2, col=1
+        )
+
+        # =====================================================
+        # VOLUME (BOTTOM PANEL - PROFILE STYLE)
+        # =====================================================
+        colors = [
+            "green" if chart_df["Close"].iloc[i] >= chart_df["Close"].iloc[i - 1] else "red"
+            if i > 0 else "gray"
+            for i in range(len(chart_df))
+        ]
+
+        fig.add_trace(
+            go.Bar(
+                x=chart_df["Date"],
+                y=chart_df["Volume"],
+                name="Volume",
+                marker_color=colors,
+                opacity=0.6
+            ),
+            row=3, col=1
+        )
+
+        # =====================================================
+        # LAYOUT (TRADING TERMINAL STYLE)
+        # =====================================================
+        fig.update_layout(
+            template="plotly_dark",
+            height=750,
+            margin=dict(l=10, r=10, t=30, b=10),
+            title=f"{selected_ticker} - Price / CMF / Volume Profile",
+
+            showlegend=False
+        )
+
+        chart_data = fig.to_html(full_html=False)
+
+    return render(
+        request,
+        "scanner_dashboard/cmf_scan.html",
+        {
+            "data": results,
+            "chart": chart_data,
+            "selected_ticker": selected_ticker,
+            "sort_col": sort_col,
+            "sort_dir": sort_dir,
+        }
+    )
 
 def tool_guide(request):
     return render(request, "scanner_dashboard/tool_guide.html")

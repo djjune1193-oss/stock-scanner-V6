@@ -1,19 +1,18 @@
 import pandas as pd
 import numpy as np
-from .indicators import calculate_macd, calculate_bollinger_bands, calculate_adx, count_prev_lower_until_higher, classify_candlestick
+from .indicators import calculate_macd, calculate_bollinger_bands, calculate_adx, count_prev_lower_until_higher, classify_candlestick,calculate_rsi,calculate_cmf
 from scipy.stats import linregress
 
-import pandas as pd
-import numpy as np
-from scipy.stats import linregress
+from pandas.errors import PerformanceWarning
+import warnings
 
-from .indicators import (
-    calculate_macd,
-    calculate_adx,
-    calculate_bollinger_bands,
-    count_prev_lower_until_higher,
-    classify_candlestick
+warnings.filterwarnings(
+    "ignore",
+    category=PerformanceWarning
 )
+
+
+
 
 def build_features(data, tic, meta):
 
@@ -42,11 +41,6 @@ def build_features(data, tic, meta):
     df["Sector"] = meta["Sector"]
     df["Industry"] = meta["Industry"]
 
-    # =========================================================
-    # OHLCV (already in df, no re-copy from data)
-    # =========================================================
-    for col in ["Open", "High", "Low", "Close", "Volume"]:
-        df[col] = df[col]
 
     # =========================================================
     # RETURNS
@@ -59,6 +53,21 @@ def build_features(data, tic, meta):
     # =========================================================
     macd = calculate_macd(df, column="Close")
     df = pd.concat([df, macd], axis=1)
+
+
+    # =========================================================
+    # CMF
+    # =========================================================
+    cmf = calculate_cmf(df, high="High", low="Low", close="Close", volume="Volume", period=20)
+    df = pd.concat([df, cmf], axis=1)
+
+    # =========================================================
+    # RSI
+    # =========================================================
+
+    rsi = calculate_rsi(df, column="Close", period=14)
+
+    df = pd.concat([df, rsi],axis=1)
 
     # =========================================================
     # ATR
@@ -194,5 +203,6 @@ def build_features(data, tic, meta):
         (df["fast_slope"] < 0) &
         (df["slow_slope"] < 0)
     )
+
 
     return df

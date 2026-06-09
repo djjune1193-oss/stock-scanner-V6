@@ -535,24 +535,20 @@ tr:hover {
   <a href="{% url 'sector' %}">Daily Sector</a>
   <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
   <a href="{% url 'industry_today' %}">Daily Industry</a>
-  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'industry_rs' %}">Industry Relative Strength</a>
   <a href="{% url 'equity_ranking' %}">Equity Rank</a>
   <a href="{% url 'metrics' %}">Metrics</a>
-  <a href="{% url 'ma_structure' %}">MA Groups</a>
-  <a href="{% url 'keltner_scan' %}">Keltner</a>
-  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'ma_structure' %}">Moving Average Groups</a>
   <a href="{% url 'rs_alignment' %}">Correlation</a>
   <a href="{% url 'industry_dashboard' %}">Charts</a>
-  <a href="{% url 'tool_guide' %}">Guide</a>
+  <a href="{% url 'tool_guide' %}"> Tool Guide</a>
 
   </div>
 
 
 
-<!-- ================= SEARCH BAR ================= -->
 
 
-<!-- ================= FULL WIDTH SEARCH ================= -->
 
 
   <!-- RIGHT: USER -->
@@ -592,6 +588,12 @@ tr:hover {
 
 </div>
 
+
+
+
+
+
+<!-- ================= FULL WIDTH SEARCH ================= -->
 <div class="full-search-bar">
 
   <form
@@ -630,14 +632,20 @@ tr:hover {
 
 <div class="entry-panel">
 
+  <a href="{% url 'premarket' %}">Premarket</a>
   <a href="{% url 'scanner' %}">21/34 Moving average</a>
   <a href="{% url 'hot_ten_day' %}">Hot Theme</a>
   <a href="{% url 'turtle_soup' %}">Anti Long</a>
   <a href="{% url 'stochastic_short' %}">Anti Short</a>
   <a href="{% url 'breakout_21' %}">Breakout 21</a>
   <a href="{% url 'double-bottom' %}">Double Bottom</a>
-  <a href="{% url 'sector_lbr' %}">3/10 Osc.</a>
+  <a href="{% url 'sector_lbr' %}">3/10 Oscillator</a>
   <a href="{% url 'momentum_strength' %}">Daily Momentum</a>
+  <a href="{% url 'rsi_scan' %}">RSI</a>
+  <a href="{% url 'macd_scan' %}">MACD</a>
+  <a href="{% url 'cmf_scan' %}">Chaikin Money Flow</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci Retracement</a>
+  <a href="{% url 'keltner_scan' %}">Keltner Bands</a>
 
 </div>
 

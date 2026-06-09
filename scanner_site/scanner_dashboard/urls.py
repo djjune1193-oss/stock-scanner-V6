@@ -35,6 +35,9 @@ urlpatterns = [
     path("today/<str:industry_name>/",views.industry_today_detail,name="industry_today_detail"),
     path("ma_structure/",views.ma_structure_view,name="ma_structure"),
     path('keltner_scan/', views.keltner_scan, name='keltner_scan'),
+    path('rsi_scan/', views.rsi_scan, name='rsi_scan'),
+    path('macd_scan/', views.macd_scan, name='macd_scan'),
+    path('cmf_scan/', views.cmf_scan, name='cmf_scan'),
     path("futures/", views.futures_view, name="futures"),
     path("fib_scan/", views.fib_retracement_scan, name="fib_scan"),
     path('industry_dashboard/',views.industry_dashboard,name='industry_dashboard'),
@@ -47,5 +50,6 @@ urlpatterns = [
     path("reset-password-verify/", views.reset_password_verify, name="reset_password_verify"),
     path("new-password/", views.new_password, name="new_password"),
     path("tool_guide/", views.tool_guide, name="tool_guide"),
+    path("premarket/", views.premarket_view, name="premarket"),
     
 ]

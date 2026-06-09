@@ -1,5 +1,33 @@
 import pandas as pd
 
+
+import pandas as pd
+
+def calculate_rsi(df, column="Close", period=14):
+
+    close = df[column]
+    delta = close.diff()
+
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    # -----------------------------
+    # Wilder smoothing (RMA)
+    # -----------------------------
+    avg_gain = gain.ewm(alpha=1/period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/period, adjust=False).mean()
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+
+    rsi_df = pd.DataFrame(index=df.index)
+
+    rsi_df[f"RSI{period}"] = rsi
+    rsi_df[f"RSI{period}_slope"] = rsi.diff()
+
+
+    return rsi_df
+
 def calculate_macd(df, column="Close", fast=12, slow=26, signal=9):
     macd = pd.DataFrame(index=df.index)
 
@@ -10,6 +38,40 @@ def calculate_macd(df, column="Close", fast=12, slow=26, signal=9):
     macd["Histogram"] = macd["MACD"] - macd["Signal"]
 
     return macd
+
+
+
+def calculate_cmf(df, high="High", low="Low", close="Close", volume="Volume", period=20):
+
+    cmf_df = pd.DataFrame(index=df.index)
+
+    # ------------------------------------
+    # Money Flow Multiplier (CLV concept)
+    # ------------------------------------
+    mf_multiplier = (
+        (df[close] - df[low]) - (df[high] - df[close])
+    ) / (df[high] - df[low])
+
+    # handle division by zero (flat candles)
+    mf_multiplier = mf_multiplier.replace([float("inf"), -float("inf")], 0).fillna(0)
+
+    # ------------------------------------
+    # Money Flow Volume
+    # ------------------------------------
+    mf_volume = mf_multiplier * df[volume]
+
+    # ------------------------------------
+    # Chaikin Money Flow
+    # ------------------------------------
+    cmf = (
+        mf_volume.rolling(period).sum()
+        / df[volume].rolling(period).sum()
+    )
+
+    cmf_df[f"CMF{period}"] = cmf
+
+
+    return cmf_df
 
 
 def calculate_bollinger_bands(df, period=20, std=2):

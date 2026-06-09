@@ -134,6 +134,7 @@ def build_fib_retracement_data(df):
         .transform("min")
     )
 
+
     # =====================================================
     # SAFE DENOMINATOR
     # =====================================================
@@ -142,6 +143,8 @@ def build_fib_retracement_data(df):
         df["high_max"] - df["low_min"]
     ).replace(0, 1)
 
+    
+
     # =====================================================
     # RETRACEMENT %
     # =====================================================
@@ -149,6 +152,8 @@ def build_fib_retracement_data(df):
     df["retracement"] = (
         (df["high_max"] - df["Close"]) / diff
     ) * 100
+
+    
 
     # =====================================================
     # FIB LEVELS
@@ -171,6 +176,7 @@ def build_fib_retracement_data(df):
     df["fib_618"] = (
         df["high_max"] - 0.618 * diff
     )
+
 
     # =====================================================
     # LATEST SNAPSHOT
@@ -199,10 +205,6 @@ def build_fib_retracement_data(df):
         "fib_618"
     ]].copy()
 
-    latest_df["tv_link"] = (
-        "https://www.tradingview.com/chart/?symbol="
-        + latest_df["TICKER"]
-    )
 
     latest_df = latest_df.round(2)
 
@@ -832,13 +834,17 @@ def run_scanner():
             print(download_timestamp)
             df = build_features(df, ticker, meta)
             df["download_timestamp"] = download_timestamp
-
-
-            master.append(df)
-
+            
             # ================= KELTNER =================
             df = build_keltner_data(df)
             keltner_latest_chunks.append(df.tail(1).copy())
+            # ================= FIB =================
+            df, fib_latest = build_fib_retracement_data(df)
+            fib_latest_chunks.append(fib_latest.copy())
+
+            master.append(df)
+
+
 
             # ================= TURTLE =================
             df, ts_signals = build_turtle_soup_signals(df)
@@ -850,9 +856,7 @@ def run_scanner():
             if not ss_signals.empty:
                 stochastic_signals.append(ss_signals.copy())
 
-            # ================= FIB =================
-            df, fib_latest = build_fib_retracement_data(df)
-            fib_latest_chunks.append(fib_latest.copy())
+
 
             # ================= MA =================
             df, ma_latest = build_ma_structure(df)

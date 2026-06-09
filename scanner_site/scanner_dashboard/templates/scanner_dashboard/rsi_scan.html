@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>RSI Scan</title>
+
+<style>
+
+/* ================= LOGIN PREVIEW ================= */
+
+.locked-preview {
+    filter: blur(6px);
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+}
+
+.login-overlay {
+    margin-top: 15px;
+    padding: 20px;
+    text-align: center;
+
+    background: rgba(15,23,42,0.95);
+
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 10px;
+
+    color: #cbd5e1;
+}
+
+.login-overlay p {
+    margin-bottom: 14px;
+    font-size: 13px;
+}
+
+/* ================= BRAND ================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 18px;
+}
+
+.brand img {
+
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  padding: 4px;
+
+  background: #0b1220;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+      0 0 18px rgba(37,99,235,0.35),
+      0 0 30px rgba(56,189,248,0.15);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: #93c5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+
+/* ================= BASE ================= */
+
+body {
+  margin: 0;
+  background: #111827;
+  font-family: Arial;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* ================= NAV ================= */
+
+.top-nav {
+  background: #0f172a;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #374151;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  align-items: center;
+}
+
+.top-nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.top-nav a:hover {
+  background: #1f2937;
+  color: white;
+}
+
+.nav-right {
+  margin-left: auto;     /* pushes it to far right */
+  display: flex;
+  align-items: center;
+  padding-right: 10px;   /* slight breathing space from edge */
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= AUTH BUTTON ================= */
+
+.auth-btn {
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb !important;
+
+  padding: 7px 14px;
+  border-radius: 10px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  box-shadow: none;
+}
+
+.auth-btn:hover {
+  background: #1f2937;
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 0 10px rgba(96,165,250,0.2);
+}
+
+/* ================= USER SECTION ================= */
+
+.user-section {
+
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ================= USER CHIP ================= */
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+/* ================= AVATAR ================= */
+
+.user-avatar {
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+      135deg,
+      #2563eb,
+      #38bdf8
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+
+  box-shadow:
+      0 0 10px rgba(37,99,235,0.35);
+}
+
+/* ================= USER INFO ================= */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-label {
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  color: #94a3b8;
+}
+
+.user-name {
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+/* ================= CARD ================= */
+
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+/* ================= DESCRIPTION ================= */
+
+.desc {
+    background: rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.desc strong {
+    color: #93c5fd;
+}
+
+/* ================= INPUT ================= */
+
+input {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: #0f172a;
+    color: white;
+    width: 260px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+/* ================= TABLE ================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+/* SORTABLE HEADERS */
+th {
+    background: #1f2937;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+}
+
+th a {
+    color: white;
+    text-decoration: none;
+}
+
+th a:hover {
+    color: #93c5fd;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+}
+
+tr:nth-child(even) {
+    background: #0f172a;
+}
+
+/* TICKER LINK */
+.ticker-link {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.ticker-link:hover {
+    text-decoration: underline;
+}
+
+</style>
+
+</head>
+
+<body>
+
+{% load static %}
+
+<!-- ================= MASTER TOP NAV ================= -->
+
+<div class="top-nav">
+
+  <!-- ================= BRAND (ALWAYS SAME) ================= -->
+  <div class="brand">
+
+    <img src="{% static 'images/bull_bear_logo.png' %}" alt="Logo">
+
+    <div class="brand-text">
+      <div class="brand-title">ScannerX</div>
+      <div class="brand-sub">Market Intelligence</div>
+    </div>
+
+  </div>
+
+  <!-- ================= NAV LINKS ================= -->
+  <a href="{% url 'home'%}">Home</a>
+  <a href="{% url 'fundamentals' %}">Fundamentals</a>
+  <a href="{% url 'futures' %}">Futures</a>
+  <a href="{% url 'sector_chart' %}">Sector Trend</a>
+  <a href="{% url 'sector' %}">Daily Sector</a>
+  <a href="{% url 'industry_weekly' %}">Weekly Industry</a>
+  <a href="{% url 'industry_today' %}">Daily Industry</a>
+  <a href="{% url 'industry_rs' %}">Industry RS</a>
+  <a href="{% url 'equity_ranking' %}">Equity Rank</a>
+  <a href="{% url 'metrics' %}">Metrics</a>
+  <a href="{% url 'ma_structure' %}">MA Groups</a>
+  <a href="{% url 'keltner_scan' %}">Keltner</a>
+  <a href="{% url 'fib_scan' %}">Fibonacci</a>
+  <a href="{% url 'rs_alignment' %}">Correlation</a>
+  <a href="{% url 'industry_dashboard' %}">Charts</a>
+
+  <!-- ================= USER SECTION ================= -->
+  <div class="nav-right">
+
+    {% if request.user.is_authenticated %}
+
+      <div class="user-panel">
+
+        <div class="user-chip">
+
+          <div class="user-avatar">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div class="user-info">
+            <div class="user-label">Signed in</div>
+            <div class="user-name">{{ request.user.username }}</div>
+          </div>
+
+        </div>
+
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="auth-btn logout-btn">
+            Logout
+          </button>
+        </form>
+
+      </div>
+
+    {% else %}
+
+      <a href="{% url 'login' %}" class="auth-btn">
+        Login
+      </a>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+<div class="container">
+
+
+<div class="container">
+
+<!-- ================= TITLE ================= -->
+
+<h1>RSI Scan</h1>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="card desc">
+
+RSI(14) momentum oscillator<br>
+Measures the speed and magnitude of price changes<br>
+Identifies overbought and oversold conditions<br>
+Highlights momentum shifts and trend strength<br>
+
+<strong>Interpretation</strong><br>
+
+🟢 Bullish = RSI above 50<br>
+🟡 Neutral = RSI between 30 and 70<br>
+🔴 Bearish = RSI below 50<br>
+
+<strong>Key Levels</strong><br>
+
+70+ = Overbought<br>
+30− = Oversold<br>
+50 = Momentum Pivot<br>
+
+<strong>Default Chart</strong><br>
+Auto-loads <b>S&P500</b> RSI(14) structure
+
+</div>
+
+<!-- ================= INPUT ================= -->
+
+<div class="card">
+
+<form method="get">
+    <input type="text"
+           name="ticker"
+           value="{{ selected_ticker }}"
+           placeholder="Switch ticker (e.g. AAPL)">
+    <button type="submit">Switch</button>
+</form>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<div class="card">
+    {% if chart %}
+        {{ chart|safe }}
+    {% endif %}
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=ticker">Ticker</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Close">Close</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=RSI14">RSI14</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=Volume">Volume</a>
+</th>
+
+<th>
+<a href="?ticker={{ selected_ticker }}&sort=RSI14_slope">RSI14_slope</a>
+</th>
+
+
+</tr>
+</thead>
+
+{% if not request.user.is_authenticated %}
+
+<div class="login-overlay">
+
+    <p>
+        🔒 Preview mode showing only the first 2 Keltner setups.
+        Login to unlock the complete scanner.
+    </p>
+
+    <a href="{% url 'login' %}" class="auth-btn">
+        Login to Unlock
+    </a>
+
+</div>
+
+{% endif %}
+
+<tbody>
+
+{% for row in data %}
+
+    {% if request.user.is_authenticated or forloop.counter <= 2 %}
+
+    <tr>
+
+        <td>
+            <a class="ticker-link"
+               href="?ticker={{ row.TICKER }}">
+                {{ row.TICKER }}
+            </a>
+        </td>
+
+        <td>{{ row.Close }}</td>
+        <td>{{ row.RSI14 }}</td>
+        <td>{{ row.Volume }}</td>
+        <td>{{ row.RSI14_slope }}</td>
+
+    </tr>
+
+    {% endif %}
+
+{% endfor %}
+
+{% if not request.user.is_authenticated %}
+
+<tr class="locked-preview">
+
+    <td>NVDA</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+
+</tr>
+
+<tr class="locked-preview">
+
+    <td>AAPL</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+
+</tr>
+
+<tr class="locked-preview">
+
+    <td>MSFT</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+    <td>###</td>
+
+</tr>
+
+{% endif %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>
