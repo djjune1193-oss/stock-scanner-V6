@@ -208,6 +208,97 @@ body {
   box-shadow: 0 0 10px rgba(96,165,250,0.2);
 }
 
+
+/* ================= NEWS TICKER ================= */
+
+.news-ticker {
+
+  margin: 14px 0 2px 0;
+
+  background: #0b1220;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  position: relative;
+
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+}
+
+.news-label {
+
+    flex-shrink: 0;
+
+    margin-left: 10px;
+    margin-right: 14px;
+
+    background: #111827;
+    border: 1px solid #374151;
+
+    color: #e5e7eb;
+
+    padding: 7px 14px;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+.news-scroll {
+    display: flex;
+    width: max-content;
+    white-space: nowrap;
+    animation: ticker-scroll 300s linear infinite;
+}
+
+.news-scroll:hover {
+  animation-play-state: paused;
+}
+
+.news-item {
+
+  color: #e5e7eb;
+
+  text-decoration: none;
+
+  margin-right: 50px;
+
+  font-size: 13px;
+}
+
+.news-item:hover {
+
+  color: #60a5fa;
+}
+
+.news-time {
+
+  color: #64748b;
+
+  margin-right: 8px;
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+
 /* ================= AUTH BUTTON (UNIFIED STYLE) ================= */
 
 .auth-btn {
@@ -330,7 +421,7 @@ h1 {
 
 .section-title {
 
-  margin: 22px 0 14px;
+  margin: 10px 0 10px;
 
   font-size: 13px;
 
@@ -623,6 +714,61 @@ tr:hover {
     {% endfor %}
 {% endif %}
 </div>
+
+
+
+<!-- ================= NEWS TICKER ================= -->
+
+
+<div class="container">
+{% if headlines %}
+
+<div class="news-ticker">
+
+  <div class="news-scroll">
+
+    {% for h in headlines %}
+
+      <a
+        href="{{ h.url }}"
+        target="_blank"
+        class="news-item"
+      >
+        <span class="news-time">
+          {{ h.datetime }}
+        </span>
+
+        {{ h.headline }}
+      </a>
+
+    {% endfor %}
+
+    <!-- duplicate for seamless loop -->
+
+    {% for h in headlines %}
+
+      <a
+        href="{{ h.url }}"
+        target="_blank"
+        class="news-item"
+      >
+        <span class="news-time">
+          {{ h.datetime }}
+        </span>
+
+        {{ h.headline }}
+      </a>
+
+    {% endfor %}
+
+  </div>
+
+</div>
+
+{% endif %}
+
+</div>
+
 
 <div class="container">
 

@@ -412,6 +412,27 @@ def home(request):
             "row_class": get_row_class(r["perc_change"])
         })
 
+    # =========================================================
+    # NEWS HEADLINES
+    # =========================================================
+
+    headline_path = (
+        BASE_DIR
+        / "scanner_site"
+        / "data"
+        / "top_headlines.parquet"
+    )
+
+    headlines = []
+
+    try:
+        news_df = pd.read_parquet(headline_path)
+
+        headlines = news_df.to_dict("records")
+
+    except Exception:
+        headlines = []
+
     return render(
         request,
         "scanner_dashboard/home.html",
@@ -420,6 +441,7 @@ def home(request):
             "columns": selected_columns,
             "rows": rows,
             "mhi": mhi,
+            "headlines": headlines,
             "index_values": index_values,
             "up_count": int(up_count),
             "down_count": int(down_count),
@@ -2254,12 +2276,58 @@ def equity_chart(request, ticker):
             }
 
     # =====================================================
+    # NEWS (TICKER-LEVEL)
+    # =====================================================
+
+    NEWS_PATH = BASE_DIR / "scanner_site" / "data" / "ticker_news.parquet"
+
+    news_list = []
+
+    if NEWS_PATH.exists():
+
+        news_df = pd.read_parquet(NEWS_PATH)
+
+        # normalize ticker column (your dataset may use different names)
+        if "Ticker" in news_df.columns:
+            col = "Ticker"
+        elif "related" in news_df.columns:
+            col = "related"
+        else:
+            col = None
+
+        if col:
+
+            ticker_news = news_df[
+                news_df[col] == ticker
+            ].copy()
+
+            if not ticker_news.empty:
+
+                # clean + sort
+                ticker_news["datetime"] = pd.to_datetime(
+                    ticker_news["datetime"],
+                    errors="coerce",
+                    unit="s"
+                )
+
+                ticker_news = ticker_news.sort_values(
+                    "datetime",
+                    ascending=False
+                )
+
+                ticker_news = ticker_news.head(15)
+
+                news_list = ticker_news.to_dict("records")
+
+
+    # =====================================================
     # CONTEXT
     # =====================================================
 
     context = {
 
         "ticker": ticker,
+        "news": news_list,
 
         # Chart
         "dates":

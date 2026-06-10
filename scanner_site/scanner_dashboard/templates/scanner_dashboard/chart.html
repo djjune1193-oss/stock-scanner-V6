@@ -237,6 +237,68 @@ body {
   color: #e2e8f0;
 }
 
+
+/* ================= NEWS PANEL (SEPARATED) ================= */
+
+.news-panel{
+  background: linear-gradient(135deg, #0b1220, #0f172a);
+  border: 1px solid #334155;
+  border-left: 4px solid #f59e0b; /* 🔥 orange accent = news identity */
+  border-radius: 14px;
+
+  padding: 12px;
+  margin: 10px 0 16px 0;  /* 👈 gives breathing space from chart */
+  box-shadow: 0 0 12px rgba(245,158,11,0.08);
+}
+
+/* header */
+.news-header{
+  font-size: 11px;
+  font-weight: 800;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+/* scroll row */
+.news-scroll{
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.news-scroll::-webkit-scrollbar{
+  display: none;
+}
+
+/* item */
+.news-item{
+  color: #e2e8f0;
+  font-size: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(148,163,184,0.15);
+}
+
+.news-item:hover{
+  background: rgba(245,158,11,0.10);
+  border-color: rgba(245,158,11,0.4);
+  color: #fbbf24;
+}
+
+.news-time{
+  color: #94a3b8;
+  margin-right: 6px;
+  font-size: 11px;
+}
+
 /* ================= HEADER ================= */
 
 
@@ -719,6 +781,37 @@ td{
       </div>
 
     </div>
+
+{% if news %}
+
+<div class="news-panel">
+
+  <div class="news-header">
+    📰 Latest News
+  </div>
+
+  <div class="news-scroll">
+
+    {% for n in news %}
+
+      <a class="news-item" href="{{ n.url }}" target="_blank">
+
+        <span class="news-time">
+          {{ n.datetime }}
+        </span>
+
+        {{ n.headline }}
+
+      </a>
+
+    {% endfor %}
+
+  </div>
+
+</div>
+
+{% endif %}
+
 
   <!-- =========================================
        CHART
