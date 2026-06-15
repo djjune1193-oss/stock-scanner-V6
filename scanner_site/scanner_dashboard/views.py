@@ -908,7 +908,8 @@ def sector_view(request):
         "Close",
         "Open",
         "High",
-        "Low"
+        "Low",
+        "perc_change"
     ]
 
     sector_df[round_cols] = (

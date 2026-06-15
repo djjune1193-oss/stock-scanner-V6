@@ -129,6 +129,17 @@ tbody tr:hover {
 
 /* TICKER */
 
+.ticker {
+  color: #60a5fa;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.ticker:hover {
+  text-decoration: underline;
+}
+
+
 td:first-child {
     font-weight: 700;
     color: #93c5fd;
@@ -171,9 +182,11 @@ td:first-child {
             <tr>
 
                 <!-- TICKER -->
-                <td>
-                    {{ row.TICKER }}
-                </td>
+  <td>
+    <a class="ticker" href="{% url 'equity_chart' row.TICKER %}">
+      {{ row.TICKER }}
+    </a>
+  </td>
 
                 <!-- DAILY RETURN -->
                 <td class="
