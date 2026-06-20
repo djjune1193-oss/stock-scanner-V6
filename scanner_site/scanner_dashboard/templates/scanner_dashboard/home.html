@@ -547,14 +547,22 @@ h1 {
 /* ================= TABLE ================= */
 
 .table-wrap {
-  overflow-x: auto;
   background: #1f2937;
-  padding: 10px;
+
+  padding: 10px 16px;     /* left/right breathing room */
   border-radius: 10px;
+
+  width: 1200px;           /* 👈 reduced fixed width (adjust 800–1000px as needed) */
+  height: 420px;          /* 👈 fixed height (controls “length”) */
+
+  overflow: auto;         /* scroll BOTH X and Y if needed */
+
+  margin: 0 auto;         /* center on page */
 }
 
+/* table inside fixed container */
 table {
-  width: 100%;
+  width: 100%;            /* fill container */
   border-collapse: collapse;
   font-size: 12px;
 }
